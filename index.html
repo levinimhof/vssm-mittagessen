@@ -119,7 +119,22 @@
     .ca-ok:hover{background:var(--green-dark);}
     .ca-red{background:none;border:0.5px solid var(--red-border);color:var(--red);}
     .ca-red:hover{background:var(--red-bg);}
-    #custom-field{display:none;}
+
+    .pin-wrap{position:relative;display:flex;align-items:center;margin-bottom:1rem;}
+    .pin-wrap input{margin-bottom:0;flex:1;padding-right:44px;}
+    .eye-btn{position:absolute;right:10px;background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;display:flex;align-items:center;user-select:none;-webkit-user-select:none;}
+    .eye-btn:hover{color:var(--text2);}
+
+    .pin-wrap{position:relative;margin-bottom:1rem;}
+    .pin-wrap input{margin-bottom:0;padding-right:44px;}
+    .eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;display:flex;align-items:center;user-select:none;}
+    .eye-btn:hover{color:var(--text2);}
+
+    .pin-wrap{position:relative;display:flex;align-items:center;margin-bottom:1rem;}
+    .pin-wrap input{margin-bottom:0;padding-right:44px;}
+    .pin-eye{position:absolute;right:10px;background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;display:flex;align-items:center;justify-content:center;user-select:none;}
+    .pin-eye:hover{color:var(--text2);}
+        #custom-field{display:none;}
     #gruppe-fields{display:none;}
     @media(max-width:480px){.app{padding:1rem 0.75rem 3rem;}.app-title{font-size:18px;}}
   </style>
@@ -257,21 +272,33 @@
               <label for="l-email">E-Mail</label>
               <input type="email" id="l-email" placeholder="admin@beispiel.ch" />
               <label for="l-pin">PIN</label>
-              <input type="password" id="l-pin" placeholder="····" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()" />
+              <div class="pin-wrap">
+                <div class="pin-wrap"><div class="pin-wrap"><input type="password" id="l-pin" placeholder="····" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()" style="margin-bottom:0;" /><button class="pin-eye" onmousedown="toggleEye('l-pin',true)" onmouseup="toggleEye('l-pin',false)" onmouseleave="toggleEye('l-pin',false)" ontouchstart="toggleEye('l-pin',true)" ontouchend="toggleEye('l-pin',false)" tabindex="-1"><i class="ti ti-eye"></i></button></div><button class="eye-btn" type="button" onmousedown="showPin('l-pin')" onmouseup="hidePin('l-pin')" onmouseleave="hidePin('l-pin')" ontouchstart="showPin('l-pin')" ontouchend="hidePin('l-pin')" title="PIN anzeigen"><i class="ti ti-eye" id="eye-l-pin"></i></button></div>
+                <button class="eye-btn" onmousedown="showPin('l-pin')" onmouseup="hidePin('l-pin')" onmouseleave="hidePin('l-pin')" ontouchstart="showPin('l-pin')" ontouchend="hidePin('l-pin')" tabindex="-1"><i class="ti ti-eye" style="font-size:18px"></i></button>
+              </div>
               <div class="field-err" id="l-err"></div>
               <button class="btn-green-full" onclick="doLogin()"><i class="ti ti-login"></i>Einloggen</button>
             </div>
             <!-- Register -->
             <div id="aform-register" class="auth-form-wrap" style="display:none;">
-              <div class="info-box" style="margin-bottom:1rem;"><i class="ti ti-key" style="font-size:16px;flex-shrink:0"></i><span>Registrierung ist nur mit dem internen Zugangscode möglich.</span></div>
+              <div class="info-box" style="margin-bottom:1rem;"><i class="ti ti-key" style="font-size:16px;flex-shrink:0"></i><span>Registrierung mit internem Zugangscode. Super Admins können alle Admins verwalten.</span></div>
               <label for="r-code">Registrierungscode</label>
-              <input type="password" id="r-code" placeholder="Interner Zugangscode" />
+              <div class="pin-wrap">
+                <div class="pin-wrap"><div class="pin-wrap"><input type="password" id="r-code" placeholder="Interner Zugangscode" style="margin-bottom:0;" /><button class="pin-eye" onmousedown="toggleEye('r-code',true)" onmouseup="toggleEye('r-code',false)" onmouseleave="toggleEye('r-code',false)" ontouchstart="toggleEye('r-code',true)" ontouchend="toggleEye('r-code',false)" tabindex="-1"><i class="ti ti-eye"></i></button></div><button class="eye-btn" type="button" onmousedown="showPin('r-code')" onmouseup="hidePin('r-code')" onmouseleave="hidePin('r-code')" ontouchstart="showPin('r-code')" ontouchend="hidePin('r-code')" title="PIN anzeigen"><i class="ti ti-eye" id="eye-r-code"></i></button></div>
+                <button class="eye-btn" onmousedown="showPin('r-code')" onmouseup="hidePin('r-code')" onmouseleave="hidePin('r-code')" ontouchstart="showPin('r-code')" ontouchend="hidePin('r-code')" tabindex="-1"><i class="ti ti-eye" style="font-size:18px"></i></button>
+              </div>
               <label for="r-email">E-Mail</label>
               <input type="email" id="r-email" placeholder="admin@beispiel.ch" />
               <label for="r-pin">PIN (mind. 4 Zeichen)</label>
-              <input type="password" id="r-pin" placeholder="Neuer PIN" inputmode="numeric" />
+              <div class="pin-wrap">
+                <div class="pin-wrap"><div class="pin-wrap"><input type="password" id="r-pin" placeholder="Neuer PIN" inputmode="numeric" style="margin-bottom:0;" /><button class="pin-eye" onmousedown="toggleEye('r-pin',true)" onmouseup="toggleEye('r-pin',false)" onmouseleave="toggleEye('r-pin',false)" ontouchstart="toggleEye('r-pin',true)" ontouchend="toggleEye('r-pin',false)" tabindex="-1"><i class="ti ti-eye"></i></button></div><button class="eye-btn" type="button" onmousedown="showPin('r-pin')" onmouseup="hidePin('r-pin')" onmouseleave="hidePin('r-pin')" ontouchstart="showPin('r-pin')" ontouchend="hidePin('r-pin')" title="PIN anzeigen"><i class="ti ti-eye" id="eye-r-pin"></i></button></div>
+                <button class="eye-btn" onmousedown="showPin('r-pin')" onmouseup="hidePin('r-pin')" onmouseleave="hidePin('r-pin')" ontouchstart="showPin('r-pin')" ontouchend="hidePin('r-pin')" tabindex="-1"><i class="ti ti-eye" style="font-size:18px"></i></button>
+              </div>
               <label for="r-pin2">PIN wiederholen</label>
-              <input type="password" id="r-pin2" placeholder="PIN wiederholen" inputmode="numeric" />
+              <div class="pin-wrap">
+                <div class="pin-wrap"><div class="pin-wrap"><input type="password" id="r-pin2" placeholder="PIN wiederholen" inputmode="numeric" style="margin-bottom:0;" /><button class="pin-eye" onmousedown="toggleEye('r-pin2',true)" onmouseup="toggleEye('r-pin2',false)" onmouseleave="toggleEye('r-pin2',false)" ontouchstart="toggleEye('r-pin2',true)" ontouchend="toggleEye('r-pin2',false)" tabindex="-1"><i class="ti ti-eye"></i></button></div><button class="eye-btn" type="button" onmousedown="showPin('r-pin2')" onmouseup="hidePin('r-pin2')" onmouseleave="hidePin('r-pin2')" ontouchstart="showPin('r-pin2')" ontouchend="hidePin('r-pin2')" title="PIN anzeigen"><i class="ti ti-eye" id="eye-r-pin2"></i></button></div>
+                <button class="eye-btn" onmousedown="showPin('r-pin2')" onmouseup="hidePin('r-pin2')" onmouseleave="hidePin('r-pin2')" ontouchstart="showPin('r-pin2')" ontouchend="hidePin('r-pin2')" tabindex="-1"><i class="ti ti-eye" style="font-size:18px"></i></button>
+              </div>
               <div class="field-err" id="r-err"></div>
               <button class="btn-green-full" onclick="doRegister()"><i class="ti ti-user-plus"></i>Registrieren</button>
             </div>
@@ -317,7 +344,7 @@
         <!-- Anmeldeschluss -->
         <div class="card-title" style="margin-bottom:0.5rem;"><i class="ti ti-calendar"></i>Anmeldeschluss</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:0.75rem;">Datum und Uhrzeit bis wann Anmeldungen möglich sind.</div>
-        <input type="datetime-local" id="inp-deadline-dt" min="2026-01-01T00:00" value="2026-07-01T11:00" />
+        <input type="datetime-local" id="inp-deadline-dt"  />
         <div class="confirm-panel" id="confirm-deadline">
           <div class="confirm-panel-title"><i class="ti ti-calendar-check" style="color:var(--green)"></i>Anmeldeschluss ändern?</div>
           <div class="confirm-summary" id="confirm-deadline-summary"></div>
@@ -333,12 +360,20 @@
         <!-- PIN ändern -->
         <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-lock"></i>PIN ändern</div>
         <label for="inp-pin-current">Aktueller PIN</label>
-        <input type="password" id="inp-pin-current" placeholder="Aktueller PIN" inputmode="numeric" />
+        <div class="pin-wrap">
+          <div class="pin-wrap"><div class="pin-wrap"><input type="password" id="inp-pin-current" placeholder="Aktueller PIN" inputmode="numeric" style="margin-bottom:0;" /><button class="pin-eye" onmousedown="toggleEye('inp-pin-current',true)" onmouseup="toggleEye('inp-pin-current',false)" onmouseleave="toggleEye('inp-pin-current',false)" ontouchstart="toggleEye('inp-pin-current',true)" ontouchend="toggleEye('inp-pin-current',false)" tabindex="-1"><i class="ti ti-eye"></i></button></div><button class="eye-btn" type="button" onmousedown="showPin('inp-pin-current')" onmouseup="hidePin('inp-pin-current')" onmouseleave="hidePin('inp-pin-current')" ontouchstart="showPin('inp-pin-current')" ontouchend="hidePin('inp-pin-current')" title="PIN anzeigen"><i class="ti ti-eye" id="eye-inp-pin-current"></i></button></div>
+          <button class="eye-btn" onmousedown="showPin('inp-pin-current')" onmouseup="hidePin('inp-pin-current')" onmouseleave="hidePin('inp-pin-current')" ontouchstart="showPin('inp-pin-current')" ontouchend="hidePin('inp-pin-current')" tabindex="-1"><i class="ti ti-eye" style="font-size:18px"></i></button>
+        </div>
         <div class="field-err" id="err-current"></div>
         <label for="inp-pin-new">Neuer PIN</label>
-        <input type="password" id="inp-pin-new" placeholder="Neuer PIN" inputmode="numeric" />
+        <div class="pin-wrap">
+          <div class="pin-wrap"><div class="pin-wrap"><input type="password" id="inp-pin-new" placeholder="Neuer PIN" inputmode="numeric" style="margin-bottom:0;" /><button class="pin-eye" onmousedown="toggleEye('inp-pin-new',true)" onmouseup="toggleEye('inp-pin-new',false)" onmouseleave="toggleEye('inp-pin-new',false)" ontouchstart="toggleEye('inp-pin-new',true)" ontouchend="toggleEye('inp-pin-new',false)" tabindex="-1"><i class="ti ti-eye"></i></button></div><button class="eye-btn" type="button" onmousedown="showPin('inp-pin-new')" onmouseup="hidePin('inp-pin-new')" onmouseleave="hidePin('inp-pin-new')" ontouchstart="showPin('inp-pin-new')" ontouchend="hidePin('inp-pin-new')" title="PIN anzeigen"><i class="ti ti-eye" id="eye-inp-pin-new"></i></button></div>
+          <button class="eye-btn" onmousedown="showPin('inp-pin-new')" onmouseup="hidePin('inp-pin-new')" onmouseleave="hidePin('inp-pin-new')" ontouchstart="showPin('inp-pin-new')" ontouchend="hidePin('inp-pin-new')" tabindex="-1"><i class="ti ti-eye" style="font-size:18px"></i></button>
+        </div>
         <label for="inp-pin-repeat">Neuer PIN wiederholen</label>
-        <input type="password" id="inp-pin-repeat" placeholder="Neuer PIN wiederholen" style="margin-bottom:4px;" inputmode="numeric" />
+        <div class="pin-wrap" style="margin-bottom:0.5rem;"><input type="password" id="inp-pin-repeat" placeholder="Neuer PIN wiederholen" inputmode="numeric" style="margin-bottom:0;" /><button class="pin-eye" onmousedown="toggleEye('inp-pin-repeat',true)" onmouseup="toggleEye('inp-pin-repeat',false)" onmouseleave="toggleEye('inp-pin-repeat',false)" ontouchstart="toggleEye('inp-pin-repeat',true)" ontouchend="toggleEye('inp-pin-repeat',false)" tabindex="-1"><i class="ti ti-eye"></i></button></div>
+          <button class="eye-btn" onmousedown="showPin('inp-pin-repeat')" onmouseup="hidePin('inp-pin-repeat')" onmouseleave="hidePin('inp-pin-repeat')" ontouchstart="showPin('inp-pin-repeat')" ontouchend="hidePin('inp-pin-repeat')" tabindex="-1"><i class="ti ti-eye" style="font-size:18px"></i></button>
+        </div>
         <div class="field-err" id="err-repeat"></div>
         <div class="confirm-panel" id="confirm-pin">
           <div class="confirm-panel-title"><i class="ti ti-lock-check" style="color:var(--green)"></i>PIN wirklich ändern?</div>
@@ -405,6 +440,9 @@ const EMAILJS_SERVICE='service_vssm';
 const EMAILJS_TEMPLATE='template_pinreset';
 const EMAILJS_PUBLIC='YOUR_EMAILJS_PUBLIC_KEY';
 const REG_CODE='VSSM2026';
+  const SUPER_REG_CODE='VSSM-SUPER-2026';
+  const SUPER_CODE='VSSM-SUPER-2026';
+  const SUPER_CODE='VSSM-SUPER-2026';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let orders=[], deadlineStr='', currentAdmin=null, pendingNewPin='', pendingPayload=null;
@@ -412,6 +450,35 @@ let pendingDeleteAdminId=null, lockoutInterval=null;
 let activeEditId=null;
 
 emailjs.init(EMAILJS_PUBLIC);
+
+function showPin(id){
+  const el=document.getElementById(id);
+  if(el){el.type='text';}
+}
+function hidePin(id){
+  const el=document.getElementById(id);
+  if(el){el.type='password';}
+}
+
+
+function showPin(id){
+  const el=document.getElementById(id);
+  if(el)el.type='text';
+  const eye=document.getElementById('eye-'+id);
+  if(eye)eye.className='ti ti-eye-off';
+}
+function hidePin(id){
+  const el=document.getElementById(id);
+  if(el)el.type='password';
+  const eye=document.getElementById('eye-'+id);
+  if(eye)eye.className='ti ti-eye';
+}
+
+
+function toggleEye(id, show){
+  const el=document.getElementById(id);
+  if(el)el.type=show?'text':'password';
+}
 function hashPin(pin){return btoa(unescape(encodeURIComponent('vssm_salt_2026_'+pin)));}
 
 // ── Load ──────────────────────────────────────────────────────────────────
@@ -438,18 +505,21 @@ async function loadOrders(){
 }
 
 async function loadAdmins(){
-  const {data}=await sb.from('admins').select('id,email,created_at').order('created_at',{ascending:true});
+  const {data}=await sb.from('admins').select('id,email,role,created_at').order('created_at',{ascending:true});
   const el=document.getElementById('admin-list');
   if(!data||data.length===0){el.innerHTML='<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Admins gefunden</div>';return;}
   el.innerHTML=data.map(a=>{
     const isMe=currentAdmin&&a.id===currentAdmin.id;
+    const isSuper=currentAdmin&&currentAdmin.role==='super';
+    const canDelete=isMe||(isSuper&&!isMe);
+    const roleTag=a.role==='super'?'<span style="font-size:11px;background:var(--amber-bg);color:var(--amber);padding:1px 7px;border-radius:99px;font-weight:600;margin-left:4px;">Super Admin</span>':'';
     return`<div class="admin-list-item">
       <div class="admin-badge${isMe?' admin-badge-me':''}"><i class="ti ti-shield${isMe?'-check':''}"></i></div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:500;">${esc(a.email)}${isMe?'&nbsp;<span style="font-size:11px;background:var(--green-bg);color:var(--green);padding:1px 7px;border-radius:99px;font-weight:600;">Ich</span>':''}</div>
+        <div style="font-size:14px;font-weight:500;">${esc(a.email)}${isMe?'&nbsp;<span style="font-size:11px;background:var(--green-bg);color:var(--green);padding:1px 7px;border-radius:99px;font-weight:600;">Ich</span>':''}${roleTag}</div>
         <div style="font-size:12px;color:var(--text2);">Seit ${new Date(a.created_at).toLocaleDateString('de-CH')}</div>
       </div>
-      <button class="icon-btn del" onclick="initDeleteAdmin('${a.id}','${esc(a.email)}')" title="Admin löschen"><i class="ti ti-user-x" style="font-size:15px"></i></button>
+      ${canDelete?`${(currentAdmin&&(currentAdmin.role==='super'||a.id===currentAdmin.id))?`<button class="icon-btn del" onclick="initDeleteAdmin('${a.id}','${esc(a.email)}')" title="Admin löschen"><i class="ti ti-user-x" style="font-size:15px"></i></button>`:''}`:''}
     </div>`;
   }).join('');
 }
@@ -713,7 +783,8 @@ async function doRegister(){
   if(!email){errEl.textContent='Bitte E-Mail eingeben.';errEl.style.display='block';return;}
   if(!pin||pin.length<4){errEl.textContent='PIN muss mind. 4 Zeichen sein.';errEl.style.display='block';return;}
   if(pin!==pin2){errEl.textContent='PINs stimmen nicht überein.';errEl.style.display='block';return;}
-  const {error}=await sb.from('admins').insert({email,pin_hash:hashPin(pin)});
+  const isSuper=code===SUPER_CODE;
+  const {error}=await sb.from('admins').insert({email,pin_hash:hashPin(pin),role:isSuper?'super':'admin'});
   if(error){errEl.textContent=error.code==='23505'?'E-Mail bereits registriert.':'Fehler bei Registrierung.';errEl.style.display='block';return;}
   showAuthTab('login');
   const le=document.getElementById('l-err');le.style.color='var(--green)';
@@ -747,9 +818,15 @@ function showPinResetForm(token){
     <div style="text-align:left;width:100%;max-width:320px;">
       <div class="info-box" style="margin-bottom:1rem;"><i class="ti ti-lock" style="font-size:16px;flex-shrink:0"></i><span>Neuen PIN eingeben.</span></div>
       <label>Neuer PIN (mind. 4 Zeichen)</label>
-      <input type="password" id="nr-pin" placeholder="Neuer PIN" inputmode="numeric" style="width:100%;" />
+      <div class="pin-wrap">
+        <div class="pin-wrap"><input type="password" id="nr-pin" placeholder="Neuer PIN" inputmode="numeric" style="width:100%;" /><button class="eye-btn" type="button" onmousedown="showPin('nr-pin')" onmouseup="hidePin('nr-pin')" onmouseleave="hidePin('nr-pin')" ontouchstart="showPin('nr-pin')" ontouchend="hidePin('nr-pin')" title="PIN anzeigen"><i class="ti ti-eye" id="eye-nr-pin"></i></button></div>
+        <button class="eye-btn" onmousedown="showPin('nr-pin')" onmouseup="hidePin('nr-pin')" onmouseleave="hidePin('nr-pin')" ontouchstart="showPin('nr-pin')" ontouchend="hidePin('nr-pin')" tabindex="-1"><i class="ti ti-eye" style="font-size:18px"></i></button>
+      </div>
       <label>PIN wiederholen</label>
-      <input type="password" id="nr-pin2" placeholder="PIN wiederholen" inputmode="numeric" style="width:100%;margin-bottom:4px;" />
+      <div class="pin-wrap">
+        <div class="pin-wrap"><input type="password" id="nr-pin2" placeholder="PIN wiederholen" inputmode="numeric" /><button class="eye-btn" type="button" onmousedown="showPin('nr-pin2')" onmouseup="hidePin('nr-pin2')" onmouseleave="hidePin('nr-pin2')" ontouchstart="showPin('nr-pin2')" ontouchend="hidePin('nr-pin2')" title="PIN anzeigen"><i class="ti ti-eye" id="eye-nr-pin2"></i></button></div>
+        <button class="eye-btn" onmousedown="showPin('nr-pin2')" onmouseup="hidePin('nr-pin2')" onmouseleave="hidePin('nr-pin2')" ontouchstart="showPin('nr-pin2')" ontouchend="hidePin('nr-pin2')" tabindex="-1"><i class="ti ti-eye" style="font-size:18px"></i></button>
+      </div>
       <div class="field-err" id="nr-err"></div>
       <button class="btn-green-full" style="margin-top:8px;" onclick="confirmPinReset('${token}')"><i class="ti ti-lock"></i>PIN zurücksetzen</button>
     </div>`;
