@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VSSM Mittagessen – Rothenburg</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #f5f5f3;
+      --bg3: #efefec;
+      --text: #1a1a1a;
+      --text2: #6b6b68;
+      --text3: #9b9b97;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.22);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --green-bg: #E1F5EE;
+      --green: #0F6E56;
+      --green-dark: #085041;
+      --red-bg: #FCEBEB;
+      --red: #A32D2D;
+      --red-border: #E24B4A;
+      --amber-bg: #FAEEDA;
+      --amber: #633806;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg2);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .app { max-width: 600px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+    .app-header { display: flex; align-items: center; gap: 14px; margin-bottom: 1.75rem; }
+    .app-icon { width: 48px; height: 48px; border-radius: var(--radius-lg); background: var(--green-bg); display: flex; align-items: center; justify-content: center; color: var(--green); font-size: 24px; flex-shrink: 0; }
+    .app-title { font-size: 20px; font-weight: 600; color: var(--text); }
+    .app-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+    .status-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 99px; font-size: 13px; font-weight: 500; margin-bottom: 1.5rem; }
+    .status-open { background: var(--green-bg); color: var(--green); }
+    .status-closed { background: var(--red-bg); color: var(--red); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+    .nav { display: flex; background: var(--bg3); border-radius: var(--radius-lg); padding: 4px; gap: 4px; margin-bottom: 1.5rem; }
+    .nav-btn { flex: 1; padding: 9px 4px; border: none; background: none; border-radius: var(--radius-md); cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text2); display: flex; align-items: center; justify-content: center; gap: 5px; transition: background 0.15s, color 0.15s; }
+    .nav-btn.active { background: var(--bg); color: var(--text); border: 0.5px solid var(--border); }
+    .nav-btn i { font-size: 16px; }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.25rem 1.5rem; margin-bottom: 1rem; position: relative; }
+    .card-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+    .card-title i { font-size: 17px; color: var(--text2); }
+
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 5px; letter-spacing: .03em; text-transform: uppercase; }
+
+    input, select {
+      width: 100%; margin-bottom: 1rem; font-size: 14px;
+      border: 0.5px solid var(--border2); border-radius: var(--radius-md);
+      padding: 9px 12px; background: var(--bg); color: var(--text);
+      outline: none; font-family: inherit;
+    }
+    input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(15,110,86,0.12); }
+
+    .toggle-row { display: flex; background: var(--bg2); border-radius: var(--radius-md); padding: 3px; gap: 3px; margin-bottom: 1rem; }
+    .toggle-opt { flex: 1; }
+    .toggle-opt input[type=radio] { display: none; }
+    .toggle-opt label { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text2); margin: 0; text-transform: none; letter-spacing: 0; }
+    .toggle-opt input[type=radio]:checked + label { background: var(--bg); color: var(--text); border: 0.5px solid var(--border); }
+
+    .btn-primary { width: 100%; padding: 12px; font-size: 15px; font-weight: 600; background: var(--green); color: #E1F5EE; border: none; border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; }
+    .btn-primary:hover { background: var(--green-dark); }
+
+    .btn-outline { padding: 8px 14px; font-size: 13px; font-weight: 500; border: 0.5px solid var(--border2); border-radius: var(--radius-md); background: none; cursor: pointer; color: var(--text2); display: inline-flex; align-items: center; gap: 5px; font-family: inherit; }
+    .btn-outline:hover { background: var(--bg2); }
+
+    .btn-logout { padding: 8px 14px; font-size: 13px; font-weight: 500; border: 0.5px solid var(--red-border); border-radius: var(--radius-md); background: none; cursor: pointer; color: var(--red); display: inline-flex; align-items: center; gap: 5px; font-family: inherit; }
+    .btn-logout:hover { background: var(--red-bg); }
+
+    .btn-danger-full { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; background: none; border: 0.5px solid var(--red-border); color: var(--red); border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+    .btn-danger-full:hover { background: var(--red-bg); }
+
+    .btn-green-full { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; background: var(--green); color: #E1F5EE; border: none; border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+    .btn-green-full:hover { background: var(--green-dark); }
+
+    .toast { background: var(--green-dark); color: #E1F5EE; border-radius: var(--radius-md); padding: 11px 14px; font-size: 13px; display: none; margin-top: 1rem; align-items: center; justify-content: center; gap: 6px; }
+
+    .order-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+    .order-item:last-child { border-bottom: none; }
+    .order-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green-bg); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--green); flex-shrink: 0; }
+    .order-info { flex: 1; min-width: 0; }
+    .order-name { font-size: 14px; font-weight: 500; color: var(--text); }
+    .order-rest { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    .tag-custom { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 99px; background: var(--amber-bg); color: var(--amber); margin-left: 5px; font-weight: 600; }
+    .order-del { background: none; border: none; cursor: pointer; color: var(--text3); padding: 5px; border-radius: 4px; display: flex; }
+    .order-del:hover { color: var(--red); background: var(--red-bg); }
+
+    .empty-state { text-align: center; padding: 2.5rem 0; color: var(--text2); font-size: 14px; }
+    .empty-state i { font-size: 36px; display: block; margin-bottom: 10px; color: var(--text3); }
+
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+    .stat { background: var(--bg2); border-radius: var(--radius-md); padding: 14px; }
+    .stat-num { font-size: 26px; font-weight: 700; color: var(--text); }
+    .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+    .group-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 0.5px solid var(--border); margin-bottom: 4px; }
+    .group-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .group-count { font-size: 11px; padding: 2px 9px; border-radius: 99px; background: var(--green-bg); color: var(--green); font-weight: 700; }
+
+    .pin-screen { display: flex; flex-direction: column; align-items: center; padding: 2.5rem 1.5rem; gap: 12px; text-align: center; }
+    .pin-icon { width: 60px; height: 60px; border-radius: var(--radius-lg); background: var(--green-bg); display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--green); }
+    .pin-icon-red { background: var(--red-bg); color: var(--red); }
+    .pin-input-wrap { display: flex; gap: 8px; margin-top: 4px; }
+    .pin-input-wrap input { width: 170px; text-align: center; letter-spacing: 6px; font-size: 22px; margin-bottom: 0; }
+    .pin-err { font-size: 13px; color: var(--red); display: none; }
+    .pin-attempts { font-size: 12px; color: var(--amber); background: var(--amber-bg); border-radius: var(--radius-md); padding: 7px 14px; display: none; font-weight: 500; }
+    .lockout-box { display: none; flex-direction: column; align-items: center; gap: 10px; }
+    .lockout-timer { font-size: 40px; font-weight: 700; color: var(--red); letter-spacing: 2px; }
+    .lockout-sub { font-size: 13px; color: var(--text2); }
+
+    .admin-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .divider { border: none; border-top: 0.5px solid var(--border); margin: 1.5rem 0; }
+
+    .time-picker { display: flex; align-items: center; gap: 6px; margin-bottom: 1rem; }
+    .time-select { width: 72px; margin-bottom: 0; text-align: center; font-size: 16px; font-weight: 600; padding: 8px 4px; }
+    .time-sep { font-size: 20px; font-weight: 600; color: var(--text); }
+
+    .reset-box { background: var(--red-bg); border: 0.5px solid #F09595; border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; }
+    .reset-box-title { font-size: 14px; font-weight: 600; color: var(--red); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .reset-box-sub { font-size: 13px; color: #791F1F; margin-bottom: 1rem; }
+
+    .field-err { font-size: 12px; color: var(--red); margin-top: -8px; margin-bottom: 10px; display: none; font-weight: 500; }
+
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+    .modal-backdrop.show { display: flex; }
+    .modal { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; max-width: 340px; width: 100%; text-align: center; }
+    .modal-icon { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 14px; }
+    .modal-icon-red { background: var(--red-bg); color: var(--red); }
+    .modal-icon-green { background: var(--green-bg); color: var(--green); }
+    .modal-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+    .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 8px; }
+    .modal-actions button { flex: 1; padding: 10px; font-size: 13px; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; font-family: inherit; }
+    .modal-cancel { background: none; border: 0.5px solid var(--border2); color: var(--text2); }
+    .modal-cancel:hover { background: var(--bg2); }
+    .modal-confirm-red { background: none; border: 0.5px solid var(--red-border); color: var(--red); }
+    .modal-confirm-red:hover { background: var(--red-bg); }
+    .modal-confirm-green { background: var(--green); border: none; color: #E1F5EE; }
+    .modal-confirm-green:hover { background: var(--green-dark); }
+
+    #custom-field { display: none; }
+
+    @media (max-width: 480px) {
+      .app { padding: 1rem 0.75rem 3rem; }
+      .app-title { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <div class="app-icon"><i class="ti ti-tools-kitchen-2"></i></div>
+    <div>
+      <div class="app-title">VSSM Mittagessen</div>
+      <div class="app-sub">Rothenburg · Schreiner Verband Luzern</div>
+    </div>
+  </div>
+
+  <div id="status-pill" class="status-pill status-open">
+    <span class="dot"></span>
+    <span id="status-text">Anmeldung offen bis <strong>11:00 Uhr</strong></span>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-btn active" id="tab-anmelden" onclick="switchTab('anmelden')"><i class="ti ti-pencil"></i>Anmelden</button>
+    <button class="nav-btn" id="tab-uebersicht" onclick="switchTab('uebersicht')"><i class="ti ti-list"></i>Übersicht</button>
+    <button class="nav-btn" id="tab-admin" onclick="switchTab('admin')"><i class="ti ti-lock"></i>Admin</button>
+  </nav>
+
+  <div id="view-anmelden" class="view active">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-user"></i>Restaurantwahl</div>
+      <div id="form-open">
+        <label for="inp-name">Ihr Name</label>
+        <input type="text" id="inp-name" placeholder="Vorname Nachname" autocomplete="name" />
+        <label>Restaurant</label>
+        <div class="toggle-row">
+          <div class="toggle-opt">
+            <input type="radio" name="rmode" id="rmode-list" checked onchange="toggleMode()">
+            <label for="rmode-list"><i class="ti ti-list" style="font-size:14px"></i>Aus Liste</label>
+          </div>
+          <div class="toggle-opt">
+            <input type="radio" name="rmode" id="rmode-custom" onchange="toggleMode()">
+            <label for="rmode-custom"><i class="ti ti-pencil" style="font-size:14px"></i>Eigenes</label>
+          </div>
+        </div>
+        <div id="list-field">
+          <select id="inp-restaurant">
+            <option value="">— bitte auswählen —</option>
+            <option>Gasthaus Ochsen</option>
+            <option>Gasthaus Bahnhof</option>
+            <option>Fläcke Restaurant</option>
+            <option>AMAYA Restaurant &amp; Bar</option>
+            <option>Ace Cafe Luzern</option>
+            <option>Chärnsmatt Gasthof</option>
+          </select>
+        </div>
+        <div id="custom-field">
+          <input type="text" id="inp-custom" placeholder="z.B. Restaurant Sonne, Luzern" />
+        </div>
+        <button class="btn-primary" onclick="submitOrder()"><i class="ti ti-check"></i>Anmelden</button>
+        <div class="toast" id="toast"><i class="ti ti-circle-check"></i>Anmeldung gespeichert!</div>
+      </div>
+      <div id="form-closed" style="display:none;">
+        <div class="empty-state">
+          <i class="ti ti-lock"></i>
+          <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Anmeldeschluss erreicht</div>
+          <div>Keine weiteren Anmeldungen möglich.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-uebersicht" class="view">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-users"></i>Alle Anmeldungen <span id="count-badge" style="font-size:12px;padding:2px 9px;border-radius:99px;background:var(--green-bg);color:var(--green);font-weight:700;margin-left:4px;">0</span></div>
+      <div id="list-orders"><div class="empty-state"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div></div>
+    </div>
+  </div>
+
+  <div id="view-admin" class="view">
+    <div class="card" id="admin-card">
+      <div id="pin-screen" class="pin-screen">
+        <div class="pin-icon" id="pin-icon"><i class="ti ti-shield-lock"></i></div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);" id="pin-title">Admin-Bereich</div>
+        <div style="font-size:13px;color:var(--text2);" id="pin-sub">PIN eingeben um fortzufahren</div>
+        <div id="pin-form">
+          <div class="pin-input-wrap">
+            <input type="password" id="inp-pin" placeholder="····" onkeydown="if(event.key==='Enter')checkPin()" inputmode="numeric" />
+            <button class="btn-outline" id="pin-submit-btn" onclick="checkPin()"><i class="ti ti-arrow-right"></i></button>
+          </div>
+          <div class="pin-err" id="pin-err"><i class="ti ti-alert-circle" style="vertical-align:-2px;margin-right:3px"></i><span id="pin-err-text">Falscher PIN</span></div>
+          <div class="pin-attempts" id="pin-attempts"></div>
+        </div>
+        <div class="lockout-box" id="lockout-box">
+          <div class="lockout-timer" id="lockout-timer">1:00</div>
+          <div class="lockout-sub">Bitte warten und danach erneut versuchen</div>
+        </div>
+      </div>
+
+      <div id="admin-content" style="display:none;">
+        <div class="admin-topbar">
+          <div class="card-title" style="margin-bottom:0;"><i class="ti ti-chart-bar"></i>Übersicht</div>
+          <button class="btn-logout" onclick="logout()"><i class="ti ti-logout"></i>Ausloggen</button>
+        </div>
+        <div class="stat-row">
+          <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Anmeldungen total</div></div>
+          <div class="stat"><div class="stat-num" id="stat-rests">0</div><div class="stat-label">Restaurants</div></div>
+        </div>
+        <div id="admin-groups"></div>
+
+        <hr class="divider">
+        <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-settings"></i>Einstellungen</div>
+        <label>Anmeldeschluss</label>
+        <div class="time-picker">
+          <select id="sel-h" class="time-select"></select>
+          <span class="time-sep">:</span>
+          <select id="sel-m" class="time-select"></select>
+          <span style="font-size:14px;color:var(--text2);margin-left:4px;">Uhr</span>
+          <button class="btn-outline" style="margin-left:10px;" onclick="saveDeadline()"><i class="ti ti-check"></i>Speichern</button>
+        </div>
+
+        <hr class="divider">
+        <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-lock"></i>PIN ändern</div>
+        <label for="inp-pin-current">Aktueller PIN</label>
+        <input type="password" id="inp-pin-current" placeholder="Aktueller PIN" inputmode="numeric" />
+        <div class="field-err" id="err-current"><i class="ti ti-alert-circle" style="vertical-align:-2px;margin-right:3px"></i>Falscher PIN</div>
+        <label for="inp-pin-new">Neuer PIN</label>
+        <input type="password" id="inp-pin-new" placeholder="Neuer PIN" inputmode="numeric" />
+        <label for="inp-pin-repeat">Neuer PIN wiederholen</label>
+        <input type="password" id="inp-pin-repeat" placeholder="Neuer PIN wiederholen" style="margin-bottom:4px;" inputmode="numeric" />
+        <div class="field-err" id="err-repeat"><i class="ti ti-alert-circle" style="vertical-align:-2px;margin-right:3px"></i>Die PINs stimmen nicht überein</div>
+        <button class="btn-green-full" onclick="initPinChange()" style="margin-top:10px;"><i class="ti ti-lock"></i>PIN ändern</button>
+
+        <hr class="divider">
+        <div class="reset-box">
+          <div class="reset-box-title"><i class="ti ti-refresh" style="font-size:16px"></i>Nächster Kurs</div>
+          <div class="reset-box-sub">Alle Anmeldungen löschen um für den nächsten Kurs neu zu starten.</div>
+          <button class="btn-danger-full" onclick="showResetModal()"><i class="ti ti-trash"></i>Alle Kursteilnehmer löschen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-reset">
+  <div class="modal">
+    <div class="modal-icon modal-icon-red"><i class="ti ti-trash"></i></div>
+    <div class="modal-title">Alle Anmeldungen löschen?</div>
+    <div class="modal-sub" id="modal-reset-sub">Diese Aktion kann nicht rückgängig gemacht werden.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="hideModal('modal-reset')">Abbrechen</button>
+      <button class="modal-confirm-red" onclick="confirmReset()">Ja, löschen</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-pin">
+  <div class="modal">
+    <div class="modal-icon modal-icon-green"><i class="ti ti-lock"></i></div>
+    <div class="modal-title">PIN wirklich ändern?</div>
+    <div class="modal-sub">Der aktuelle PIN wird durch den neuen PIN ersetzt. Bitte merken Sie sich den neuen PIN gut.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="hideModal('modal-pin')">Abbrechen</button>
+      <button class="modal-confirm-green" onclick="confirmPinChange()">Ja, ändern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SK='vssm_orders',DK='vssm_deadline',PK='vssm_pin';
+let orders=[],deadlineH=11,deadlineM=0,adminPin='1234',adminOpen=false;
+let failedAttempts=0,lockoutUntil=0,lockoutInterval=null,pendingNewPin='';
+
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+
+function buildSelects(){
+  const sh=document.getElementById('sel-h'),sm=document.getElementById('sel-m');
+  for(let h=6;h<=18;h++){const o=document.createElement('option');o.value=h;o.textContent=String(h).padStart(2,'0');if(h===deadlineH)o.selected=true;sh.appendChild(o);}
+  [0,15,30,45].forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=String(m).padStart(2,'0');if(m===deadlineM)o.selected=true;sm.appendChild(o);});
+}
+
+function load(){
+  const o=lsGet(SK);if(o){try{orders=JSON.parse(o);}catch(e){orders=[];}}
+  const d=lsGet(DK);if(d){const p=d.split(':');deadlineH=parseInt(p[0]);deadlineM=parseInt(p[1]);}
+  const p=lsGet(PK);if(p){adminPin=p;}
+  buildSelects();updateStatus();renderAll();
+}
+
+function isPast(){const n=new Date();return n.getHours()>deadlineH||(n.getHours()===deadlineH&&n.getMinutes()>=deadlineM);}
+function fmtTime(){return String(deadlineH).padStart(2,'0')+':'+String(deadlineM).padStart(2,'0');}
+
+function updateStatus(){
+  const past=isPast(),pill=document.getElementById('status-pill'),txt=document.getElementById('status-text'),t=fmtTime();
+  if(past){
+    pill.className='status-pill status-closed';
+    txt.innerHTML='<i class="ti ti-lock" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Anmeldeschluss war um <strong>'+t+' Uhr</strong>';
+    document.getElementById('form-open').style.display='none';
+    document.getElementById('form-closed').style.display='block';
+  }else{
+    pill.className='status-pill status-open';
+    txt.innerHTML='Anmeldung offen bis <strong>'+t+' Uhr</strong>';
+    document.getElementById('form-open').style.display='block';
+    document.getElementById('form-closed').style.display='none';
+  }
+}
+
+function toggleMode(){
+  const c=document.getElementById('rmode-custom').checked;
+  document.getElementById('list-field').style.display=c?'none':'block';
+  document.getElementById('custom-field').style.display=c?'block':'none';
+}
+
+function submitOrder(){
+  if(isPast())return;
+  const name=document.getElementById('inp-name').value.trim();
+  const isC=document.getElementById('rmode-custom').checked;
+  const rest=isC?document.getElementById('inp-custom').value.trim():document.getElementById('inp-restaurant').value;
+  if(!name||!rest){alert('Bitte Name und Restaurant eingeben.');return;}
+  orders.push({id:Date.now(),name,restaurant:rest,custom:isC});
+  lsSet(SK,JSON.stringify(orders));
+  document.getElementById('inp-name').value='';
+  document.getElementById('inp-restaurant').value='';
+  document.getElementById('inp-custom').value='';
+  document.getElementById('rmode-list').checked=true;toggleMode();
+  const t=document.getElementById('toast');t.style.display='flex';setTimeout(()=>t.style.display='none',2500);
+  renderAll();
+}
+
+function deleteOrder(id){
+  orders=orders.filter(o=>o.id!==id);
+  lsSet(SK,JSON.stringify(orders));
+  renderAll();
+}
+
+function isLockedOut(){return Date.now()<lockoutUntil;}
+
+function startLockout(){
+  lockoutUntil=Date.now()+60000;
+  document.getElementById('pin-form').style.display='none';
+  document.getElementById('lockout-box').style.display='flex';
+  document.getElementById('pin-icon').className='pin-icon pin-icon-red';
+  document.getElementById('pin-title').textContent='Zugang gesperrt';
+  document.getElementById('pin-sub').textContent='Zu viele falsche Versuche';
+  tickLockout();
+  lockoutInterval=setInterval(tickLockout,1000);
+}
+
+function tickLockout(){
+  const rem=Math.max(0,lockoutUntil-Date.now());
+  const s=Math.ceil(rem/1000),m=Math.floor(s/60),sec=s%60;
+  document.getElementById('lockout-timer').textContent=m+':'+String(sec).padStart(2,'0');
+  if(rem<=0){
+    clearInterval(lockoutInterval);lockoutInterval=null;failedAttempts=0;
+    document.getElementById('pin-form').style.display='block';
+    document.getElementById('lockout-box').style.display='none';
+    document.getElementById('pin-icon').className='pin-icon';
+    document.getElementById('pin-title').textContent='Admin-Bereich';
+    document.getElementById('pin-sub').textContent='PIN eingeben um fortzufahren';
+    document.getElementById('inp-pin').value='';
+    document.getElementById('pin-err').style.display='none';
+    document.getElementById('pin-attempts').style.display='none';
+  }
+}
+
+function checkPin(){
+  if(isLockedOut())return;
+  const val=document.getElementById('inp-pin').value;
+  if(val===adminPin){
+    failedAttempts=0;adminOpen=true;
+    document.getElementById('pin-screen').style.display='none';
+    document.getElementById('admin-content').style.display='block';
+    document.getElementById('tab-admin').innerHTML='<i class="ti ti-shield-check"></i>Admin';
+    renderAll();
+  }else{
+    failedAttempts++;
+    document.getElementById('inp-pin').value='';
+    const rem=5-failedAttempts;
+    if(failedAttempts>=5){startLockout();}
+    else{
+      document.getElementById('pin-err').style.display='block';
+      const att=document.getElementById('pin-attempts');
+      att.style.display='block';
+      att.textContent='Noch '+rem+' Versuch'+(rem===1?'':'e')+' — danach 1 Minute Sperre';
+    }
+  }
+}
+
+function logout(){
+  adminOpen=false;failedAttempts=0;
+  document.getElementById('pin-screen').style.display='flex';
+  document.getElementById('admin-content').style.display='none';
+  document.getElementById('pin-err').style.display='none';
+  document.getElementById('pin-attempts').style.display='none';
+  document.getElementById('inp-pin').value='';
+  document.getElementById('pin-icon').className='pin-icon';
+  document.getElementById('pin-title').textContent='Admin-Bereich';
+  document.getElementById('pin-sub').textContent='PIN eingeben um fortzufahren';
+  document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
+  switchTab('anmelden');
+}
+
+function showResetModal(){
+  document.getElementById('modal-reset-sub').textContent='Es werden '+orders.length+' Anmeldung'+(orders.length===1?'':'en')+' gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.';
+  document.getElementById('modal-reset').classList.add('show');
+}
+
+function confirmReset(){
+  orders=[];lsSet(SK,JSON.stringify(orders));
+  hideModal('modal-reset');renderAll();
+}
+
+function initPinChange(){
+  const current=document.getElementById('inp-pin-current').value;
+  const np=document.getElementById('inp-pin-new').value;
+  const rp=document.getElementById('inp-pin-repeat').value;
+  document.getElementById('err-current').style.display='none';
+  document.getElementById('err-repeat').style.display='none';
+  if(current!==adminPin){document.getElementById('err-current').style.display='block';return;}
+  if(!np){alert('Bitte neuen PIN eingeben.');return;}
+  if(np!==rp){document.getElementById('err-repeat').style.display='block';return;}
+  pendingNewPin=np;
+  document.getElementById('modal-pin').classList.add('show');
+}
+
+function confirmPinChange(){
+  adminPin=pendingNewPin;lsSet(PK,adminPin);
+  hideModal('modal-pin');
+  document.getElementById('inp-pin-current').value='';
+  document.getElementById('inp-pin-new').value='';
+  document.getElementById('inp-pin-repeat').value='';
+  pendingNewPin='';
+}
+
+function hideModal(id){document.getElementById(id).classList.remove('show');}
+
+function initials(n){return n.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderAll(){
+  document.getElementById('count-badge').textContent=orders.length;
+  const lo=document.getElementById('list-orders');
+  lo.innerHTML=orders.length===0
+    ?'<div class="empty-state"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div>'
+    :orders.map(o=>`<div class="order-item"><div class="order-avatar">${esc(initials(o.name))}</div><div class="order-info"><div class="order-name">${esc(o.name)}</div><div class="order-rest"><i class="ti ti-building-store" style="font-size:11px;margin-right:3px"></i>${esc(o.restaurant)}${o.custom?'<span class="tag-custom">Eigenes</span>':''}</div></div></div>`).join('');
+  if(!adminOpen)return;
+  document.getElementById('stat-total').textContent=orders.length;
+  const groups={};
+  orders.forEach(o=>{if(!groups[o.restaurant])groups[o.restaurant]={entries:[],custom:o.custom};groups[o.restaurant].entries.push({name:o.name,id:o.id});});
+  document.getElementById('stat-rests').textContent=Object.keys(groups).length;
+  const ag=document.getElementById('admin-groups');
+  ag.innerHTML=Object.keys(groups).length===0
+    ?'<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div>'
+    :Object.entries(groups).sort((a,b)=>b[1].entries.length-a[1].entries.length).map(([rest,data])=>`
+      <div style="margin-bottom:1rem;">
+        <div class="group-header">
+          <div class="group-name">${esc(rest)}${data.custom?'<span class="tag-custom" style="margin-left:6px">Eigenes</span>':''}</div>
+          <span class="group-count">${data.entries.length}</span>
+        </div>
+        ${data.entries.map(p=>`<div class="order-item"><div class="order-avatar">${esc(initials(p.name))}</div><div class="order-info"><div class="order-name">${esc(p.name)}</div></div><button class="order-del" onclick="deleteOrder(${p.id})" aria-label="Löschen"><i class="ti ti-trash" style="font-size:15px"></i></button></div>`).join('')}
+      </div>`).join('');
+}
+
+function saveDeadline(){
+  deadlineH=parseInt(document.getElementById('sel-h').value);
+  deadlineM=parseInt(document.getElementById('sel-m').value);
+  lsSet(DK,fmtTime());updateStatus();
+}
+
+function switchTab(tab){
+  ['anmelden','uebersicht','admin'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('view-'+t).classList.toggle('active',t===tab);
+  });
+}
+
+load();
+setInterval(updateStatus,30000);
+</script>
+</body>
+</html>
