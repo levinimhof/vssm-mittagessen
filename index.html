@@ -40,7 +40,6 @@
     label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:.03em;text-transform:uppercase;}
     input,select{width:100%;margin-bottom:1rem;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:9px 12px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;}
     input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(15,110,86,0.12);}
-    input[type=datetime-local]{cursor:pointer;}
     .toggle-row{display:flex;background:var(--bg2);border-radius:var(--radius-md);padding:3px;gap:3px;margin-bottom:1rem;}
     .toggle-opt{flex:1;}.toggle-opt input[type=radio]{display:none;}
     .toggle-opt label{display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);margin:0;text-transform:none;letter-spacing:0;}
@@ -58,6 +57,7 @@
     .toast{background:var(--green-dark);color:#E1F5EE;border-radius:var(--radius-md);padding:11px 14px;font-size:13px;display:none;margin-top:1rem;align-items:center;justify-content:center;gap:6px;}
     .info-box{background:var(--blue-bg);border:0.5px solid var(--blue);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;color:var(--blue);margin-bottom:1rem;display:flex;gap:8px;align-items:flex-start;line-height:1.6;}
     .warn-box{background:var(--amber-bg);border:0.5px solid #d4a24a;border-radius:var(--radius-md);padding:12px 14px;font-size:13px;color:var(--amber);margin-bottom:1rem;display:flex;gap:8px;align-items:flex-start;line-height:1.6;}
+    /* Order items */
     .order-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);}
     .order-item:last-child{border-bottom:none;}
     .order-avatar{width:36px;height:36px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--green);flex-shrink:0;}
@@ -67,10 +67,10 @@
     .order-rest{font-size:12px;color:var(--text2);margin-top:1px;}
     .tag-custom{display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:var(--amber-bg);color:var(--amber);margin-left:5px;font-weight:600;}
     .tag-gruppe{display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:var(--blue-bg);color:var(--blue);margin-left:5px;font-weight:600;}
-    .order-del{background:none;border:none;cursor:pointer;color:var(--text3);padding:5px;border-radius:4px;display:flex;}
-    .order-del:hover{color:var(--red);background:var(--red-bg);}
-    .order-edit{background:none;border:none;cursor:pointer;color:var(--text3);padding:5px;border-radius:4px;display:flex;}
-    .order-edit:hover{color:var(--blue);background:var(--blue-bg);}
+    .order-actions{display:flex;gap:4px;flex-shrink:0;}
+    .icon-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:5px;border-radius:4px;display:flex;align-items:center;justify-content:center;}
+    .icon-btn:hover.edit{color:var(--blue);background:var(--blue-bg);}
+    .icon-btn:hover.del{color:var(--red);background:var(--red-bg);}
     .empty-state{text-align:center;padding:2.5rem 0;color:var(--text2);font-size:14px;}
     .empty-state i{font-size:36px;display:block;margin-bottom:10px;color:var(--text3);}
     .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;}
@@ -80,6 +80,11 @@
     .group-header{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
     .group-name{font-size:13px;font-weight:600;}
     .group-count{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--green-bg);color:var(--green);font-weight:700;}
+    /* Admin list */
+    .admin-list-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);}
+    .admin-list-item:last-child{border-bottom:none;}
+    .admin-badge{width:32px;height:32px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--green);flex-shrink:0;}
+    .admin-badge-me{background:var(--green);color:#E1F5EE;}
     /* Auth */
     .auth-screen{display:flex;flex-direction:column;align-items:center;padding:2rem 1.5rem;gap:14px;text-align:center;}
     .auth-icon{width:60px;height:60px;border-radius:var(--radius-lg);background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--green);}
@@ -90,29 +95,30 @@
     .auth-form-wrap{width:100%;max-width:320px;text-align:left;}
     .field-err{font-size:12px;color:var(--red);margin-top:-8px;margin-bottom:10px;display:none;font-weight:500;}
     .field-ok{font-size:12px;color:var(--green);margin-top:-8px;margin-bottom:10px;display:none;font-weight:500;}
-    .lockout-wrap{display:none;flex-direction:column;align-items:center;gap:10px;}
-    .lockout-timer{font-size:44px;font-weight:700;color:var(--red);letter-spacing:2px;font-variant-numeric:tabular-nums;}
     .support-box{background:var(--red-bg);border:0.5px solid var(--red-border);border-radius:var(--radius-md);padding:16px;font-size:13px;color:var(--red);line-height:1.7;display:none;max-width:320px;text-align:center;}
     .support-box a{color:var(--red);font-weight:600;}
-    .admin-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+    .admin-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;}
     .divider{border:none;border-top:0.5px solid var(--border);margin:1.5rem 0;}
     .reset-box{background:var(--red-bg);border:0.5px solid #F09595;border-radius:var(--radius-lg);padding:1.1rem 1.25rem;}
     .reset-box-title{font-size:14px;font-weight:600;color:var(--red);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
     .reset-box-sub{font-size:13px;color:#791F1F;margin-bottom:1rem;}
-    /* Inline Confirm */
-    .confirm-panel{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:1.25rem;margin-top:1rem;display:none;}
+    /* Inline Confirm Panels */
+    .confirm-panel{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:1.25rem;margin-top:0.75rem;display:none;animation:fadeIn 0.15s ease;}
+    .confirm-panel.danger{background:var(--red-bg);border-color:var(--red-border);}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
     .confirm-panel-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:7px;}
-    .confirm-panel-body{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1rem;}
-    .confirm-panel-summary{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:1rem;font-size:13px;line-height:1.7;}
-    .confirm-panel-summary strong{color:var(--text);}
+    .confirm-panel.danger .confirm-panel-title{color:var(--red);}
+    .confirm-panel-body{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:0.75rem;}
+    .confirm-summary{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:0.75rem;font-size:13px;line-height:1.8;}
+    .confirm-summary strong{color:var(--text);}
     .confirm-actions{display:flex;gap:8px;}
     .confirm-actions button{flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:var(--radius-md);cursor:pointer;font-family:inherit;}
-    .confirm-abort{background:none;border:0.5px solid var(--border2);color:var(--text2);}
-    .confirm-abort:hover{background:var(--bg3);}
-    .confirm-ok{background:var(--green);border:none;color:#E1F5EE;}
-    .confirm-ok:hover{background:var(--green-dark);}
-    .confirm-ok-red{background:none;border:0.5px solid var(--red-border);color:var(--red);}
-    .confirm-ok-red:hover{background:var(--red-bg);}
+    .ca-abort{background:none;border:0.5px solid var(--border2);color:var(--text2);}
+    .ca-abort:hover{background:var(--bg3);}
+    .ca-ok{background:var(--green);border:none;color:#E1F5EE;}
+    .ca-ok:hover{background:var(--green-dark);}
+    .ca-red{background:none;border:0.5px solid var(--red-border);color:var(--red);}
+    .ca-red:hover{background:var(--red-bg);}
     #custom-field{display:none;}
     #gruppe-fields{display:none;}
     @media(max-width:480px){.app{padding:1rem 0.75rem 3rem;}.app-title{font-size:18px;}}
@@ -155,20 +161,17 @@
             <label for="atyp-gruppe"><i class="ti ti-users" style="font-size:14px"></i>Gruppe</label>
           </div>
         </div>
-
         <div id="einzel-fields">
           <label for="inp-name">Ihr Name</label>
           <input type="text" id="inp-name" placeholder="Vorname Nachname" autocomplete="name" />
         </div>
-
         <div id="gruppe-fields">
-          <div class="info-box"><i class="ti ti-users" style="font-size:16px;flex-shrink:0;margin-top:1px"></i><span>Gruppenanmeldung für Kursleiter. Geben Sie Ihren Namen und die Gesamtanzahl Personen (inkl. sich selbst) an. Kursteilnehmer die individuell essen möchten, tätigen bitte eine separate Einzelanmeldung.</span></div>
+          <div class="info-box"><i class="ti ti-users" style="font-size:16px;flex-shrink:0;margin-top:1px"></i><span>Gruppenanmeldung für Kursleiter. Kursteilnehmer die individuell essen möchten, tätigen bitte eine separate Einzelanmeldung.</span></div>
           <label for="inp-kursleiter">Name Kursleiter</label>
           <input type="text" id="inp-kursleiter" placeholder="Vorname Nachname" />
           <label for="inp-anzahl">Anzahl Personen (inkl. Kursleiter)</label>
           <input type="number" id="inp-anzahl" min="2" max="100" value="2" />
         </div>
-
         <label>Restaurant</label>
         <div class="toggle-row">
           <div class="toggle-opt">
@@ -194,30 +197,25 @@
         <div id="custom-field">
           <input type="text" id="inp-custom" placeholder="z.B. Restaurant Sonne, Luzern" />
         </div>
-
-        <!-- Hinweis vor Absenden (nur Einzelanmeldung) -->
         <div class="warn-box" id="einzel-hinweis">
           <i class="ti ti-alert-triangle" style="font-size:16px;flex-shrink:0;margin-top:1px"></i>
-          <span>Bitte beachten Sie: <strong>Nachträgliche Änderungen sind nicht möglich.</strong> Bei dringenden Anpassungen wenden Sie sich bitte an einen Mitarbeiter des Schreiner Verbands Luzern.</span>
+          <span>Bitte beachten Sie: <strong>Nachträgliche Änderungen sind nicht möglich.</strong> Bei dringenden Anpassungen wenden Sie sich an einen Mitarbeiter des Schreiner Verbands Luzern.</span>
         </div>
-
-        <!-- Inline Bestätigung -->
+        <!-- Anmeldung Bestätigung -->
         <div class="confirm-panel" id="confirm-anmeldung">
           <div class="confirm-panel-title"><i class="ti ti-clipboard-check" style="color:var(--green)"></i>Anmeldung bestätigen</div>
-          <div class="confirm-panel-body">Bitte überprüfen Sie Ihre Angaben sorgfältig. Nach der Bestätigung sind keine Änderungen mehr möglich.</div>
-          <div class="confirm-panel-summary" id="confirm-summary"></div>
+          <div class="confirm-panel-body">Bitte überprüfen Sie Ihre Angaben. Nach der Bestätigung sind keine Änderungen mehr möglich.</div>
+          <div class="confirm-summary" id="confirm-anmeldung-summary"></div>
           <div class="confirm-actions">
-            <button class="confirm-abort" onclick="hideConfirmAnmeldung()"><i class="ti ti-x"></i>Korrigieren</button>
-            <button class="confirm-ok" onclick="finalSubmit()"><i class="ti ti-check"></i>Jetzt verbindlich anmelden</button>
+            <button class="ca-abort" onclick="hidePanel('confirm-anmeldung');pendingPayload=null;"><i class="ti ti-x"></i>Korrigieren</button>
+            <button class="ca-ok" onclick="finalSubmit()"><i class="ti ti-check"></i>Verbindlich anmelden</button>
           </div>
         </div>
-
-        <button class="btn-primary" id="btn-submit" onclick="submitOrder()" style="margin-top:0.5rem;"><i class="ti ti-arrow-right"></i>Weiter zur Bestätigung</button>
+        <button class="btn-primary" id="btn-submit" onclick="submitOrder()" style="margin-top:0.75rem;"><i class="ti ti-arrow-right"></i>Weiter zur Bestätigung</button>
         <div class="toast" id="toast"><i class="ti ti-circle-check"></i>Anmeldung gespeichert!</div>
       </div>
       <div id="form-closed" style="display:none;">
-        <div class="empty-state">
-          <i class="ti ti-lock"></i>
+        <div class="empty-state"><i class="ti ti-lock"></i>
           <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Anmeldeschluss erreicht</div>
           <div>Keine weiteren Anmeldungen möglich.</div>
         </div>
@@ -236,33 +234,24 @@
   <!-- ADMIN -->
   <div id="view-admin" class="view">
     <div class="card">
-
-      <!-- Auth -->
+      <!-- Auth Screen -->
       <div id="auth-screen">
         <div class="auth-screen">
           <div class="auth-icon" id="auth-icon"><i class="ti ti-shield-lock"></i></div>
           <div style="font-size:17px;font-weight:600;" id="auth-title">Admin-Bereich</div>
-          <div style="font-size:13px;color:var(--text2);" id="auth-sub">Einloggen oder registrieren</div>
-
-          <div class="lockout-wrap" id="lockout-wrap">
-            <div class="lockout-timer" id="lockout-timer">1:00</div>
-            <div style="font-size:13px;color:var(--text2);">Zugang temporär gesperrt — bitte warten</div>
-          </div>
-
+          <div style="font-size:13px;color:var(--text2);margin-top:-4px;" id="auth-sub">Einloggen oder registrieren</div>
           <div class="support-box" id="support-box">
             <i class="ti ti-shield-x" style="font-size:28px;display:block;margin-bottom:8px;"></i>
             <strong>Zugang dauerhaft gesperrt</strong><br>
             Bitte wenden Sie sich an den Support oder setzen Sie Ihren PIN zurück.<br><br>
             <a href="mailto:levin.imhof@protonmail.ch">levin.imhof@protonmail.ch</a>
           </div>
-
           <div id="auth-forms" style="width:100%;max-width:320px;">
             <div class="auth-tabs">
               <button class="auth-tab active" id="atab-login" onclick="showAuthTab('login')">Einloggen</button>
               <button class="auth-tab" id="atab-register" onclick="showAuthTab('register')">Registrieren</button>
               <button class="auth-tab" id="atab-reset" onclick="showAuthTab('reset')">PIN vergessen</button>
             </div>
-
             <!-- Login -->
             <div id="aform-login" class="auth-form-wrap">
               <label for="l-email">E-Mail</label>
@@ -272,7 +261,6 @@
               <div class="field-err" id="l-err"></div>
               <button class="btn-green-full" onclick="doLogin()"><i class="ti ti-login"></i>Einloggen</button>
             </div>
-
             <!-- Register -->
             <div id="aform-register" class="auth-form-wrap" style="display:none;">
               <div class="info-box" style="margin-bottom:1rem;"><i class="ti ti-key" style="font-size:16px;flex-shrink:0"></i><span>Registrierung ist nur mit dem internen Zugangscode möglich.</span></div>
@@ -287,15 +275,23 @@
               <div class="field-err" id="r-err"></div>
               <button class="btn-green-full" onclick="doRegister()"><i class="ti ti-user-plus"></i>Registrieren</button>
             </div>
-
             <!-- Reset -->
             <div id="aform-reset" class="auth-form-wrap" style="display:none;">
-              <div class="info-box" style="margin-bottom:1rem;"><i class="ti ti-mail" style="font-size:16px;flex-shrink:0"></i><span>Geben Sie Ihre registrierte E-Mail ein. Sie erhalten einen Reset-Link per E-Mail zugestellt.</span></div>
+              <div class="info-box" style="margin-bottom:1rem;"><i class="ti ti-mail" style="font-size:16px;flex-shrink:0"></i><span>Sie erhalten einen Reset-Link per E-Mail.</span></div>
               <label for="rs-email">E-Mail</label>
               <input type="email" id="rs-email" placeholder="admin@beispiel.ch" />
               <div class="field-err" id="rs-err"></div>
-              <div class="field-ok" id="rs-ok"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Reset-Link wurde per E-Mail gesendet!</div>
+              <div class="field-ok" id="rs-ok"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Reset-Link per E-Mail gesendet!</div>
               <button class="btn-green-full" id="btn-reset-send" onclick="doReset()"><i class="ti ti-mail"></i>Reset-Link senden</button>
+            </div>
+          </div>
+          <!-- Lockout -->
+          <div id="lockout-section" style="display:none;width:100%;max-width:320px;">
+            <div class="warn-box" style="justify-content:center;flex-direction:column;align-items:center;text-align:center;gap:6px;">
+              <i class="ti ti-lock" style="font-size:28px;color:var(--amber);"></i>
+              <div style="font-weight:600;font-size:14px;">Zugang temporär gesperrt</div>
+              <div style="font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:2px;" id="lockout-timer">1:00</div>
+              <div style="font-size:13px;">Bitte warten — danach erneut versuchen</div>
             </div>
           </div>
         </div>
@@ -304,34 +300,37 @@
       <!-- Admin Content -->
       <div id="admin-content" style="display:none;">
         <div class="admin-topbar">
-          <div class="card-title" style="margin-bottom:0;"><i class="ti ti-chart-bar"></i>Übersicht</div>
+          <div class="card-title" style="margin-bottom:0;"><i class="ti ti-chart-bar"></i>Admin-Übersicht</div>
           <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i>Ausloggen</button>
         </div>
-        <div style="font-size:12px;color:var(--text2);margin-top:-0.75rem;margin-bottom:1rem;" id="admin-email-display"></div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:1.25rem;" id="admin-email-display"></div>
 
         <div class="stat-row">
           <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Personen total</div></div>
           <div class="stat"><div class="stat-num" id="stat-rests">0</div><div class="stat-label">Restaurants</div></div>
         </div>
+
         <div id="admin-groups"></div>
 
         <hr class="divider">
+
+        <!-- Anmeldeschluss -->
         <div class="card-title" style="margin-bottom:0.5rem;"><i class="ti ti-calendar"></i>Anmeldeschluss</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:0.75rem;">Datum und Uhrzeit bis wann Anmeldungen möglich sind.</div>
         <input type="datetime-local" id="inp-deadline-dt" min="2026-01-01T00:00" />
-
-        <!-- Deadline Bestätigung -->
         <div class="confirm-panel" id="confirm-deadline">
           <div class="confirm-panel-title"><i class="ti ti-calendar-check" style="color:var(--green)"></i>Anmeldeschluss ändern?</div>
-          <div class="confirm-panel-summary" id="confirm-deadline-summary"></div>
+          <div class="confirm-summary" id="confirm-deadline-summary"></div>
           <div class="confirm-actions">
-            <button class="confirm-abort" onclick="hidePanel('confirm-deadline')"><i class="ti ti-x"></i>Abbrechen</button>
-            <button class="confirm-ok" onclick="finalSaveDeadline()"><i class="ti ti-check"></i>Bestätigen</button>
+            <button class="ca-abort" onclick="hidePanel('confirm-deadline')"><i class="ti ti-x"></i>Abbrechen</button>
+            <button class="ca-ok" onclick="finalSaveDeadline()"><i class="ti ti-check"></i>Bestätigen</button>
           </div>
         </div>
-        <button class="btn-outline" onclick="initSaveDeadline()" style="margin-top:0.25rem;"><i class="ti ti-check"></i>Speichern</button>
+        <button class="btn-outline" onclick="initSaveDeadline()" style="margin-top:0.25rem;margin-bottom:0;"><i class="ti ti-check"></i>Speichern</button>
 
         <hr class="divider">
+
+        <!-- PIN ändern -->
         <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-lock"></i>PIN ändern</div>
         <label for="inp-pin-current">Aktueller PIN</label>
         <input type="password" id="inp-pin-current" placeholder="Aktueller PIN" inputmode="numeric" />
@@ -341,89 +340,92 @@
         <label for="inp-pin-repeat">Neuer PIN wiederholen</label>
         <input type="password" id="inp-pin-repeat" placeholder="Neuer PIN wiederholen" style="margin-bottom:4px;" inputmode="numeric" />
         <div class="field-err" id="err-repeat"></div>
-
-        <!-- PIN Change Bestätigung -->
         <div class="confirm-panel" id="confirm-pin">
           <div class="confirm-panel-title"><i class="ti ti-lock-check" style="color:var(--green)"></i>PIN wirklich ändern?</div>
-          <div class="confirm-panel-body">Der aktuelle PIN wird durch den neuen PIN ersetzt. Bitte merken Sie sich den neuen PIN gut.</div>
+          <div class="confirm-panel-body">Der aktuelle PIN wird ersetzt. Bitte merken Sie sich den neuen PIN gut.</div>
           <div class="confirm-actions">
-            <button class="confirm-abort" onclick="hidePanel('confirm-pin')"><i class="ti ti-x"></i>Abbrechen</button>
-            <button class="confirm-ok" onclick="finalPinChange()"><i class="ti ti-check"></i>PIN ändern</button>
+            <button class="ca-abort" onclick="hidePanel('confirm-pin')"><i class="ti ti-x"></i>Abbrechen</button>
+            <button class="ca-ok" onclick="finalPinChange()"><i class="ti ti-check"></i>PIN ändern</button>
           </div>
         </div>
         <button class="btn-green-full" onclick="initPinChange()" style="margin-top:10px;"><i class="ti ti-lock"></i>PIN ändern</button>
 
         <hr class="divider">
+
+        <!-- Admins Übersicht -->
+        <div class="card-title" style="margin-bottom:0.75rem;"><i class="ti ti-shield"></i>Registrierte Admins</div>
+        <div id="admin-list"><div class="empty-state" style="padding:1rem 0;"><i class="ti ti-loader"></i></div></div>
+
+        <!-- Admin löschen Bestätigung -->
+        <div class="confirm-panel danger" id="confirm-delete-admin">
+          <div class="confirm-panel-title"><i class="ti ti-user-x"></i>Admin-Konto löschen?</div>
+          <div class="confirm-summary" id="confirm-delete-admin-summary"></div>
+          <div class="confirm-panel-body" style="margin-top:0.5rem;">Das Konto wird vollständig aus der Datenbank entfernt. Eine erneute Registrierung ist danach möglich.</div>
+          <div class="confirm-actions">
+            <button class="ca-abort" onclick="hidePanel('confirm-delete-admin')"><i class="ti ti-x"></i>Abbrechen</button>
+            <button class="ca-red" onclick="finalDeleteAdmin()"><i class="ti ti-trash"></i>Konto löschen</button>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Alle löschen -->
         <div class="reset-box">
           <div class="reset-box-title"><i class="ti ti-refresh"></i>Nächster Kurs</div>
-          <div class="reset-box-sub">Alle Anmeldungen löschen um für den nächsten Kurs neu zu starten.</div>
-          <!-- Reset Bestätigung -->
-          <div class="confirm-panel" id="confirm-reset" style="background:var(--red-bg);border-color:var(--red-border);margin-bottom:0.75rem;">
-            <div class="confirm-panel-title" style="color:var(--red);"><i class="ti ti-trash" style="color:var(--red)"></i>Alle Anmeldungen löschen?</div>
-            <div class="confirm-panel-summary" id="confirm-reset-summary" style="background:var(--bg);"></div>
-            <div class="confirm-actions" style="margin-top:0.75rem;">
-              <button class="confirm-abort" onclick="hidePanel('confirm-reset')"><i class="ti ti-x"></i>Abbrechen</button>
-              <button class="confirm-ok-red" onclick="finalReset()"><i class="ti ti-trash"></i>Ja, löschen</button>
+          <div class="reset-box-sub">Alle Anmeldungen werden vollständig und datenschutzkonform aus der Datenbank entfernt.</div>
+          <div class="confirm-panel danger" id="confirm-reset" style="margin-bottom:0.75rem;">
+            <div class="confirm-panel-title"><i class="ti ti-trash"></i>Alle Anmeldungen löschen?</div>
+            <div class="confirm-summary" id="confirm-reset-summary"></div>
+            <div class="confirm-panel-body" style="margin-top:0.5rem;">Alle Einträge werden datenschutzkonform und unwiderruflich aus der Datenbank entfernt.</div>
+            <div class="confirm-actions">
+              <button class="ca-abort" onclick="hidePanel('confirm-reset')"><i class="ti ti-x"></i>Abbrechen</button>
+              <button class="ca-red" onclick="finalReset()"><i class="ti ti-trash"></i>Ja, löschen</button>
             </div>
           </div>
           <button class="btn-danger-full" onclick="initReset()"><i class="ti ti-trash"></i>Alle Kursteilnehmer löschen</button>
         </div>
 
-        <!-- Gruppenanmeldung bearbeiten -->
-        <hr class="divider">
-        <div class="card-title" style="margin-bottom:0.5rem;"><i class="ti ti-edit"></i>Gruppenanmeldung anpassen</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:0.75rem;">Anzahl Personen einer bestehenden Gruppenanmeldung korrigieren.</div>
-        <select id="sel-gruppe" style="margin-bottom:0.75rem;">
-          <option value="">— Gruppenanmeldung auswählen —</option>
-        </select>
-        <div id="gruppe-edit-wrap" style="display:none;">
-          <label for="inp-neue-anzahl">Neue Anzahl Personen</label>
-          <input type="number" id="inp-neue-anzahl" min="2" max="100" />
-          <!-- Gruppenänderung Bestätigung -->
-          <div class="confirm-panel" id="confirm-gruppe">
-            <div class="confirm-panel-title"><i class="ti ti-users" style="color:var(--blue)"></i>Gruppenanmeldung ändern</div>
-            <div class="confirm-panel-body">Bitte kontrollieren Sie die Angaben sorgfältig bevor Sie bestätigen.</div>
-            <div class="confirm-panel-summary" id="confirm-gruppe-summary"></div>
-            <div class="confirm-actions">
-              <button class="confirm-abort" onclick="hidePanel('confirm-gruppe')"><i class="ti ti-x"></i>Abbrechen</button>
-              <button class="confirm-ok" onclick="finalUpdateGruppe()"><i class="ti ti-check"></i>Änderung bestätigen</button>
-            </div>
-          </div>
-          <button class="btn-outline" onclick="initUpdateGruppe()"><i class="ti ti-check"></i>Anpassen</button>
+        <!-- Eigenes Konto löschen -->
+        <div style="margin-top:1rem;">
+          <button class="btn-danger-full" onclick="initDeleteOwnAdmin()" style="border-color:var(--text3);color:var(--text2);"><i class="ti ti-user-x"></i>Eigenes Admin-Konto löschen</button>
         </div>
+
       </div>
     </div>
   </div>
 </div>
+
+<!-- Inline Edit Panel (floating, attached to order) -->
+<div id="edit-panel-container"></div>
 
 <script>
 const SUPABASE_URL='https://gbvmkclhrjogcepmupzm.supabase.co';
 const SUPABASE_KEY='sb_publishable_5cWQ1s6E0giLF_MxkY6_9w_zP_slLh6';
 const EMAILJS_SERVICE='service_vssm';
 const EMAILJS_TEMPLATE='template_pinreset';
-const EMAILJS_PUBLIC='YOUR_EMAILJS_PUBLIC_KEY'; // <-- EmailJS Public Key eintragen
-const REG_CODE='VSSM2026'; // <-- Registrierungscode (bitte nach Einrichtung ändern!)
+const EMAILJS_PUBLIC='YOUR_EMAILJS_PUBLIC_KEY';
+const REG_CODE='VSSM2026';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let orders=[], deadlineStr='', currentAdmin=null, pendingNewPin='', pendingPayload=null, pendingGruppeId=null, pendingNewAnzahl=null;
-let lockoutInterval=null;
+let orders=[], deadlineStr='', currentAdmin=null, pendingNewPin='', pendingPayload=null;
+let pendingDeleteAdminId=null, lockoutInterval=null;
+let activeEditId=null;
 
 emailjs.init(EMAILJS_PUBLIC);
-
 function hashPin(pin){return btoa(unescape(encodeURIComponent('vssm_salt_2026_'+pin)));}
 
 // ── Load ──────────────────────────────────────────────────────────────────
 async function load(){
   const params=new URLSearchParams(window.location.search);
-  const resetToken=params.get('reset_token');
-  if(resetToken){showPinResetForm(resetToken);return;}
+  const rt=params.get('reset_token');
+  if(rt){showPinResetForm(rt);return;}
   await loadDeadline();
   await loadOrders();
 }
 
 async function loadDeadline(){
   const {data}=await sb.from('einstellungen').select('value').eq('key','deadline').single();
-  if(data){deadlineStr=data.value;}
+  if(data)deadlineStr=data.value;
   updateStatus();
   const el=document.getElementById('inp-deadline-dt');
   if(el&&deadlineStr)el.value=deadlineStr;
@@ -435,11 +437,25 @@ async function loadOrders(){
   renderAll();
 }
 
-// ── Deadline ──────────────────────────────────────────────────────────────
-function isPast(){
-  if(!deadlineStr)return false;
-  return new Date()>new Date(deadlineStr);
+async function loadAdmins(){
+  const {data}=await sb.from('admins').select('id,email,created_at').order('created_at',{ascending:true});
+  const el=document.getElementById('admin-list');
+  if(!data||data.length===0){el.innerHTML='<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Admins gefunden</div>';return;}
+  el.innerHTML=data.map(a=>{
+    const isMe=currentAdmin&&a.id===currentAdmin.id;
+    return`<div class="admin-list-item">
+      <div class="admin-badge${isMe?' admin-badge-me':''}"><i class="ti ti-shield${isMe?'-check':''}"></i></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:500;">${esc(a.email)}${isMe?'&nbsp;<span style="font-size:11px;background:var(--green-bg);color:var(--green);padding:1px 7px;border-radius:99px;font-weight:600;">Ich</span>':''}</div>
+        <div style="font-size:12px;color:var(--text2);">Seit ${new Date(a.created_at).toLocaleDateString('de-CH')}</div>
+      </div>
+      <button class="icon-btn del" onclick="initDeleteAdmin('${a.id}','${esc(a.email)}')" title="Admin löschen"><i class="ti ti-user-x" style="font-size:15px"></i></button>
+    </div>`;
+  }).join('');
 }
+
+// ── Deadline ──────────────────────────────────────────────────────────────
+function isPast(){if(!deadlineStr)return false;return new Date()>new Date(deadlineStr);}
 function fmtDeadline(str){
   if(!str)return '—';
   const d=new Date(str);
@@ -447,8 +463,7 @@ function fmtDeadline(str){
 }
 function updateStatus(){
   const past=isPast();
-  const pill=document.getElementById('status-pill');
-  const txt=document.getElementById('status-text');
+  const pill=document.getElementById('status-pill'),txt=document.getElementById('status-text');
   if(past){
     pill.className='status-pill status-closed';
     txt.innerHTML='<i class="ti ti-lock" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Anmeldeschluss war am <strong>'+fmtDeadline(deadlineStr)+'</strong>';
@@ -461,19 +476,16 @@ function updateStatus(){
     document.getElementById('form-closed').style.display='none';
   }
 }
-
 function initSaveDeadline(){
   const val=document.getElementById('inp-deadline-dt').value;
-  if(!val){showErr('Bitte Datum und Uhrzeit eingeben.');return;}
-  document.getElementById('confirm-deadline-summary').innerHTML=
-    '<strong>Neuer Anmeldeschluss:</strong><br>'+fmtDeadline(val);
+  if(!val){return;}
+  document.getElementById('confirm-deadline-summary').innerHTML='<strong>Neuer Anmeldeschluss:</strong><br>'+fmtDeadline(val);
   showPanel('confirm-deadline');
 }
 async function finalSaveDeadline(){
   const val=document.getElementById('inp-deadline-dt').value;
   await sb.from('einstellungen').upsert({key:'deadline',value:val});
-  deadlineStr=val;updateStatus();
-  hidePanel('confirm-deadline');
+  deadlineStr=val;updateStatus();hidePanel('confirm-deadline');
 }
 
 // ── Anmeldetyp ────────────────────────────────────────────────────────────
@@ -482,64 +494,49 @@ function toggleAnmeldeTyp(){
   document.getElementById('einzel-fields').style.display=isG?'none':'block';
   document.getElementById('gruppe-fields').style.display=isG?'block':'none';
   document.getElementById('einzel-hinweis').style.display=isG?'none':'flex';
-  document.getElementById('btn-submit').innerHTML=isG
-    ?'<i class="ti ti-arrow-right"></i>Weiter zur Bestätigung'
-    :'<i class="ti ti-arrow-right"></i>Weiter zur Bestätigung';
-  hideConfirmAnmeldung();
+  hidePanel('confirm-anmeldung');pendingPayload=null;
 }
 function toggleMode(){
   const c=document.getElementById('rmode-custom').checked;
   document.getElementById('list-field').style.display=c?'none':'block';
   document.getElementById('custom-field').style.display=c?'block':'none';
-  hideConfirmAnmeldung();
+  hidePanel('confirm-anmeldung');pendingPayload=null;
 }
 
-// ── Submit (2-Schritt) ────────────────────────────────────────────────────
+// ── Submit ────────────────────────────────────────────────────────────────
 function submitOrder(){
   if(isPast())return;
-  hideConfirmAnmeldung();
+  hidePanel('confirm-anmeldung');
   const isG=document.getElementById('atyp-gruppe').checked;
   const isC=document.getElementById('rmode-custom').checked;
   const rest=isC?document.getElementById('inp-custom').value.trim():document.getElementById('inp-restaurant').value;
-  if(!rest){showToastErr('Bitte ein Restaurant auswählen.');return;}
-
+  if(!rest){return;}
   if(isG){
     const kl=document.getElementById('inp-kursleiter').value.trim();
     const anz=parseInt(document.getElementById('inp-anzahl').value);
-    if(!kl){showToastErr('Bitte Name des Kursleiters eingeben.');return;}
-    if(!anz||anz<2){showToastErr('Anzahl Personen muss mind. 2 sein.');return;}
+    if(!kl||!anz||anz<2)return;
     pendingPayload={name:kl+' (Kursleiter)',restaurant:rest,custom:isC,typ:'gruppe',anzahl:anz};
-    document.getElementById('confirm-summary').innerHTML=
-      '<strong>Typ:</strong> Gruppenanmeldung<br>'+
-      '<strong>Kursleiter:</strong> '+esc(kl)+'<br>'+
-      '<strong>Anzahl Personen:</strong> '+anz+'<br>'+
-      '<strong>Restaurant:</strong> '+esc(rest);
+    document.getElementById('confirm-anmeldung-summary').innerHTML=
+      '<strong>Typ:</strong> Gruppenanmeldung<br><strong>Kursleiter:</strong> '+esc(kl)+'<br><strong>Anzahl Personen:</strong> '+anz+'<br><strong>Restaurant:</strong> '+esc(rest);
   }else{
     const name=document.getElementById('inp-name').value.trim();
-    if(!name){showToastErr('Bitte Namen eingeben.');return;}
+    if(!name)return;
     pendingPayload={name,restaurant:rest,custom:isC,typ:'einzeln',anzahl:1};
-    document.getElementById('confirm-summary').innerHTML=
-      '<strong>Typ:</strong> Einzelanmeldung<br>'+
-      '<strong>Name:</strong> '+esc(name)+'<br>'+
-      '<strong>Restaurant:</strong> '+esc(rest);
+    document.getElementById('confirm-anmeldung-summary').innerHTML=
+      '<strong>Typ:</strong> Einzelanmeldung<br><strong>Name:</strong> '+esc(name)+'<br><strong>Restaurant:</strong> '+esc(rest);
   }
   showPanel('confirm-anmeldung');
   document.getElementById('confirm-anmeldung').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-
 async function finalSubmit(){
   if(!pendingPayload)return;
-  const btn=document.getElementById('btn-submit');
-  btn.disabled=true;
+  const btn=document.getElementById('btn-submit');btn.disabled=true;
   const {error}=await sb.from('anmeldungen').insert(pendingPayload);
   btn.disabled=false;
-  if(error){showToastErr('Fehler beim Speichern. Bitte nochmals versuchen.');return;}
-  pendingPayload=null;
-  hideConfirmAnmeldung();
-  document.getElementById('inp-name').value='';
-  document.getElementById('inp-kursleiter').value='';
-  document.getElementById('inp-anzahl').value='2';
-  document.getElementById('inp-restaurant').value='';
+  if(error)return;
+  pendingPayload=null;hidePanel('confirm-anmeldung');
+  document.getElementById('inp-name').value='';document.getElementById('inp-kursleiter').value='';
+  document.getElementById('inp-anzahl').value='2';document.getElementById('inp-restaurant').value='';
   document.getElementById('inp-custom').value='';
   document.getElementById('atyp-einzel').checked=true;toggleAnmeldeTyp();
   document.getElementById('rmode-list').checked=true;toggleMode();
@@ -547,59 +544,118 @@ async function finalSubmit(){
   await loadOrders();
 }
 
-function hideConfirmAnmeldung(){hidePanel('confirm-anmeldung');pendingPayload=null;}
-
-// ── Delete ────────────────────────────────────────────────────────────────
-async function deleteOrder(id){
+// ── Delete Order ──────────────────────────────────────────────────────────
+function initDeleteOrder(id){
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  closeEditPanel();
+  // Inline confirm below order item
+  const existingPanel=document.getElementById('del-confirm-'+id);
+  if(existingPanel){existingPanel.remove();return;}
+  const panel=document.createElement('div');
+  panel.id='del-confirm-'+id;
+  panel.className='confirm-panel danger';
+  panel.style.display='block';
+  panel.innerHTML=`
+    <div class="confirm-panel-title"><i class="ti ti-trash"></i>Anmeldung löschen?</div>
+    <div class="confirm-summary"><strong>Name:</strong> ${esc(o.name)}<br><strong>Restaurant:</strong> ${esc(o.restaurant)}${o.typ==='gruppe'?'<br><strong>Personen:</strong> '+o.anzahl:''}</div>
+    <div class="confirm-actions" style="margin-top:0.75rem;">
+      <button class="ca-abort" onclick="this.closest('.confirm-panel').remove()"><i class="ti ti-x"></i>Abbrechen</button>
+      <button class="ca-red" onclick="finalDeleteOrder(${id})"><i class="ti ti-trash"></i>Löschen</button>
+    </div>`;
+  const orderEl=document.getElementById('order-item-'+id);
+  if(orderEl)orderEl.after(panel);
+}
+async function finalDeleteOrder(id){
   await sb.from('anmeldungen').delete().eq('id',id);
+  const panel=document.getElementById('del-confirm-'+id);if(panel)panel.remove();
   await loadOrders();
 }
 
+// ── Edit Order (inline) ───────────────────────────────────────────────────
+function initEditOrder(id){
+  const o=orders.find(x=>x.id===id);if(!o||o.typ!=='gruppe')return;
+  const existingPanel=document.getElementById('edit-confirm-'+id);
+  if(existingPanel){existingPanel.remove();activeEditId=null;return;}
+  closeEditPanel();
+  activeEditId=id;
+  const panel=document.createElement('div');
+  panel.id='edit-confirm-'+id;
+  panel.className='confirm-panel';
+  panel.style.display='block';
+  panel.innerHTML=`
+    <div class="confirm-panel-title"><i class="ti ti-edit" style="color:var(--blue)"></i>Gruppenanzahl anpassen</div>
+    <div class="confirm-summary"><strong>Kursleiter:</strong> ${esc(o.name)}<br><strong>Restaurant:</strong> ${esc(o.restaurant)}<br><strong>Aktuelle Anzahl:</strong> ${o.anzahl} Personen</div>
+    <div style="margin-top:0.75rem;">
+      <label style="margin-bottom:4px;">Neue Anzahl Personen</label>
+      <input type="number" id="edit-anzahl-${id}" min="2" max="100" value="${o.anzahl}" style="margin-bottom:0.75rem;" />
+      <div class="confirm-panel-body" id="edit-summary-${id}" style="margin-bottom:0.75rem;display:none;"></div>
+      <div class="confirm-actions">
+        <button class="ca-abort" onclick="document.getElementById('edit-confirm-${id}').remove();activeEditId=null;"><i class="ti ti-x"></i>Abbrechen</button>
+        <button class="ca-ok" onclick="confirmEditOrder(${id})"><i class="ti ti-check"></i>Änderung prüfen</button>
+      </div>
+      <div class="confirm-actions" id="edit-final-actions-${id}" style="display:none;margin-top:8px;">
+        <button class="ca-abort" onclick="document.getElementById('edit-summary-${id}').style.display='none';document.getElementById('edit-final-actions-${id}').style.display='none';"><i class="ti ti-x"></i>Nochmals prüfen</button>
+        <button class="ca-ok" onclick="finalEditOrder(${id})"><i class="ti ti-check"></i>Bestätigen</button>
+      </div>
+    </div>`;
+  const orderEl=document.getElementById('order-item-'+id);
+  if(orderEl)orderEl.after(panel);
+}
+function confirmEditOrder(id){
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  const newAnz=parseInt(document.getElementById('edit-anzahl-'+id).value);
+  if(!newAnz||newAnz<2)return;
+  const summaryEl=document.getElementById('edit-summary-'+id);
+  summaryEl.innerHTML='<strong>Bitte bestätigen:</strong> Anzahl wird von <strong>'+o.anzahl+'</strong> auf <span style="color:var(--green);font-weight:600;">'+newAnz+' Personen</span> geändert.';
+  summaryEl.style.display='block';
+  document.getElementById('edit-final-actions-'+id).style.display='flex';
+}
+async function finalEditOrder(id){
+  const newAnz=parseInt(document.getElementById('edit-anzahl-'+id).value);
+  await sb.from('anmeldungen').update({anzahl:newAnz}).eq('id',id);
+  const panel=document.getElementById('edit-confirm-'+id);if(panel)panel.remove();
+  activeEditId=null;
+  await loadOrders();
+}
+function closeEditPanel(){
+  if(activeEditId){
+    const p=document.getElementById('edit-confirm-'+activeEditId);if(p)p.remove();
+    activeEditId=null;
+  }
+}
+
+// ── Reset All ─────────────────────────────────────────────────────────────
 function initReset(){
   const total=orders.reduce((s,o)=>s+(o.typ==='gruppe'?o.anzahl:1),0);
-  document.getElementById('confirm-reset-summary').innerHTML=
-    '<strong>'+orders.length+' Einträge</strong> ('+total+' Personen) werden unwiderruflich gelöscht.';
+  document.getElementById('confirm-reset-summary').innerHTML='<strong>'+orders.length+' Einträge</strong> ('+total+' Personen) werden vollständig und datenschutzkonform aus der Datenbank entfernt.';
   showPanel('confirm-reset');
 }
 async function finalReset(){
-  await sb.from('anmeldungen').delete().neq('id',0);
+  // Hard delete all - datenschutzkonform
+  await sb.from('anmeldungen').delete().gte('id',0);
   hidePanel('confirm-reset');
   await loadOrders();
 }
 
-// ── Gruppe bearbeiten ─────────────────────────────────────────────────────
-function initUpdateGruppe(){
-  const id=parseInt(document.getElementById('sel-gruppe').value);
-  const anz=parseInt(document.getElementById('inp-neue-anzahl').value);
-  if(!id||!anz||anz<2){showToastErr('Bitte gültige Werte eingeben.');return;}
-  const entry=orders.find(o=>o.id===id);
-  if(!entry)return;
-  pendingGruppeId=id;pendingNewAnzahl=anz;
-  document.getElementById('confirm-gruppe-summary').innerHTML=
-    '<strong>Kursleiter:</strong> '+esc(entry.name)+'<br>'+
-    '<strong>Restaurant:</strong> '+esc(entry.restaurant)+'<br>'+
-    '<strong>Bisherige Anzahl:</strong> '+entry.anzahl+' Personen<br>'+
-    '<strong>Neue Anzahl:</strong> <span style="color:var(--green);font-weight:600;">'+anz+' Personen</span>';
-  showPanel('confirm-gruppe');
+// ── Admin Management ──────────────────────────────────────────────────────
+function initDeleteAdmin(id,email){
+  pendingDeleteAdminId=id;
+  const isMe=currentAdmin&&id===currentAdmin.id;
+  document.getElementById('confirm-delete-admin-summary').innerHTML=
+    '<strong>E-Mail:</strong> '+esc(email)+(isMe?'<br><span style="color:var(--red);">⚠ Dies ist Ihr eigenes Konto. Sie werden danach ausgeloggt.</span>':'');
+  showPanel('confirm-delete-admin');
 }
-async function finalUpdateGruppe(){
-  if(!pendingGruppeId)return;
-  await sb.from('anmeldungen').update({anzahl:pendingNewAnzahl}).eq('id',pendingGruppeId);
-  hidePanel('confirm-gruppe');
-  pendingGruppeId=null;pendingNewAnzahl=null;
-  document.getElementById('sel-gruppe').value='';
-  document.getElementById('gruppe-edit-wrap').style.display='none';
-  await loadOrders();
+function initDeleteOwnAdmin(){
+  if(!currentAdmin)return;
+  initDeleteAdmin(currentAdmin.id,currentAdmin.email);
 }
-
-function onGruppeSelect(){
-  const id=parseInt(document.getElementById('sel-gruppe').value);
-  const wrap=document.getElementById('gruppe-edit-wrap');
-  if(!id){wrap.style.display='none';hidePanel('confirm-gruppe');return;}
-  const entry=orders.find(o=>o.id===id);
-  if(entry){document.getElementById('inp-neue-anzahl').value=entry.anzahl;}
-  wrap.style.display='block';
-  hidePanel('confirm-gruppe');
+async function finalDeleteAdmin(){
+  if(!pendingDeleteAdminId)return;
+  const isMe=currentAdmin&&pendingDeleteAdminId===currentAdmin.id;
+  await sb.from('admins').delete().eq('id',pendingDeleteAdminId);
+  hidePanel('confirm-delete-admin');
+  pendingDeleteAdminId=null;
+  if(isMe){doLogout();}else{await loadAdmins();}
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────
@@ -614,29 +670,23 @@ async function doLogin(){
   const email=document.getElementById('l-email').value.trim().toLowerCase();
   const pin=document.getElementById('l-pin').value;
   const errEl=document.getElementById('l-err');
-  errEl.style.display='none';
+  errEl.style.display='none';errEl.style.color='var(--red)';
   if(!email||!pin){errEl.textContent='Bitte E-Mail und PIN eingeben.';errEl.style.display='block';return;}
-
   const {data:admin,error}=await sb.from('admins').select('*').eq('email',email).single();
-  if(error||!admin){errEl.textContent='E-Mail nicht gefunden.';errEl.style.display='block';return;}
-
+  if(error||!admin){errEl.textContent='E-Mail oder PIN ungültig.';errEl.style.display='block';return;}
   if(admin.permanent_lock){showSupportBox();return;}
-
   if(admin.locked_until&&new Date()<new Date(admin.locked_until)){
-    startLockout(new Date(admin.locked_until));return;
+    showLockout(new Date(admin.locked_until));return;
   }
-
   if(admin.pin_hash!==hashPin(pin)){
+    document.getElementById('l-pin').value='';
     const newFailed=(admin.failed_attempts||0)+1;
     let updates={failed_attempts:newFailed};
-
     if(newFailed>=4&&newFailed<8){
       const lockUntil=new Date(Date.now()+60000).toISOString();
       updates.locked_until=lockUntil;
       await sb.from('admins').update(updates).eq('id',admin.id);
-      errEl.textContent='Falscher PIN. Zugang für 1 Minute gesperrt.';errEl.style.display='block';
-      document.getElementById('l-pin').value='';
-      startLockout(new Date(lockUntil));
+      showLockout(new Date(lockUntil));
     }else if(newFailed>=8){
       updates.permanent_lock=true;
       await sb.from('admins').update(updates).eq('id',admin.id);
@@ -644,16 +694,13 @@ async function doLogin(){
     }else{
       await sb.from('admins').update(updates).eq('id',admin.id);
       const rem=4-newFailed;
-      errEl.textContent='Falscher PIN — noch '+rem+' Versuch'+(rem===1?'':'e')+' vor der Sperre.';
+      errEl.textContent='E-Mail oder PIN ungültig — noch '+rem+' Versuch'+(rem===1?'':'e')+' vor der Sperre.';
       errEl.style.display='block';
-      document.getElementById('l-pin').value='';
     }
     return;
   }
-
   await sb.from('admins').update({failed_attempts:0,locked_until:null}).eq('id',admin.id);
-  currentAdmin=admin;
-  showAdminContent();
+  currentAdmin=admin;showAdminContent();
 }
 
 async function doRegister(){
@@ -661,29 +708,22 @@ async function doRegister(){
   const email=document.getElementById('r-email').value.trim().toLowerCase();
   const pin=document.getElementById('r-pin').value;
   const pin2=document.getElementById('r-pin2').value;
-  const errEl=document.getElementById('r-err');
-  errEl.style.display='none';
+  const errEl=document.getElementById('r-err');errEl.style.display='none';
   if(code!==REG_CODE){errEl.textContent='Ungültiger Registrierungscode.';errEl.style.display='block';return;}
   if(!email){errEl.textContent='Bitte E-Mail eingeben.';errEl.style.display='block';return;}
-  if(!pin||pin.length<4){errEl.textContent='PIN muss mind. 4 Zeichen lang sein.';errEl.style.display='block';return;}
+  if(!pin||pin.length<4){errEl.textContent='PIN muss mind. 4 Zeichen sein.';errEl.style.display='block';return;}
   if(pin!==pin2){errEl.textContent='PINs stimmen nicht überein.';errEl.style.display='block';return;}
   const {error}=await sb.from('admins').insert({email,pin_hash:hashPin(pin)});
-  if(error){
-    if(error.code==='23505'){errEl.textContent='Diese E-Mail ist bereits registriert.';}
-    else{errEl.textContent='Fehler bei der Registrierung.';}
-    errEl.style.display='block';return;
-  }
+  if(error){errEl.textContent=error.code==='23505'?'E-Mail bereits registriert.':'Fehler bei Registrierung.';errEl.style.display='block';return;}
   showAuthTab('login');
+  const le=document.getElementById('l-err');le.style.color='var(--green)';
+  le.textContent='Registrierung erfolgreich! Bitte einloggen.';le.style.display='block';
   document.getElementById('l-email').value=email;
-  document.getElementById('l-err').textContent='Registrierung erfolgreich! Bitte einloggen.';
-  document.getElementById('l-err').style.color='var(--green)';
-  document.getElementById('l-err').style.display='block';
 }
 
 async function doReset(){
   const email=document.getElementById('rs-email').value.trim().toLowerCase();
-  const errEl=document.getElementById('rs-err');
-  const okEl=document.getElementById('rs-ok');
+  const errEl=document.getElementById('rs-err'),okEl=document.getElementById('rs-ok');
   errEl.style.display='none';okEl.style.display='none';
   if(!email){errEl.textContent='Bitte E-Mail eingeben.';errEl.style.display='block';return;}
   const {data:admin}=await sb.from('admins').select('id').eq('email',email).single();
@@ -693,19 +733,19 @@ async function doReset(){
   await sb.from('pin_resets').insert({admin_id:admin.id,token,expires_at:expires});
   const resetUrl=window.location.origin+window.location.pathname+'?reset_token='+token;
   try{
-    await emailjs.send(EMAILJS_SERVICE,EMAILJS_TEMPLATE,{to_email:email,reset_url:resetUrl,expires:'1 Stunde'});
+    await emailjs.send(EMAILJS_SERVICE,EMAILJS_TEMPLATE,{to_email:email,reset_url:resetUrl});
     okEl.style.display='block';
     document.getElementById('btn-reset-send').disabled=true;
   }catch(e){
-    errEl.textContent='E-Mail konnte nicht gesendet werden. Bitte Support kontaktieren.';
-    errEl.style.display='block';
+    errEl.textContent='E-Mail konnte nicht gesendet werden. Support kontaktieren.';errEl.style.display='block';
   }
 }
 
 function showPinResetForm(token){
+  switchTab('admin');
   document.getElementById('auth-forms').innerHTML=`
     <div style="text-align:left;width:100%;max-width:320px;">
-      <div class="info-box" style="margin-bottom:1rem;"><i class="ti ti-lock" style="font-size:16px;flex-shrink:0"></i><span>Neuen PIN eingeben um Ihr Konto wiederherzustellen.</span></div>
+      <div class="info-box" style="margin-bottom:1rem;"><i class="ti ti-lock" style="font-size:16px;flex-shrink:0"></i><span>Neuen PIN eingeben.</span></div>
       <label>Neuer PIN (mind. 4 Zeichen)</label>
       <input type="password" id="nr-pin" placeholder="Neuer PIN" inputmode="numeric" style="width:100%;" />
       <label>PIN wiederholen</label>
@@ -714,12 +754,9 @@ function showPinResetForm(token){
       <button class="btn-green-full" style="margin-top:8px;" onclick="confirmPinReset('${token}')"><i class="ti ti-lock"></i>PIN zurücksetzen</button>
     </div>`;
 }
-
 async function confirmPinReset(token){
-  const pin=document.getElementById('nr-pin').value;
-  const pin2=document.getElementById('nr-pin2').value;
-  const errEl=document.getElementById('nr-err');
-  errEl.style.display='none';
+  const pin=document.getElementById('nr-pin').value,pin2=document.getElementById('nr-pin2').value;
+  const errEl=document.getElementById('nr-err');errEl.style.display='none';
   if(!pin||pin.length<4){errEl.textContent='PIN mind. 4 Zeichen.';errEl.style.display='block';return;}
   if(pin!==pin2){errEl.textContent='PINs stimmen nicht überein.';errEl.style.display='block';return;}
   const {data:reset}=await sb.from('pin_resets').select('*').eq('token',token).eq('used',false).single();
@@ -727,16 +764,15 @@ async function confirmPinReset(token){
   await sb.from('admins').update({pin_hash:hashPin(pin),failed_attempts:0,locked_until:null,permanent_lock:false}).eq('id',reset.admin_id);
   await sb.from('pin_resets').update({used:true}).eq('id',reset.id);
   window.history.replaceState({},'',window.location.pathname);
-  showAuthTab('login');
   location.reload();
 }
 
-function startLockout(until){
+function showLockout(until){
   document.getElementById('auth-forms').style.display='none';
-  document.getElementById('lockout-wrap').style.display='flex';
+  document.getElementById('lockout-section').style.display='block';
   document.getElementById('auth-icon').className='auth-icon auth-icon-red';
   document.getElementById('auth-title').textContent='Zugang gesperrt';
-  document.getElementById('auth-sub').textContent='Zu viele Fehlversuche';
+  document.getElementById('auth-sub').textContent='';
   if(lockoutInterval)clearInterval(lockoutInterval);
   lockoutInterval=setInterval(()=>{
     const rem=Math.max(0,until-Date.now());
@@ -745,14 +781,13 @@ function startLockout(until){
     if(rem<=0){clearInterval(lockoutInterval);location.reload();}
   },1000);
 }
-
 function showSupportBox(){
   document.getElementById('auth-forms').style.display='none';
-  document.getElementById('lockout-wrap').style.display='none';
+  document.getElementById('lockout-section').style.display='none';
   document.getElementById('support-box').style.display='block';
   document.getElementById('auth-icon').className='auth-icon auth-icon-red';
-  document.getElementById('auth-title').textContent='Zugang gesperrt';
-  document.getElementById('auth-sub').textContent='Bitte Support kontaktieren';
+  document.getElementById('auth-title').textContent='Zugang dauerhaft gesperrt';
+  document.getElementById('auth-sub').textContent='';
 }
 
 function showAdminContent(){
@@ -761,8 +796,8 @@ function showAdminContent(){
   document.getElementById('tab-admin').innerHTML='<i class="ti ti-shield-check"></i>Admin';
   document.getElementById('admin-email-display').innerHTML='<i class="ti ti-user" style="vertical-align:-2px;margin-right:4px"></i>Eingeloggt als: <strong>'+currentAdmin.email+'</strong>';
   renderAll();
+  loadAdmins();
 }
-
 function doLogout(){
   currentAdmin=null;
   document.getElementById('auth-screen').style.display='block';
@@ -771,7 +806,8 @@ function doLogout(){
   document.getElementById('auth-title').textContent='Admin-Bereich';
   document.getElementById('auth-sub').textContent='Einloggen oder registrieren';
   document.getElementById('auth-forms').style.display='block';
-  document.getElementById('lockout-wrap').style.display='none';
+  document.getElementById('lockout-section').style.display='none';
+  document.getElementById('support-box').style.display='none';
   document.getElementById('l-pin').value='';
   document.getElementById('l-err').style.display='none';
   document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
@@ -780,23 +816,16 @@ function doLogout(){
 
 // ── PIN Change ────────────────────────────────────────────────────────────
 function initPinChange(){
-  const current=document.getElementById('inp-pin-current').value;
+  const cur=document.getElementById('inp-pin-current').value;
   const np=document.getElementById('inp-pin-new').value;
   const rp=document.getElementById('inp-pin-repeat').value;
   document.getElementById('err-current').style.display='none';
   document.getElementById('err-repeat').style.display='none';
   if(!currentAdmin)return;
-  if(hashPin(current)!==currentAdmin.pin_hash){
-    document.getElementById('err-current').textContent='Falscher PIN';
-    document.getElementById('err-current').style.display='block';return;
-  }
+  if(hashPin(cur)!==currentAdmin.pin_hash){document.getElementById('err-current').textContent='Falscher PIN';document.getElementById('err-current').style.display='block';return;}
   if(!np||np.length<4){document.getElementById('err-current').textContent='Neuer PIN mind. 4 Zeichen.';document.getElementById('err-current').style.display='block';return;}
-  if(np!==rp){
-    document.getElementById('err-repeat').textContent='PINs stimmen nicht überein';
-    document.getElementById('err-repeat').style.display='block';return;
-  }
-  pendingNewPin=np;
-  showPanel('confirm-pin');
+  if(np!==rp){document.getElementById('err-repeat').textContent='PINs stimmen nicht überein';document.getElementById('err-repeat').style.display='block';return;}
+  pendingNewPin=np;showPanel('confirm-pin');
 }
 async function finalPinChange(){
   await sb.from('admins').update({pin_hash:hashPin(pendingNewPin)}).eq('id',currentAdmin.id);
@@ -811,7 +840,6 @@ async function finalPinChange(){
 // ── Render ────────────────────────────────────────────────────────────────
 function initials(n){return n.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function showToastErr(msg){alert(msg);}
 
 function renderAll(){
   const totalP=orders.reduce((s,o)=>s+(o.typ==='gruppe'?o.anzahl:1),0);
@@ -821,7 +849,7 @@ function renderAll(){
     ?'<div class="empty-state"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div>'
     :orders.map(o=>{
       const isG=o.typ==='gruppe';
-      return`<div class="order-item">
+      return`<div class="order-item" id="order-item-${o.id}">
         <div class="order-avatar${isG?' order-avatar-group':''}">${isG?'<i class="ti ti-users" style="font-size:14px"></i>':esc(initials(o.name))}</div>
         <div class="order-info">
           <div class="order-name">${esc(o.name)}${isG?'&nbsp;<span class="tag-gruppe">'+o.anzahl+' Personen</span>':''}</div>
@@ -831,6 +859,7 @@ function renderAll(){
     }).join('');
 
   if(!currentAdmin)return;
+
   document.getElementById('stat-total').textContent=totalP;
   const groups={};
   orders.forEach(o=>{
@@ -849,28 +878,21 @@ function renderAll(){
           <span class="group-count">${data.p} Pers.</span>
         </div>
         ${data.entries.map(o=>{const isG=o.typ==='gruppe';return`
-          <div class="order-item">
+          <div class="order-item" id="order-item-admin-${o.id}">
             <div class="order-avatar${isG?' order-avatar-group':''}">${isG?'<i class="ti ti-users" style="font-size:14px"></i>':esc(initials(o.name))}</div>
-            <div class="order-info"><div class="order-name">${esc(o.name)}${isG?'<span class="tag-gruppe" style="margin-left:6px">'+o.anzahl+' Pers.</span>':''}</div></div>
-            <button class="order-del" onclick="deleteOrder(${o.id})" aria-label="Löschen"><i class="ti ti-trash" style="font-size:15px"></i></button>
+            <div class="order-info">
+              <div class="order-name">${esc(o.name)}${isG?'<span class="tag-gruppe" style="margin-left:5px">'+o.anzahl+' Pers.</span>':''}</div>
+            </div>
+            <div class="order-actions">
+              ${isG?`<button class="icon-btn edit" onclick="initEditOrder(${o.id})" title="Bearbeiten"><i class="ti ti-pencil" style="font-size:15px"></i></button>`:''}
+              <button class="icon-btn del" onclick="initDeleteOrder(${o.id})" title="Löschen"><i class="ti ti-trash" style="font-size:15px"></i></button>
+            </div>
           </div>`;}).join('')}
       </div>`).join('');
-
-  // Gruppen-Dropdown
-  const sel=document.getElementById('sel-gruppe');
-  const curVal=sel.value;
-  sel.innerHTML='<option value="">— Gruppenanmeldung auswählen —</option>';
-  orders.filter(o=>o.typ==='gruppe').forEach(o=>{
-    const opt=document.createElement('option');
-    opt.value=o.id;
-    opt.textContent=o.name+' — '+o.restaurant+' ('+o.anzahl+' Pers.)';
-    sel.appendChild(opt);
-  });
-  sel.value=curVal;
 }
 
-function showPanel(id){document.getElementById(id).style.display='block';}
-function hidePanel(id){document.getElementById(id).style.display='none';}
+function showPanel(id){const el=document.getElementById(id);if(el){el.style.display='block';}}
+function hidePanel(id){const el=document.getElementById(id);if(el)el.style.display='none';}
 
 function switchTab(tab){
   ['anmelden','uebersicht','admin'].forEach(t=>{
@@ -878,9 +900,8 @@ function switchTab(tab){
     document.getElementById('view-'+t).classList.toggle('active',t===tab);
   });
   if(tab==='uebersicht')loadOrders();
+  if(tab==='admin'&&currentAdmin)loadAdmins();
 }
-
-document.getElementById('sel-gruppe').addEventListener('change',onGruppeSelect);
 
 load();
 setInterval(updateStatus,30000);
