@@ -383,8 +383,16 @@ async function load(){
     renderLoginForm();
   }
 
-  // Check existing session
   const {data:{session}}=await sb.auth.getSession();
+
+  if(!isAdminUrl()){
+    // On normal URL: always sign out to prevent auto-login
+    if(session) await sb.auth.signOut();
+    currentUser=null;
+    return;
+  }
+
+  // On ?admin URL: restore session if exists
   if(session){
     currentUser=session.user;
     document.getElementById('tab-admin').style.display='flex';
@@ -393,22 +401,22 @@ async function load(){
     return;
   }
 
-  // If no session and admin url, show login
-  if(isAdminUrl()) renderLoginForm();
+  // No session on ?admin URL: show login
+  renderLoginForm();
 }
 
 // ── Auth State Changes ────────────────────────────────────
 sb.auth.onAuthStateChange(async (event,session)=>{
   if(event==='SIGNED_IN'&&session&&!currentUser){
     currentUser=session.user;
-    // If came from invite/recovery link, show set password form
     const hash=window.location.hash;
     if(hash.includes('type=invite')||hash.includes('type=recovery')){
       renderSetPasswordForm(
         hash.includes('type=invite')?'Willkommen!':'Passwort zurücksetzen',
         hash.includes('type=invite')?'Bitte legen Sie Ihr Passwort fest.':'Bitte legen Sie ein neues Passwort fest.'
       );
-    }else{
+    }else if(isAdminUrl()){
+      // Only show admin if ?admin in URL
       document.getElementById('tab-admin').style.display='flex';
       showAdminContent();
     }
@@ -734,11 +742,19 @@ function showAdminContent(){
 
 function forceLogout(){
   currentUser=null;
-  document.getElementById('auth-panel').style.display='block';
-  document.getElementById('admin-content').style.display='none';
-  document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
-  renderLoginForm();
-  switchTab('admin');
+  // Hide admin tab if not on ?admin URL
+  if(!isAdminUrl()){
+    document.getElementById('tab-admin').style.display='none';
+    document.getElementById('view-admin').classList.remove('active');
+    document.getElementById('tab-anmelden').classList.add('active');
+    document.getElementById('view-anmelden').classList.add('active');
+  }else{
+    document.getElementById('auth-panel').style.display='block';
+    document.getElementById('admin-content').style.display='none';
+    document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
+    renderLoginForm();
+    switchTab('admin');
+  }
 }
 
 async function doLogout(){
@@ -748,7 +764,8 @@ async function doLogout(){
   document.getElementById('admin-content').style.display='none';
   document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
   renderLoginForm();
-  switchTab('admin');
+  // Stay on admin tab (user is on ?admin URL when logged in)
+  if(isAdminUrl()) switchTab('admin');
 }
 
 // ── Render ────────────────────────────────────────────────
@@ -794,7 +811,8 @@ function renderAll(){
 
 // ── Navigation ────────────────────────────────────────────
 function switchTab(tab){
-  if(tab==='admin'&&!isAdminUrl()&&!currentUser)return;
+  // Admin tab STRICTLY requires ?admin in URL
+  if(tab==='admin'&&!isAdminUrl())return;
   ['anmelden','uebersicht','admin'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('view-'+t).classList.toggle('active',t===tab);
