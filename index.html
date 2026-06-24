@@ -424,6 +424,13 @@ async function load(){
   const isInvite=hash.includes('type=invite');
   const isRecovery=hash.includes('type=recovery');
 
+  // If ?admin without valid token → redirect to normal page
+  const _params=new URLSearchParams(window.location.search);
+  if(_params.has('admin')&&_params.get('admin')!=='vssm-luzern-2026'&&!isInvite&&!isRecovery){
+    window.location.replace('/');
+    return;
+  }
+
   await loadKurse();
   document.getElementById('status-pill').style.visibility='visible';
 
