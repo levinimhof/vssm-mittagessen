@@ -138,8 +138,8 @@
     </div>
   </div>
 
-  <div id="status-pill" class="status-pill status-open">
-    <span class="dot"></span><span id="status-text">Anmeldung offen</span>
+  <div id="status-pill" class="status-pill status-closed" style="visibility:hidden;">
+    <span class="dot"></span><span id="status-text">Wird geladen...</span>
   </div>
 
   <nav class="nav">
@@ -415,6 +415,7 @@ async function load(){
   const isRecovery=hash.includes('type=recovery');
 
   await loadKurse();
+  document.getElementById('status-pill').style.visibility='visible';
 
   if(isInvite||isRecovery){
     document.getElementById('tab-admin').style.display='flex';
@@ -479,10 +480,7 @@ async function loadKurse(){
     updateKursBanner(aktiv);
     updateStatusForKurs(aktiv);
   }else{
-    // No active kurs - hide banner and show no-kurs message
     currentKursId=null;
-    const banner=document.getElementById('kurs-banner');
-    if(banner)banner.style.display='none';
     showNoKurs();
   }
   renderUebersichtOrders();
@@ -1072,6 +1070,27 @@ async function finalResetAll(){
   document.getElementById('kurse-list').innerHTML='<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Kurse</div>';
   showNoKurs();
   await loadKurse();
+}
+
+function showNoKurs(){
+  const banner=document.getElementById('kurs-banner');
+  if(banner)banner.style.display='none';
+  const dlBox=document.getElementById('deadline-box');
+  if(dlBox)dlBox.innerHTML='';
+  document.getElementById('form-open').style.display='none';
+  document.getElementById('form-closed').style.display='none';
+  document.getElementById('form-no-kurs').style.display='block';
+  document.getElementById('form-no-kurs').innerHTML=`
+    <div class="empty-state">
+      <i class="ti ti-calendar-off"></i>
+      <div style="font-weight:600;color:var(--text);margin-bottom:6px;">Kein aktiver Kurs</div>
+      <div style="color:var(--text2);font-size:13px;line-height:1.6;">Aktuell ist kein Kurs zur Anmeldung geöffnet.<br>Bei Fragen wenden Sie sich an einen Mitarbeiter des Schreiner Verbands Luzern.</div>
+    </div>`;
+  const pill=document.getElementById('status-pill');
+  pill.className='status-pill status-closed';
+  document.getElementById('status-text').innerHTML='<i class="ti ti-calendar-off" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Kein aktiver Kurs';
+  const kss=document.getElementById('kurs-select-section');
+  if(kss)kss.style.display='none';
 }
 
 load();
