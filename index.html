@@ -1341,47 +1341,84 @@ function scrollChat(){
   msgs.scrollTop = msgs.scrollHeight;
 }
 
+function getRestaurantRecommendation(text){
+  const t = text.toLowerCase();
+
+  // Keywords -> restaurants
+  const rules = [
+    {keys:['asiat','chines','japanisch','sushi','wok','international','mediterran','vielfalt','abwechslung'],
+     recs:['AMAYA Restaurant & Bar'],
+     reason:'bietet internationale und asiatisch-mediterrane Küche — genau das Richtige für Abwechslung.'},
+    {keys:['schweiz','traditional','rösti','schnitzel','klassisch','heimisch','typisch','lokal'],
+     recs:['Gasthaus Ochsen','Chärnsmatt Gasthof'],
+     reason:'sind bekannt für traditionelle Schweizer Küche mit Rösti, Schnitzel und regionalen Spezialitäten.'},
+    {keys:['günstig','budget','billig','preiswert','sparen','wenig geld','tagesmenü'],
+     recs:['Gasthaus Bahnhof'],
+     reason:'ist die günstigste Option mit einfachen Tagesmenüs zu fairen Preisen.'},
+    {keys:['schnell','kurze pause','wenig zeit','quick','flott'],
+     recs:['Ace Cafe Luzern','Gasthaus Bahnhof'],
+     reason:'sind ideal für ein schnelles Mittagessen — Sandwiches, Salate und einfache Gerichte.'},
+    {keys:['vegetarisch','vegan','salat','leicht','gesund','ohne fleisch'],
+     recs:['AMAYA Restaurant & Bar','Ace Cafe Luzern'],
+     reason:'haben gute vegetarische Optionen und leichte Gerichte.'},
+    {keys:['gemütlich','rustikal','ländlich','entspannt','ruhig','atmosphere','stimmung'],
+     recs:['Chärnsmatt Gasthof','Gasthaus Ochsen'],
+     reason:'bieten eine gemütliche, rustikale Atmosphäre — perfekt zum Entspannen.'},
+    {keys:['modern','trendig','stylish','schick','gehoben','besonder'],
+     recs:['AMAYA Restaurant & Bar','Fläcke Restaurant'],
+     reason:'sind modern eingerichtet und bieten ein gehobenes Mittagessen.'},
+    {keys:['gruppe','viele leute','team','kollegen','gross'],
+     recs:['Gasthaus Ochsen','Chärnsmatt Gasthof'],
+     reason:'sind gut geeignet für Gruppen mit ausreichend Platz.'},
+    {keys:['pasta','italienisch','mediterran'],
+     recs:['Fläcke Restaurant'],
+     reason:'serviert regionale Küche mit Pasta und mediterranen Einflüssen.'},
+    {keys:['kaffee','café','kuchen','dessert'],
+     recs:['Ace Cafe Luzern'],
+     reason:'ist das beste Café für Kaffee und leichte Snacks.'},
+  ];
+
+  for(const rule of rules){
+    if(rule.keys.some(k => t.includes(k))){
+      const names = rule.recs.join(' und ');
+      return `Ich empfehle **${names}** — ${rule.reason}
+
+Möchtest du mehr Details oder hast du andere Wünsche?`;
+    }
+  }
+
+  // Default - ask more
+  return 'Kannst du mir mehr über deine Wünsche verraten? Zum Beispiel:
+• Welche Küche magst du? (Schweizer, International, Café)
+• Wie ist dein Budget? (günstig / mittel / gehoben)
+• Wie viel Zeit hast du? (schnell / gemütlich)
+• Bist du in einer Gruppe?';
+}
+
 async function sendChat(){
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   if(!text) return;
   input.value = '';
-  input.style.height = 'auto';
 
   addUserMsg(text);
-  chatHistory.push({role:'user', content:text});
 
   const btn = document.getElementById('chat-send-btn');
   btn.disabled = true;
   addTyping();
 
-  try{
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:1000,
-        system:`Du bist ein freundlicher Restaurant-Assistent für Kursteilnehmer des VSSM Schreiner Verbands Luzern in Rothenburg. Deine Aufgabe ist es, das passende Restaurant aus der folgenden Liste zu empfehlen basierend auf den Wünschen des Nutzers. Antworte immer auf Deutsch, kurz und präzise. Empfehle maximal 2 Restaurants pro Antwort. Nach der Empfehlung frage ob der Nutzer weitere Wünsche hat oder direkt anmelden möchte.
+  // Small delay for natural feel
+  await new Promise(r => setTimeout(r, 600));
+  removeTyping();
 
-${RESTAURANTS_INFO}
-
-Wichtig: Empfehle nur Restaurants aus dieser Liste. Sei freundlich und hilfsbereit.`,
-        messages: chatHistory
-      })
-    });
-
-    const data = await response.json();
-    removeTyping();
-
-    const reply = data.content?.[0]?.text || 'Entschuldigung, ich konnte keine Antwort generieren.';
-    addBotMsg(reply);
-    chatHistory.push({role:'assistant', content:reply});
-
-  }catch(e){
-    removeTyping();
-    addBotMsg('Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuche es erneut.');
-  }
+  const reply = getRestaurantRecommendation(text);
+  // Handle bold markdown
+  const el = document.createElement('div');
+  el.className = 'chat-msg bot';
+  el.innerHTML = reply.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/
+/g,'<br>');
+  document.getElementById('chat-messages').appendChild(el);
+  scrollChat();
 
   btn.disabled = false;
   input.focus();
