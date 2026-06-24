@@ -555,9 +555,13 @@ function renderKurseSelects(){
   }
 
   if(selUebersicht){
-    selUebersicht.innerHTML=optsAlle;
-    const aktiv=kurse.find(k=>k.aktiv);
-    if(aktiv)selUebersicht.value=aktiv.id;
+    // Übersicht zeigt nur aktive Kurse
+    const optsUebersicht=aktiveKurse.length===0?'<option value="">Keine aktiven Kurse</option>':
+      '<option value="">— Kurs auswählen —</option>'+
+      aktiveKurse.map(k=>`<option value="${k.id}">${esc(k.name)} · ${fmtDate(k.datum)}</option>`).join('');
+    selUebersicht.innerHTML=optsUebersicht;
+    const aktiv=aktiveKurse[0];
+    if(aktiv){selUebersicht.value=aktiv.id;renderUebersichtOrders();}
   }
 
   if(selAdmin){
