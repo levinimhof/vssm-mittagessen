@@ -937,6 +937,35 @@ function switchTab(tab){
 load();
 setInterval(updateStatus,30000);
 setInterval(()=>loadOrders(),15000);
+
+// Check every 5 seconds if session still valid (instant logout if deleted in Supabase)
+setInterval(async()=>{
+  if(!currentUser)return;
+  const {data,error}=await sb.auth.getUser();
+  if(error||!data?.user){
+    forceLogout();
+  }
+},5000);
+
+// Also listen to Supabase auth events - fires immediately on token revocation
+sb.auth.onAuthStateChange((event,session)=>{
+  if(event==='SIGNED_OUT'||event==='USER_DELETED'||event==='TOKEN_REFRESHED'&&!session){
+    if(currentUser){
+      forceLogout();
+    }
+  }
+});
+
+function forceLogout(){
+  currentUser=null;
+  sessionStorage.removeItem('must_set_password');
+  document.getElementById('auth-screen').style.display='block';
+  document.getElementById('admin-content').style.display='none';
+  document.getElementById('super-admin-section').style.display='none';
+  document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
+  restoreLoginForm();
+  switchTab('admin');
+}
 </script>
 </body>
 </html>
