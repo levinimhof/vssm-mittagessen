@@ -511,18 +511,19 @@ async function loadKurse(){
   const {data}=await sb.from('kurse').select('*').order('datum',{ascending:false});
   kurse=data||[];
   renderKurseSelects();
-  // Auto-select first kurs (active preferred)
+  // Only auto-select ACTIVE kurse
   const aktiv=kurse.find(k=>k.aktiv);
-  const first=kurse[0];
-  const selected=aktiv||first;
-  if(selected){
-    currentKursId=selected.id;
-    // Set dropdown value if visible
+  if(aktiv){
+    currentKursId=aktiv.id;
     const sel=document.getElementById('sel-kurs-anmelden');
-    if(sel)sel.value=selected.id;
-    updateKursBanner(selected);
-    updateStatusForKurs(selected);
+    if(sel)sel.value=aktiv.id;
+    updateKursBanner(aktiv);
+    updateStatusForKurs(aktiv);
   }else{
+    // No active kurs - hide banner and show no-kurs message
+    currentKursId=null;
+    const banner=document.getElementById('kurs-banner');
+    if(banner)banner.style.display='none';
     showNoKurs();
   }
   renderUebersichtOrders();
@@ -620,10 +621,19 @@ async function createKurs(){
 async function toggleKursAktiv(id,aktiv){
   await sb.from('kurse').update({aktiv}).eq('id',id);
   await loadKurse();
-  // If toggled kurs is current, update status
-  if(id===currentKursId){
-    const kurs=kurse.find(k=>k.id===currentKursId);
-    if(kurs)updateStatusForKurs(kurs);
+  // Update user-facing anmelden view
+  const aktivKurs=kurse.find(k=>k.aktiv);
+  if(aktivKurs){
+    currentKursId=aktivKurs.id;
+    const sel=document.getElementById('sel-kurs-anmelden');
+    if(sel)sel.value=aktivKurs.id;
+    updateKursBanner(aktivKurs);
+    updateStatusForKurs(aktivKurs);
+  }else{
+    currentKursId=null;
+    const banner=document.getElementById('kurs-banner');
+    if(banner)banner.style.display='none';
+    showNoKurs();
   }
   // Re-select in admin if needed
   const sel=document.getElementById('sel-kurs-admin');
