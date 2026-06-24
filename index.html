@@ -120,6 +120,8 @@
     #custom-field{display:none;}
     #gruppe-fields{display:none;}
     @media(max-width:480px){.app{padding:1rem 0.75rem 3rem;}.app-title{font-size:18px;}}
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator{cursor:pointer;}
+    input[type="datetime-local"]{-webkit-appearance:none;}
   </style>
 </head>
 <body>
@@ -274,7 +276,7 @@
         <hr class="divider">
         <div class="card-title" style="margin-bottom:0.5rem;"><i class="ti ti-calendar"></i>Anmeldeschluss</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:0.75rem;">Datum und Uhrzeit bis wann Anmeldungen möglich sind.</div>
-        <input type="datetime-local" id="inp-deadline-dt" />
+        <input type="datetime-local" id="inp-deadline-dt" style="width:100%;" />
         <div class="confirm-panel" id="confirm-deadline">
           <div class="confirm-panel-title"><i class="ti ti-calendar-check" style="color:var(--green)"></i>Anmeldeschluss ändern?</div>
           <div class="confirm-summary" id="confirm-deadline-summary"></div>
@@ -285,18 +287,7 @@
         </div>
         <button class="btn-outline" onclick="initSaveDeadline()" style="margin-top:0.25rem;margin-bottom:0;"><i class="ti ti-check"></i>Speichern</button>
 
-        <hr class="divider">
-        <div class="card-title" style="margin-bottom:0.75rem;"><i class="ti ti-shield"></i>Registrierte Admins</div>
-        <div id="admin-list"><div class="empty-state" style="padding:1rem 0;"><i class="ti ti-loader"></i></div></div>
-        <div class="confirm-panel danger" id="confirm-delete-admin">
-          <div class="confirm-panel-title"><i class="ti ti-user-x"></i>Admin-Konto löschen?</div>
-          <div class="confirm-summary" id="confirm-delete-admin-summary"></div>
-          <div class="confirm-panel-body" style="margin-top:0.5rem;">Das Konto wird vollständig aus der Datenbank entfernt.</div>
-          <div class="confirm-actions">
-            <button class="ca-abort" onclick="hidePanel('confirm-delete-admin')"><i class="ti ti-x"></i>Abbrechen</button>
-            <button class="ca-red" onclick="finalDeleteAdmin()"><i class="ti ti-trash"></i>Konto löschen</button>
-          </div>
-        </div>
+
 
         <!-- Super Admin Bereich -->
         <div id="super-admin-section" style="display:none;">
@@ -308,6 +299,28 @@
             </div>
           </div>
         </div>
+
+        <hr class="divider">
+        <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-lock"></i>Mein Passwort ändern</div>
+        <div class="pw-field">
+          <input type="password" id="chpw-new" placeholder="Neues Passwort (mind. 6 Zeichen)" />
+          <button class="pw-eye-btn" type="button" onmousedown="peShow('chpw-new')" onmouseup="peHide('chpw-new')" onmouseleave="peHide('chpw-new')" ontouchstart="peShow('chpw-new')" ontouchend="peHide('chpw-new')" tabindex="-1"><i class="ti ti-eye"></i></button>
+        </div>
+        <div class="pw-field">
+          <input type="password" id="chpw-rep" placeholder="Passwort wiederholen" />
+          <button class="pw-eye-btn" type="button" onmousedown="peShow('chpw-rep')" onmouseup="peHide('chpw-rep')" onmouseleave="peHide('chpw-rep')" ontouchstart="peShow('chpw-rep')" ontouchend="peHide('chpw-rep')" tabindex="-1"><i class="ti ti-eye"></i></button>
+        </div>
+        <div class="field-err" id="chpw-err" style="display:none;"></div>
+        <div class="field-ok" id="chpw-ok" style="display:none;"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Passwort erfolgreich geändert!</div>
+        <div class="confirm-panel" id="confirm-chpw">
+          <div class="confirm-panel-title"><i class="ti ti-lock-check" style="color:var(--green)"></i>Passwort wirklich ändern?</div>
+          <div class="confirm-panel-body">Das neue Passwort wird sofort aktiv.</div>
+          <div class="confirm-actions">
+            <button class="ca-abort" onclick="hidePanel('confirm-chpw')"><i class="ti ti-x"></i>Abbrechen</button>
+            <button class="ca-ok" onclick="finalChangePassword()"><i class="ti ti-check"></i>Ja, ändern</button>
+          </div>
+        </div>
+        <button class="btn-green-full" onclick="initChangePassword()" style="margin-bottom:0;"><i class="ti ti-lock"></i>Passwort ändern</button>
 
         <hr class="divider">
         <div class="reset-box">
@@ -470,7 +483,7 @@ function isPast(){if(!deadlineStr)return false;return new Date()>new Date(deadli
 function fmtDeadline(str){
   if(!str)return '—';
   const d=new Date(str);
-  return d.toLocaleDateString('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})+', '+d.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'})+' Uhr';
+  return d.toLocaleDateString('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})+', '+d.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit',hour12:false})+' Uhr';
 }
 
 function updateStatus(){
@@ -683,10 +696,25 @@ function initDeleteAdmin(id,email){
 async function finalDeleteAdmin(){
   if(!pendingDeleteAdminId)return;
   const isMe=currentUser&&pendingDeleteAdminId===currentUser.id;
-  await sb.auth.admin?.deleteUser?.(pendingDeleteAdminId);
-  hidePanel('confirm-delete-admin');
-  pendingDeleteAdminId=null;
-  if(isMe)doLogout();else await loadAdmins();
+  // Delete from Supabase Auth (requires service role - works via RLS)
+  await sb.from('admins_delete').insert({user_id:pendingDeleteAdminId}).catch(()=>{});
+  // Sign out if deleting own account
+  if(isMe){
+    await sb.auth.signOut();
+    currentUser=null;
+    sessionStorage.removeItem('must_set_password');
+    window.history.replaceState({},'',window.location.pathname+'?admin');
+    document.getElementById('auth-screen').style.display='block';
+    document.getElementById('admin-content').style.display='none';
+    document.getElementById('super-admin-section').style.display='none';
+    document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
+    restoreLoginForm();
+    switchTab('admin');
+  }else{
+    hidePanel('confirm-delete-admin');
+    pendingDeleteAdminId=null;
+    await loadAdmins();
+  }
 }
 
 function showSetPasswordForm(){
@@ -752,6 +780,28 @@ async function saveNewPassword(){
     </div>`;
 }
 
+function restoreLoginForm(){
+  document.querySelector('.auth-screen').innerHTML=`
+    <div class="auth-icon"><i class="ti ti-shield-lock"></i></div>
+    <div style="font-size:17px;font-weight:600;">Admin-Bereich</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Nur für autorisierte Mitarbeitende</div>
+    <div class="auth-form-wrap">
+      <label for="l-email">E-Mail</label>
+      <input type="email" id="l-email" placeholder="admin@beispiel.ch" style="margin-bottom:1rem;" />
+      <label for="l-pw">Passwort</label>
+      <div class="pw-field">
+        <input type="password" id="l-pw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()" />
+        <button class="pw-eye-btn" type="button" onmousedown="peShow('l-pw')" onmouseup="peHide('l-pw')" onmouseleave="peHide('l-pw')" ontouchstart="peShow('l-pw')" ontouchend="peHide('l-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
+      </div>
+      <div class="field-err" id="l-err"></div>
+      <button class="btn-green-full" onclick="doLogin()"><i class="ti ti-login"></i>Einloggen</button>
+      <div style="margin-top:0.75rem;text-align:center;">
+        <button class="btn-outline" style="width:100%;justify-content:center;" onclick="doResetPw()"><i class="ti ti-mail"></i>Passwort vergessen</button>
+      </div>
+      <div class="field-ok" id="reset-ok" style="margin-top:0.5rem;display:none;"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Reset-Link per E-Mail gesendet!</div>
+    </div>`;
+}
+
 async function doLogin(){
   const email=document.getElementById('l-email').value.trim().toLowerCase();
   const pw=document.getElementById('l-pw').value;
@@ -791,7 +841,6 @@ function showAdminContent(){
     (isSuper?'&nbsp;<span style="font-size:11px;background:var(--blue-bg);color:var(--blue);padding:1px 7px;border-radius:99px;font-weight:600;">Super Admin</span>':'');
   if(isSuper)document.getElementById('super-admin-section').style.display='block';
   renderAll();
-  loadAdmins();
 }
 
 async function doLogout(){
@@ -799,32 +848,37 @@ async function doLogout(){
   currentUser=null;
   sessionStorage.removeItem('must_set_password');
   window.history.replaceState({},'',window.location.pathname+'?admin');
-  // Always restore normal login form
   document.getElementById('auth-screen').style.display='block';
   document.getElementById('admin-content').style.display='none';
   document.getElementById('super-admin-section').style.display='none';
   document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
-  // Restore login form HTML in case it was replaced
-  document.querySelector('.auth-screen').innerHTML=`
-    <div class="auth-icon" id="auth-icon"><i class="ti ti-shield-lock"></i></div>
-    <div style="font-size:17px;font-weight:600;" id="auth-title">Admin-Bereich</div>
-    <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Nur für autorisierte Mitarbeitende</div>
-    <div class="auth-form-wrap">
-      <label for="l-email">E-Mail</label>
-      <input type="email" id="l-email" placeholder="admin@beispiel.ch" style="margin-bottom:1rem;" />
-      <label for="l-pw">Passwort</label>
-      <div class="pw-field">
-        <input type="password" id="l-pw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()" />
-        <button class="pw-eye-btn" type="button" onmousedown="peShow('l-pw')" onmouseup="peHide('l-pw')" onmouseleave="peHide('l-pw')" ontouchstart="peShow('l-pw')" ontouchend="peHide('l-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
-      </div>
-      <div class="field-err" id="l-err"></div>
-      <button class="btn-green-full" onclick="doLogin()"><i class="ti ti-login"></i>Einloggen</button>
-      <div style="margin-top:0.75rem;text-align:center;">
-        <button class="btn-outline" style="width:100%;justify-content:center;" onclick="doResetPw()"><i class="ti ti-mail"></i>Passwort vergessen</button>
-      </div>
-      <div class="field-ok" id="reset-ok" style="margin-top:0.5rem;"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Reset-Link per E-Mail gesendet!</div>
-    </div>`;
-  switchTab('anmelden');
+  restoreLoginForm();
+  switchTab('admin');
+}
+
+function initChangePassword(){
+  const pw=document.getElementById('chpw-new').value;
+  const rep=document.getElementById('chpw-rep').value;
+  const errEl=document.getElementById('chpw-err');
+  const okEl=document.getElementById('chpw-ok');
+  errEl.style.display='none';okEl.style.display='none';
+  if(!pw||pw.length<6){errEl.textContent='Passwort mind. 6 Zeichen.';errEl.style.display='block';return;}
+  if(pw!==rep){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
+  showPanel('confirm-chpw');
+}
+
+async function finalChangePassword(){
+  const pw=document.getElementById('chpw-new').value;
+  const {error}=await sb.auth.updateUser({password:pw});
+  hidePanel('confirm-chpw');
+  if(error){
+    document.getElementById('chpw-err').textContent='Fehler: '+error.message;
+    document.getElementById('chpw-err').style.display='block';return;
+  }
+  document.getElementById('chpw-new').value='';
+  document.getElementById('chpw-rep').value='';
+  document.getElementById('chpw-ok').style.display='block';
+  setTimeout(()=>document.getElementById('chpw-ok').style.display='none',3000);
 }
 
 function renderAll(){
