@@ -985,23 +985,43 @@ function initSaveDeadline(){
 }
 async function finalSaveDeadline(){
   const val=document.getElementById('inp-deadline-dt').value;
-  await sb.from('kurse').update({deadline:val}).eq('id',currentKursId);
-  hidePanel('confirm-deadline');
-  // Reload all kurse from DB - single source of truth
-  await loadKurse();
   const savedId=currentKursId;
-  // Re-select in admin dropdown and refresh admin content
-  const sel=document.getElementById('sel-kurs-admin');
-  if(sel){sel.value=savedId;await onKursAdminChange();}
-  // Update anmelden view
+  await sb.from('kurse').update({deadline:val||null}).eq('id',savedId);
+  hidePanel('confirm-deadline');
+
+  // Reload from DB - wait for completion
+  await loadKurse();
+
+  // Now kurse array is fresh - update everything
   const kurs=kurse.find(k=>k.id===savedId);
-  if(kurs)updateStatusForKurs(kurs);
-  // Update ubersicht
+  if(!kurs)return;
+
+  // 1. Re-select in admin dropdown
+  const sel=document.getElementById('sel-kurs-admin');
+  if(sel)sel.value=savedId;
+
+  // 2. Update admin banner and content directly with fresh data
+  currentKursId=savedId;
+  const _past=kurs.deadline&&new Date()>new Date(kurs.deadline);
+  const _statusLabel=!kurs.aktiv?'Deaktiviert':_past?'Abgelaufen':'Aktiv';
+  const _statusStyle=!kurs.aktiv?'background:#FCEBEB;color:#A32D2D':_past?'background:#FAEEDA;color:#854F0B':'background:var(--primary-bg);color:var(--primary)';
+  const _dlTxt=kurs.deadline?`<div style="font-size:12px;margin-top:4px;opacity:0.8;"><i class="ti ti-clock" style="font-size:11px;margin-right:3px;vertical-align:-1px;"></i>Schluss: <strong>${fmtDatetime(kurs.deadline)}</strong></div>`:'<div style="font-size:12px;margin-top:4px;opacity:0.6;">Kein Anmeldeschluss gesetzt</div>';
+  document.getElementById('kurs-info-banner').innerHTML=`<div style="width:100%;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><i class="ti ti-calendar" style="font-size:16px;flex-shrink:0;"></i><strong>${esc(kurs.name)}</strong> · ${fmtDate(kurs.datum)}<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;${_statusStyle}">${_statusLabel}</span></div>${_dlTxt}</div>`;
+
+  // 3. Update deadline input
+  const dlInput=document.getElementById('inp-deadline-dt');
+  if(dlInput)dlInput.value=kurs.deadline?kurs.deadline.slice(0,16):'';
+
+  // 4. Update kurse cards
+  renderKurseList();
+
+  // 5. Update anmelden status (user-facing page)
+  updateStatusForKurs(kurs);
+
+  // 6. Update ubersicht
   const selU=document.getElementById('sel-kurs-uebersicht');
   if(selU)selU.value=savedId;
   await renderUebersichtOrders();
-  // Refresh kurse cards
-  renderKurseList();
 }
 
 // ── Reset ─────────────────────────────────────────────────
