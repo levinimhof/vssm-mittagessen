@@ -1067,6 +1067,70 @@ async function finalResetAll(){
   await loadKurse();
 }
 
+function updateStatusForKurs(kurs){
+  const pill=document.getElementById('status-pill');
+  const txt=document.getElementById('status-text');
+  const deadlineBox=document.getElementById('deadline-box');
+
+  if(!kurs.aktiv){
+    pill.className='status-pill status-closed';
+    txt.innerHTML='<i class="ti ti-lock" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Anmeldung deaktiviert';
+    if(deadlineBox)deadlineBox.innerHTML='';
+    document.getElementById('form-open').style.display='none';
+    document.getElementById('form-closed').style.display='block';
+    document.getElementById('form-no-kurs').style.display='none';
+    document.getElementById('form-closed').innerHTML=`<div class="empty-state"><i class="ti ti-calendar-off"></i>
+      <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Anmeldung geschlossen</div>
+      <div style="color:var(--text2);font-size:13px;line-height:1.6;">Die Anmeldung für den Kurs <strong>${esc(kurs.name)}</strong> wurde vom Administrator deaktiviert. Bei Fragen wenden Sie sich an einen Mitarbeiter des Schreiner Verbands Luzern.</div>
+    </div>`;
+    return;
+  }
+
+  const past=kurs.deadline&&new Date()>new Date(kurs.deadline);
+  if(past){
+    pill.className='status-pill status-closed';
+    txt.innerHTML='<i class="ti ti-lock" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Anmeldeschluss erreicht';
+    if(deadlineBox)deadlineBox.innerHTML='';
+    document.getElementById('form-open').style.display='none';
+    document.getElementById('form-closed').style.display='block';
+    document.getElementById('form-no-kurs').style.display='none';
+    document.getElementById('form-closed').innerHTML=`<div class="empty-state"><i class="ti ti-clock-off"></i>
+      <div style="font-weight:600;color:var(--text);margin-bottom:6px;">Anmeldeschluss erreicht</div>
+      <div style="color:var(--text2);font-size:13px;line-height:1.6;">Die Anmeldefrist für den Kurs <strong>${esc(kurs.name)}</strong> ist am <strong>${fmtDatetime(kurs.deadline)}</strong> abgelaufen.</div>
+    </div>`;
+  }else{
+    pill.className='status-pill status-open';
+    const rem=kurs.deadline?new Date(kurs.deadline)-new Date():null;
+    let remTxt='';
+    if(rem){
+      const hours=Math.floor(rem/3600000);
+      const mins=Math.floor((rem%3600000)/60000);
+      if(hours>24)remTxt=Math.floor(hours/24)+' Tage verbleibend';
+      else if(hours>0)remTxt=hours+'h '+mins+'min verbleibend';
+      else remTxt=mins+' Minuten verbleibend';
+    }
+    txt.innerHTML='<span class="dot"></span> Anmeldung offen';
+    if(deadlineBox){
+      deadlineBox.innerHTML=kurs.deadline?`<div style="background:var(--primary-bg);border:0.5px solid var(--primary);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;color:var(--primary);margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><i class="ti ti-clock" style="font-size:16px;flex-shrink:0;"></i><strong>Anmeldeschluss: ${fmtDatetime(kurs.deadline)}</strong></div>
+        <div style="font-size:12px;opacity:0.8;padding-left:24px;">${remTxt}</div>
+      </div>`:'';
+    }
+    document.getElementById('form-open').style.display='block';
+    document.getElementById('form-closed').style.display='none';
+    document.getElementById('form-no-kurs').style.display='none';
+  }
+}
+
+function updateKursBanner(kurs){
+  const banner=document.getElementById('kurs-banner');
+  const txt=document.getElementById('kurs-banner-text');
+  if(banner&&txt){
+    txt.innerHTML='<strong>'+esc(kurs.name)+'</strong> · '+fmtDate(kurs.datum);
+    banner.style.display='flex';
+  }
+}
+
 function showNoKurs(){
   const banner=document.getElementById('kurs-banner');
   if(banner)banner.style.display='none';
