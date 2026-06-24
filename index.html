@@ -718,36 +718,38 @@ async function saveNewPassword(){
   const pw=document.getElementById('new-pw').value;
   const pw2=document.getElementById('new-pw2').value;
   const errEl=document.getElementById('new-pw-err');
-  errEl.style.display='none';
+  errEl.style.display='none';errEl.style.color='var(--red)';
   if(!pw||pw.length<6){errEl.textContent='Passwort muss mind. 6 Zeichen haben.';errEl.style.display='block';return;}
   if(pw!==pw2){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
 
-  // Check session
-  const {data:sd,error:se}=await sb.auth.getSession();
-  if(se||!sd?.session){
-    errEl.textContent='Keine gültige Session. Bitte Einladungslink erneut öffnen. ('+( se?.message||'keine session')+')';
-    errEl.style.display='block';return;
-  }
-
-  errEl.style.color='var(--blue)';
-  errEl.textContent='Session OK: '+sd.session.user.email+' — Passwort wird gesetzt...';
-  errEl.style.display='block';
+  const {data:sd}=await sb.auth.getSession();
+  if(!sd?.session){errEl.textContent='Session abgelaufen — bitte Einladungslink erneut öffnen.';errEl.style.display='block';return;}
 
   const {data,error}=await sb.auth.updateUser({password:pw});
-  if(error){
-    errEl.style.color='var(--red)';
-    errEl.textContent='updateUser Fehler: '+error.message+' (Status: '+error.status+')';
-    errEl.style.display='block';return;
-  }
+  if(error){errEl.textContent='Fehler: '+error.message;errEl.style.display='block';return;}
 
-  errEl.style.color='var(--green)';
-  errEl.textContent='Passwort gesetzt! Öffne Admin...';
-  errEl.style.display='block';
-
+  // Password set - sign out and show login form
   sessionStorage.removeItem('must_set_password');
-  currentUser=data.user;
+  await sb.auth.signOut();
+  currentUser=null;
   window.history.replaceState({},'',window.location.pathname+'?admin');
-  setTimeout(()=>showAdminContent(), 1000);
+
+  // Show success + login form
+  document.querySelector('.auth-screen').innerHTML=`
+    <div class="auth-icon" style="background:var(--green-bg);color:var(--green);"><i class="ti ti-circle-check"></i></div>
+    <div style="font-size:17px;font-weight:600;">Passwort gespeichert!</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Bitte loggen Sie sich jetzt ein.</div>
+    <div class="auth-form-wrap">
+      <label for="l-email">E-Mail</label>
+      <input type="email" id="l-email" placeholder="admin@beispiel.ch" style="margin-bottom:1rem;" value="${sd.session.user.email}" />
+      <label for="l-pw">Passwort</label>
+      <div class="pw-field">
+        <input type="password" id="l-pw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()" />
+        <button class="pw-eye-btn" type="button" onmousedown="peShow('l-pw')" onmouseup="peHide('l-pw')" onmouseleave="peHide('l-pw')" ontouchstart="peShow('l-pw')" ontouchend="peHide('l-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
+      </div>
+      <div class="field-err" id="l-err"></div>
+      <button class="btn-green-full" onclick="doLogin()"><i class="ti ti-login"></i>Einloggen</button>
+    </div>`;
 }
 
 async function doLogin(){
@@ -795,13 +797,33 @@ function showAdminContent(){
 async function doLogout(){
   await sb.auth.signOut();
   currentUser=null;
+  sessionStorage.removeItem('must_set_password');
+  window.history.replaceState({},'',window.location.pathname+'?admin');
+  // Always restore normal login form
   document.getElementById('auth-screen').style.display='block';
   document.getElementById('admin-content').style.display='none';
-  document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
-  document.getElementById('l-pw').value='';
-  document.getElementById('l-err').style.display='none';
-  document.getElementById('reset-ok').style.display='none';
   document.getElementById('super-admin-section').style.display='none';
+  document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
+  // Restore login form HTML in case it was replaced
+  document.querySelector('.auth-screen').innerHTML=`
+    <div class="auth-icon" id="auth-icon"><i class="ti ti-shield-lock"></i></div>
+    <div style="font-size:17px;font-weight:600;" id="auth-title">Admin-Bereich</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Nur für autorisierte Mitarbeitende</div>
+    <div class="auth-form-wrap">
+      <label for="l-email">E-Mail</label>
+      <input type="email" id="l-email" placeholder="admin@beispiel.ch" style="margin-bottom:1rem;" />
+      <label for="l-pw">Passwort</label>
+      <div class="pw-field">
+        <input type="password" id="l-pw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()" />
+        <button class="pw-eye-btn" type="button" onmousedown="peShow('l-pw')" onmouseup="peHide('l-pw')" onmouseleave="peHide('l-pw')" ontouchstart="peShow('l-pw')" ontouchend="peHide('l-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
+      </div>
+      <div class="field-err" id="l-err"></div>
+      <button class="btn-green-full" onclick="doLogin()"><i class="ti ti-login"></i>Einloggen</button>
+      <div style="margin-top:0.75rem;text-align:center;">
+        <button class="btn-outline" style="width:100%;justify-content:center;" onclick="doResetPw()"><i class="ti ti-mail"></i>Passwort vergessen</button>
+      </div>
+      <div class="field-ok" id="reset-ok" style="margin-top:0.5rem;"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Reset-Link per E-Mail gesendet!</div>
+    </div>`;
   switchTab('anmelden');
 }
 
