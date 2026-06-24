@@ -27,7 +27,7 @@
     .app-title{font-size:20px;font-weight:700;color:var(--primary);}
     .app-sub{font-size:13px;color:var(--text2);margin-top:2px;}
     .status-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:99px;font-size:13px;font-weight:500;margin-bottom:1.5rem;}
-    .status-open{background:var(--primary-bg);color:var(--primary);}
+    .status-open{background:#E1F5EE;color:#0F6E56;}
     .status-closed{background:var(--red-bg);color:var(--red);}
     .dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;}
     .nav{display:flex;background:var(--bg3);border-radius:var(--radius-lg);padding:4px;gap:4px;margin-bottom:1.5rem;}
@@ -119,8 +119,8 @@
     .confirm-actions button{flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:var(--radius-md);cursor:pointer;font-family:inherit;}
     .ca-abort{background:none;border:0.5px solid var(--border2);color:var(--text2);}
     .ca-abort:hover{background:var(--bg3);}
-    .ca-ok{background:var(--primary);border:none;color:#fff;}
-    .ca-ok:hover{background:var(--primary-dark);}
+    .ca-ok{background:#0F6E56;border:none;color:#fff;}
+    .ca-ok:hover{background:#085041;}
     .ca-red{background:none;border:0.5px solid var(--red-border);color:var(--red);}
     .ca-red:hover{background:var(--red-bg);}
     .edit-order-panel{background:var(--bg);border:0.5px solid var(--primary);border-radius:var(--radius-lg);padding:1.25rem;margin-top:0.5rem;display:none;animation:fadeIn 0.15s ease;}
@@ -163,7 +163,7 @@
         <i class="ti ti-calendar" style="flex-shrink:0;font-size:16px;"></i>
         <span id="kurs-banner-text"></span>
       </div>
-      <div class="card-title"><i class="ti ti-user"></i>Restaurantwahl</div>
+      <div class="card-title"><i class="ti ti-pencil"></i>Anmeldung für Mittagessen</div>
       <div id="form-open">
         <label>Anmeldetyp</label>
         <div class="toggle-row" style="margin-bottom:1.25rem;">
@@ -1109,7 +1109,7 @@ function updateStatusForKurs(kurs){
       else if(hours>0)remTxt=hours+'h '+mins+'min verbleibend';
       else remTxt=mins+' Minuten verbleibend';
     }
-    txt.innerHTML='<span class="dot"></span> Anmeldung offen';
+    txt.innerHTML='<span class="dot" style="background:#0F6E56;"></span> Anmeldung offen';
     if(deadlineBox){
       deadlineBox.innerHTML=kurs.deadline?`<div style="background:var(--primary-bg);border:0.5px solid var(--primary);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;color:var(--primary);margin-bottom:1rem;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><i class="ti ti-clock" style="font-size:16px;flex-shrink:0;"></i><strong>Anmeldeschluss: ${fmtDatetime(kurs.deadline)}</strong></div>
