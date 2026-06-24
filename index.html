@@ -344,8 +344,26 @@ function showPanel(id){const e=document.getElementById(id);if(e)e.style.display=
 function hidePanel(id){const e=document.getElementById(id);if(e)e.style.display='none';}
 
 async function load(){
-  // Check if admin mode via URL
   const params=new URLSearchParams(window.location.search);
+  const hash=window.location.hash;
+
+  // Handle invitation / password reset link from Supabase
+  // Supabase puts tokens in the URL hash after redirect
+  if(hash&&(hash.includes('type=invite')||hash.includes('type=recovery'))){
+    document.getElementById('tab-admin').style.display='flex';
+    switchTab('admin');
+    // Exchange the hash token for a session
+    const {data,error}=await sb.auth.getSession();
+    if(data?.session){
+      currentUser=data.session.user;
+      showSetPasswordForm();
+      return;
+    }
+    // Try to get user from URL hash directly
+    showSetPasswordForm();
+    return;
+  }
+
   if(params.has('admin')){
     document.getElementById('tab-admin').style.display='flex';
   }
@@ -363,10 +381,18 @@ async function load(){
   await loadOrders();
 
   // Listen for auth changes
-  sb.auth.onAuthStateChange((event,session)=>{
-    if(event==='SIGNED_IN'&&session){
+  sb.auth.onAuthStateChange(async (event,session)=>{
+    if((event==='SIGNED_IN'||event==='PASSWORD_RECOVERY')&&session){
       currentUser=session.user;
-      showAdminContent();
+      document.getElementById('tab-admin').style.display='flex';
+      switchTab('admin');
+      if(event==='PASSWORD_RECOVERY'){
+        showSetPasswordForm();
+      }else if(event==='SIGNED_IN'&&hash.includes('type=invite')){
+        showSetPasswordForm();
+      }else{
+        showAdminContent();
+      }
     }else if(event==='SIGNED_OUT'){
       currentUser=null;
     }
@@ -641,6 +667,46 @@ async function finalDeleteAdmin(){
   hidePanel('confirm-delete-admin');
   pendingDeleteAdminId=null;
   if(isMe)doLogout();else await loadAdmins();
+}
+
+function showSetPasswordForm(){
+  document.getElementById('auth-screen').style.display='block';
+  document.getElementById('admin-content').style.display='none';
+  // Replace auth screen content with password setup form
+  const authScreen=document.querySelector('.auth-screen');
+  authScreen.innerHTML=`
+    <div class="auth-icon" style="background:var(--green-bg);color:var(--green);"><i class="ti ti-lock-check"></i></div>
+    <div style="font-size:17px;font-weight:600;">Willkommen!</div>
+    <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Bitte legen Sie Ihr Passwort fest</div>
+    <div class="auth-form-wrap">
+      <label for="new-pw">Neues Passwort (mind. 10 Zeichen)</label>
+      <div class="pw-field">
+        <input type="password" id="new-pw" placeholder="Neues Passwort" />
+        <button class="pw-eye-btn" type="button" onmousedown="peShow('new-pw')" onmouseup="peHide('new-pw')" onmouseleave="peHide('new-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
+      </div>
+      <label for="new-pw2">Passwort wiederholen</label>
+      <div class="pw-field">
+        <input type="password" id="new-pw2" placeholder="Passwort wiederholen" onkeydown="if(event.key==='Enter')saveNewPassword()" />
+        <button class="pw-eye-btn" type="button" onmousedown="peShow('new-pw2')" onmouseup="peHide('new-pw2')" onmouseleave="peHide('new-pw2')" tabindex="-1"><i class="ti ti-eye"></i></button>
+      </div>
+      <div class="field-err" id="new-pw-err"></div>
+      <button class="btn-green-full" onclick="saveNewPassword()"><i class="ti ti-check"></i>Passwort speichern & einloggen</button>
+    </div>`;
+}
+
+async function saveNewPassword(){
+  const pw=document.getElementById('new-pw').value;
+  const pw2=document.getElementById('new-pw2').value;
+  const errEl=document.getElementById('new-pw-err');
+  errEl.style.display='none';
+  if(!pw||pw.length<10){errEl.textContent='Passwort muss mind. 10 Zeichen haben.';errEl.style.display='block';return;}
+  if(pw!==pw2){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
+  const {data,error}=await sb.auth.updateUser({password:pw});
+  if(error){errEl.textContent='Fehler: '+error.message;errEl.style.display='block';return;}
+  currentUser=data.user;
+  // Clean URL
+  window.history.replaceState({},'',window.location.pathname+'?admin');
+  showAdminContent();
 }
 
 async function doLogin(){
