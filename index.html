@@ -611,8 +611,9 @@ async function onKursAdminChange(){
   if(!kurs){document.getElementById('admin-kurs-content').style.display='none';return;}
   currentKursId=kurs.id;
   document.getElementById('admin-kurs-content').style.display='block';
-  document.getElementById('kurs-info-banner').innerHTML=`<i class="ti ti-calendar" style="flex-shrink:0;font-size:16px;"></i> <strong>${esc(kurs.name)}</strong> · ${fmtDate(kurs.datum)}`;
-  if(kurs.deadline)document.getElementById('inp-deadline-dt').value=kurs.deadline.slice(0,16);
+  document.getElementById('kurs-info-banner').innerHTML=`<i class="ti ti-calendar" style="flex-shrink:0;font-size:16px;"></i> <strong>${esc(kurs.name)}</strong> · ${fmtDate(kurs.datum)}${kurs.aktiv?'&nbsp;<span style="font-size:11px;background:var(--primary-bg);color:var(--primary);padding:1px 8px;border-radius:99px;font-weight:600;">Aktiv</span>':'&nbsp;<span style="font-size:11px;background:var(--red-bg);color:var(--red);padding:1px 8px;border-radius:99px;font-weight:600;">Deaktiviert</span>'}`;
+  const dlInput=document.getElementById('inp-deadline-dt');
+  if(dlInput)dlInput.value=kurs.deadline?kurs.deadline.slice(0,16):'';
   await loadOrdersForKurs(kurs.id);
   renderAdminGroups();
 }
@@ -725,7 +726,9 @@ async function renderUebersichtOrders(){
 // ── Anmelden ──────────────────────────────────────────────
 function isPastForCurrentKurs(){
   const kurs=kurse.find(k=>k.id===currentKursId);
-  if(!kurs||!kurs.deadline)return false;
+  if(!kurs)return false;
+  if(!kurs.aktiv)return true;
+  if(!kurs.deadline)return false;
   return new Date()>new Date(kurs.deadline);
 }
 
@@ -914,8 +917,22 @@ async function finalSaveDeadline(){
   const val=document.getElementById('inp-deadline-dt').value;
   await sb.from('kurse').update({deadline:val}).eq('id',currentKursId);
   hidePanel('confirm-deadline');
+  // Reload everything so user view and admin view are in sync
   await loadKurse();
+  // Re-select the current kurs in admin
+  const sel=document.getElementById('sel-kurs-admin');
+  if(sel)sel.value=currentKursId;
   await onKursAdminChange();
+  // Also update the anmelden view if this kurs is selected there
+  const selAnmelden=document.getElementById('sel-kurs-anmelden');
+  if(selAnmelden&&parseInt(selAnmelden.value)===currentKursId){
+    const kurs=kurse.find(k=>k.id===currentKursId);
+    if(kurs)updateStatusForKurs(kurs);
+  }else{
+    // Single kurs - always update
+    const kurs=kurse.find(k=>k.id===currentKursId);
+    if(kurs&&kurse.length===1)updateStatusForKurs(kurs);
+  }
 }
 
 // ── Reset ─────────────────────────────────────────────────
@@ -1048,6 +1065,15 @@ function switchTab(tab){
 
 load();
 setInterval(async()=>{if(!currentUser)return;const{error}=await sb.auth.getUser();if(error)forceLogout();},10000);
+
+// Check deadline every 60 seconds - auto-closes form when deadline passes
+setInterval(async()=>{
+  await loadKurse();
+  // Update anmelden view
+  const kurs=kurse.find(k=>k.id===currentKursId);
+  if(kurs)updateStatusForKurs(kurs);
+  else if(kurse.length===0)showNoKurs();
+},60000);
 </script>
 </body>
 </html>
