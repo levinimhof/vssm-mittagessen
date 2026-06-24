@@ -722,20 +722,32 @@ async function saveNewPassword(){
   if(!pw||pw.length<6){errEl.textContent='Passwort muss mind. 6 Zeichen haben.';errEl.style.display='block';return;}
   if(pw!==pw2){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
 
-  // Verify session exists before updating
-  const {data:sd}=await sb.auth.getSession();
-  if(!sd?.session){
-    errEl.textContent='Session abgelaufen — bitte Einladungslink erneut öffnen.';
+  // Check session
+  const {data:sd,error:se}=await sb.auth.getSession();
+  if(se||!sd?.session){
+    errEl.textContent='Keine gültige Session. Bitte Einladungslink erneut öffnen. ('+( se?.message||'keine session')+')';
     errEl.style.display='block';return;
   }
 
+  errEl.style.color='var(--blue)';
+  errEl.textContent='Session OK: '+sd.session.user.email+' — Passwort wird gesetzt...';
+  errEl.style.display='block';
+
   const {data,error}=await sb.auth.updateUser({password:pw});
-  if(error){errEl.textContent='Fehler: '+error.message;errEl.style.display='block';return;}
+  if(error){
+    errEl.style.color='var(--red)';
+    errEl.textContent='updateUser Fehler: '+error.message+' (Status: '+error.status+')';
+    errEl.style.display='block';return;
+  }
+
+  errEl.style.color='var(--green)';
+  errEl.textContent='Passwort gesetzt! Öffne Admin...';
+  errEl.style.display='block';
 
   sessionStorage.removeItem('must_set_password');
   currentUser=data.user;
   window.history.replaceState({},'',window.location.pathname+'?admin');
-  showAdminContent();
+  setTimeout(()=>showAdminContent(), 1000);
 }
 
 async function doLogin(){
