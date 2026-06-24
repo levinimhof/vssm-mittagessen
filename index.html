@@ -126,6 +126,28 @@
     .edit-order-panel{background:var(--bg);border:0.5px solid var(--primary);border-radius:var(--radius-lg);padding:1.25rem;margin-top:0.5rem;display:none;animation:fadeIn 0.15s ease;}
     #custom-field{display:none;}#gruppe-fields{display:none;}
     @media(max-width:480px){.app{padding:1rem 0.75rem 3rem;}.app-title{font-size:18px;}}
+    /* ── Chatbot ─────────────────────────────────────────── */
+    .chat-btn{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:var(--primary);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 16px rgba(26,61,110,0.35);z-index:1000;transition:transform 0.2s;}
+    .chat-btn:hover{transform:scale(1.08);}
+    .chat-window{position:fixed;bottom:90px;right:24px;width:340px;max-height:520px;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 8px 32px rgba(0,0,0,0.15);display:none;flex-direction:column;z-index:1000;overflow:hidden;}
+    .chat-window.open{display:flex;}
+    .chat-header{background:var(--primary);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+    .chat-header-icon{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;}
+    .chat-header-title{font-size:14px;font-weight:600;flex:1;}
+    .chat-header-close{background:none;border:none;color:#fff;cursor:pointer;font-size:18px;padding:2px;display:flex;align-items:center;}
+    .chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:200px;}
+    .chat-msg{max-width:85%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5;}
+    .chat-msg.bot{background:var(--primary-bg);color:var(--text);border-bottom-left-radius:4px;align-self:flex-start;}
+    .chat-msg.user{background:var(--primary);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+    .chat-msg.typing{background:var(--bg2);color:var(--text2);font-style:italic;}
+    .chat-input-row{display:flex;gap:8px;padding:10px 12px;border-top:0.5px solid var(--border);flex-shrink:0;}
+    .chat-input{flex:1;border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:8px 12px;font-size:13px;font-family:inherit;outline:none;resize:none;}
+    .chat-input:focus{border-color:var(--primary);}
+    .chat-send{background:var(--primary);color:#fff;border:none;border-radius:var(--radius-md);padding:8px 12px;cursor:pointer;font-size:14px;display:flex;align-items:center;}
+    .chat-send:hover{background:var(--primary-dark);}
+    .chat-send:disabled{opacity:0.5;cursor:not-allowed;}
+    @media(max-width:400px){.chat-window{width:calc(100vw - 32px);right:16px;}}
+
   </style>
 </head>
 <body>
@@ -332,6 +354,28 @@
       </div>
     </div>
   </div>
+
+<!-- ── Chatbot ── -->
+<button class="chat-btn" onclick="toggleChat()" id="chat-toggle-btn" title="Restaurant-Assistent">
+  <i class="ti ti-message-chatbot"></i>
+</button>
+
+<div class="chat-window" id="chat-window">
+  <div class="chat-header">
+    <div class="chat-header-icon"><i class="ti ti-robot"></i></div>
+    <div>
+      <div class="chat-header-title">Restaurant-Assistent</div>
+      <div style="font-size:11px;opacity:0.8;">Hilft dir das passende Restaurant zu finden</div>
+    </div>
+    <button class="chat-header-close" onclick="toggleChat()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-input" placeholder="Was möchtest du essen?" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+    <button class="chat-send" id="chat-send-btn" onclick="sendChat()"><i class="ti ti-send"></i></button>
+  </div>
+</div>
+
 </div>
 
 <script>
@@ -1206,6 +1250,141 @@ function showNoKurs(){
   document.getElementById('status-text').innerHTML='<i class="ti ti-calendar-off" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Kein aktiver Kurs';
   const kss=document.getElementById('kurs-select-section');
   if(kss)kss.style.display='none';
+}
+
+
+// ── Chatbot ───────────────────────────────────────────────
+const RESTAURANTS_INFO = `
+Restaurants in Rothenburg LU (Schweiz) - für Mittagessen:
+
+1. Gasthaus Ochsen
+   - Traditionelle Schweizer Küche, Schnitzel, Rösti, Suppen
+   - Gemütlich, rustikal, günstig bis mittel
+   - Gut für: Schweizer Klassiker, grosse Gruppen
+
+2. Gasthaus Bahnhof
+   - Einfache Schweizer Küche, Tagesmenüs, Salate
+   - Unkompliziert, schnell, günstig
+   - Gut für: schnelles Mittagessen, Budget-bewusste
+
+3. Fläcke Restaurant
+   - Regionale Küche, saisonale Gerichte, Pasta, Fleisch
+   - Modern, gepflegt, mittleres Preissegment
+   - Gut für: gehobenes Mittagessen, besondere Anlässe
+
+4. AMAYA Restaurant & Bar
+   - Internationale Küche, asiatische und mediterrane Einflüsse
+   - Modern, trendig, mittleres bis gehobenes Preissegment
+   - Gut für: Abwechslung, vegetarische Optionen
+
+5. Ace Cafe Luzern
+   - Café-Küche, Sandwiches, Salate, leichte Gerichte
+   - Casual, modern, schnell
+   - Gut für: leichtes Mittagessen, Kaffee-Liebhaber
+
+6. Chärnsmatt Gasthof
+   - Traditionelle Luzerner Küche, Fleischgerichte, Älplermagronen
+   - Ländlich, gemütlich, mittleres Preissegment
+   - Gut für: authentische Schweizer Küche, ruhige Atmosphäre
+`;
+
+let chatHistory = [];
+let chatOpen = false;
+let chatInitialized = false;
+
+function toggleChat(){
+  chatOpen = !chatOpen;
+  const win = document.getElementById('chat-window');
+  const btn = document.getElementById('chat-toggle-btn');
+  win.classList.toggle('open', chatOpen);
+  btn.innerHTML = chatOpen ? '<i class="ti ti-x"></i>' : '<i class="ti ti-message-chatbot"></i>';
+  if(chatOpen && !chatInitialized){
+    chatInitialized = true;
+    addBotMsg('Hallo! 👋 Ich helfe dir das passende Restaurant in Rothenburg zu finden. Was sind deine Wünsche? (z.B. Küche, Atmosphäre, Budget)');
+  }
+  if(chatOpen) document.getElementById('chat-input').focus();
+}
+
+function addBotMsg(text){
+  const el = document.createElement('div');
+  el.className = 'chat-msg bot';
+  el.textContent = text;
+  document.getElementById('chat-messages').appendChild(el);
+  scrollChat();
+  return el;
+}
+
+function addUserMsg(text){
+  const el = document.createElement('div');
+  el.className = 'chat-msg user';
+  el.textContent = text;
+  document.getElementById('chat-messages').appendChild(el);
+  scrollChat();
+}
+
+function addTyping(){
+  const el = document.createElement('div');
+  el.className = 'chat-msg typing';
+  el.id = 'chat-typing';
+  el.textContent = 'Assistent schreibt...';
+  document.getElementById('chat-messages').appendChild(el);
+  scrollChat();
+}
+
+function removeTyping(){
+  const el = document.getElementById('chat-typing');
+  if(el) el.remove();
+}
+
+function scrollChat(){
+  const msgs = document.getElementById('chat-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function sendChat(){
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  addUserMsg(text);
+  chatHistory.push({role:'user', content:text});
+
+  const btn = document.getElementById('chat-send-btn');
+  btn.disabled = true;
+  addTyping();
+
+  try{
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        system:`Du bist ein freundlicher Restaurant-Assistent für Kursteilnehmer des VSSM Schreiner Verbands Luzern in Rothenburg. Deine Aufgabe ist es, das passende Restaurant aus der folgenden Liste zu empfehlen basierend auf den Wünschen des Nutzers. Antworte immer auf Deutsch, kurz und präzise. Empfehle maximal 2 Restaurants pro Antwort. Nach der Empfehlung frage ob der Nutzer weitere Wünsche hat oder direkt anmelden möchte.
+
+${RESTAURANTS_INFO}
+
+Wichtig: Empfehle nur Restaurants aus dieser Liste. Sei freundlich und hilfsbereit.`,
+        messages: chatHistory
+      })
+    });
+
+    const data = await response.json();
+    removeTyping();
+
+    const reply = data.content?.[0]?.text || 'Entschuldigung, ich konnte keine Antwort generieren.';
+    addBotMsg(reply);
+    chatHistory.push({role:'assistant', content:reply});
+
+  }catch(e){
+    removeTyping();
+    addBotMsg('Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuche es erneut.');
+  }
+
+  btn.disabled = false;
+  input.focus();
 }
 
 load();
