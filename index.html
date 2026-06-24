@@ -346,51 +346,72 @@ function hidePanel(id){const e=document.getElementById(id);if(e)e.style.display=
 async function load(){
   const params=new URLSearchParams(window.location.search);
   const hash=window.location.hash;
-  const isInviteOrReset=hash&&(hash.includes('type=invite')||hash.includes('type=recovery'));
-
-  // Show admin tab if ?admin in URL or invite/reset link
-  if(params.has('admin')||isInviteOrReset){
-    document.getElementById('tab-admin').style.display='flex';
-  }
-
-  if(isInviteOrReset){
-    switchTab('admin');
-    // Show loading state while Supabase processes the token
-    document.querySelector('.auth-screen').innerHTML=`
-      <div class="auth-icon" style="background:var(--green-bg);color:var(--green);"><i class="ti ti-loader"></i></div>
-      <div style="font-size:15px;color:var(--text2);">Wird verarbeitet...</div>`;
-  }
+  const isInvite=hash&&hash.includes('type=invite');
+  const isRecovery=hash&&hash.includes('type=recovery');
+  const isInviteOrReset=isInvite||isRecovery;
 
   await loadDeadline();
   await loadOrders();
 
-  // Supabase v2 automatically processes hash tokens and fires onAuthStateChange
+  // Show admin tab if ?admin in URL
+  if(params.has('admin')){
+    document.getElementById('tab-admin').style.display='flex';
+  }
+
+  // Handle invite/recovery links - Supabase fires onAuthStateChange automatically
+  if(isInviteOrReset){
+    document.getElementById('tab-admin').style.display='flex';
+    switchTab('admin');
+    // Show simple loading while token is processed
+    document.getElementById('auth-screen').style.display='block';
+    document.getElementById('admin-content').style.display='none';
+    document.querySelector('.auth-screen').innerHTML=`
+      <div class="auth-icon" style="background:var(--green-bg);color:var(--green);"><i class="ti ti-loader"></i></div>
+      <div style="font-size:15px;font-weight:600;">Einen Moment...</div>
+      <div style="font-size:13px;color:var(--text2);">Einladung wird verarbeitet</div>`;
+
+    // Wait for Supabase to process the hash token
+    sb.auth.onAuthStateChange(async (event,session)=>{
+      if((event==='SIGNED_IN'||event==='PASSWORD_RECOVERY')&&session){
+        currentUser=session.user;
+        // Mark that this user must set password (hasn't confirmed yet)
+        sessionStorage.setItem('must_set_password','1');
+        showSetPasswordForm();
+      }
+    });
+    return;
+  }
+
+  // Normal flow - check session
   sb.auth.onAuthStateChange(async (event,session)=>{
-    if(event==='PASSWORD_RECOVERY'&&session){
-      // Password reset link clicked
+    if(event==='SIGNED_IN'&&session){
+      currentUser=session.user;
+      // If they must set password (came from invite), force password form
+      if(sessionStorage.getItem('must_set_password')==='1'){
+        document.getElementById('tab-admin').style.display='flex';
+        switchTab('admin');
+        showSetPasswordForm();
+        return;
+      }
+      document.getElementById('tab-admin').style.display='flex';
+      showAdminContent();
+      switchTab('admin');
+    }else if(event==='SIGNED_OUT'){
+      currentUser=null;
+      sessionStorage.removeItem('must_set_password');
+    }
+  });
+
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){
+    // If refreshed while must_set_password is active, force password form
+    if(sessionStorage.getItem('must_set_password')==='1'){
       currentUser=session.user;
       document.getElementById('tab-admin').style.display='flex';
       switchTab('admin');
       showSetPasswordForm();
-    }else if(event==='SIGNED_IN'&&session){
-      currentUser=session.user;
-      document.getElementById('tab-admin').style.display='flex';
-      if(isInviteOrReset){
-        // Invite link - user needs to set password
-        switchTab('admin');
-        showSetPasswordForm();
-      }else{
-        showAdminContent();
-        switchTab('admin');
-      }
-    }else if(event==='SIGNED_OUT'){
-      currentUser=null;
+      return;
     }
-  });
-
-  // Check existing session (for already logged in users)
-  const {data:{session}}=await sb.auth.getSession();
-  if(session&&!isInviteOrReset){
     currentUser=session.user;
     showAdminContent();
     document.getElementById('tab-admin').style.display='flex';
@@ -704,6 +725,7 @@ async function saveNewPassword(){
   if(error){errEl.textContent='Fehler: '+error.message;errEl.style.display='block';return;}
   // Password saved successfully - user is already logged in via Supabase session
   currentUser=data.user;
+  sessionStorage.removeItem('must_set_password');
   window.history.replaceState({},'',window.location.pathname+'?admin');
   // Show success message briefly then open admin
   const authScreen=document.querySelector('.auth-screen');
