@@ -362,11 +362,8 @@ function isAdminUrl(){
   const params=new URLSearchParams(window.location.search);
   const hash=window.location.hash;
   if(hash.includes('type=invite')||hash.includes('type=recovery'))return true;
-  if(params.has('admin')){
-    const token=params.get('admin');
-    if(!token||token===''||token==='vssm-luzern-2026')return true;
-    return false;
-  }
+  // Only accept exact token - bare ?admin no longer works
+  if(params.get('admin')==='vssm-luzern-2026')return true;
   return false;
 }
 function fmtDate(str){if(!str)return '—';return new Date(str).toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'numeric'});}
@@ -1007,7 +1004,7 @@ async function saveNewPassword(){
   const email=data?.user?.email||'';
   sessionStorage.removeItem('must_set_password');
   await sb.auth.signOut();currentUser=null;
-  window.history.replaceState({},'',window.location.pathname+'?admin');
+  window.history.replaceState({},'',window.location.pathname+'?admin=vssm-luzern-2026');
   // If this tab was opened from email link, try to close it after success
   // Otherwise show login form
   if(window.opener){
@@ -1082,7 +1079,7 @@ async function doResetPw(){
 
   // Email exists - send reset link
   await sb.auth.resetPasswordForEmail(email,{
-    redirectTo:window.location.origin+window.location.pathname+'?admin'
+    redirectTo:window.location.origin+window.location.pathname+'?admin=vssm-luzern-2026'
   });
 
   if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-check"></i>Gesendet';}
