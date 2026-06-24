@@ -45,7 +45,7 @@
     .toggle-opt input[type=radio]:checked+label{background:var(--bg);color:var(--text);border:0.5px solid var(--border);}
     .btn-primary{width:100%;padding:12px;font-size:15px;font-weight:600;background:var(--green);color:#E1F5EE;border:none;border-radius:var(--radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;}
     .btn-primary:hover{background:var(--green-dark);}.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
-    .btn-outline{padding:8px 14px;font-size:13px;font-weight:500;border:0.5px solid var(--border2);border-radius:var(--radius-md);background:none;cursor:pointer;color:var(--text2);display:inline-flex;align-items:center;gap:5px;font-family:inherit;}
+    .btn-outline{padding:8px 14px;font-size:13px;font-weight:500;border:0.5px solid var(--border2);border-radius:var(--radius-md);background:none;cursor:pointer;color:var(--text2);display:inline-flex;align-items:center;gap:5px;font-family:inherit;width:100%;justify-content:center;}
     .btn-outline:hover{background:var(--bg2);}
     .btn-logout{padding:8px 14px;font-size:13px;font-weight:500;border:0.5px solid var(--red-border);border-radius:var(--radius-md);background:none;cursor:pointer;color:var(--red);display:inline-flex;align-items:center;gap:5px;font-family:inherit;}
     .btn-logout:hover{background:var(--red-bg);}
@@ -79,27 +79,22 @@
     .group-header{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
     .group-name{font-size:13px;font-weight:600;}
     .group-count{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--green-bg);color:var(--green);font-weight:700;}
-    .admin-list-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);}
-    .admin-list-item:last-child{border-bottom:none;}
-    .admin-badge{width:32px;height:32px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--green);flex-shrink:0;}
-    .admin-badge-me{background:var(--green);color:#E1F5EE;}
-    .auth-screen{display:flex;flex-direction:column;align-items:center;padding:2rem 1.5rem;gap:14px;text-align:center;}
-    .auth-icon{width:60px;height:60px;border-radius:var(--radius-lg);background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--green);}
-    .auth-icon-red{background:var(--red-bg)!important;color:var(--red)!important;}
-    .auth-form-wrap{width:100%;max-width:320px;text-align:left;}
+    /* Auth */
+    .auth-wrap{display:flex;flex-direction:column;align-items:center;padding:2rem 1.5rem;gap:14px;text-align:center;}
+    .auth-icon{width:60px;height:60px;border-radius:var(--radius-lg);background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--green);margin-bottom:4px;}
+    .auth-form{width:100%;max-width:320px;text-align:left;}
     .field-err{font-size:12px;color:var(--red);margin-top:-8px;margin-bottom:10px;display:none;font-weight:500;}
     .field-ok{font-size:12px;color:var(--green);margin-top:-8px;margin-bottom:10px;display:none;font-weight:500;}
+    .pw-field{position:relative;margin-bottom:1rem;}
+    .pw-field input{margin-bottom:0;padding-right:44px;width:100%;}
+    .pw-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;display:flex;align-items:center;user-select:none;-webkit-user-select:none;}
+    .pw-eye:hover{color:var(--text2);}
     .admin-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.25rem;}
     .divider{border:none;border-top:0.5px solid var(--border);margin:1.5rem 0;}
     .reset-box{background:var(--red-bg);border:0.5px solid #F09595;border-radius:var(--radius-lg);padding:1.1rem 1.25rem;}
     .reset-box-title{font-size:14px;font-weight:600;color:var(--red);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
     .reset-box-sub{font-size:13px;color:#791F1F;margin-bottom:1rem;}
     .super-box{background:var(--blue-bg);border:0.5px solid var(--blue);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-top:1rem;}
-    .super-box-title{font-size:14px;font-weight:600;color:var(--blue);margin-bottom:0.75rem;display:flex;align-items:center;gap:6px;}
-    .pw-field{position:relative;margin-bottom:1rem;}
-    .pw-field input{margin-bottom:0;padding-right:44px;width:100%;}
-    .pw-eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;}
-    .pw-eye-btn:hover{color:var(--text2);}
     .confirm-panel{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:1.25rem;margin-top:0.75rem;display:none;animation:fadeIn 0.15s ease;}
     .confirm-panel.danger{background:var(--red-bg);border-color:var(--red-border);}
     @keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
@@ -117,26 +112,19 @@
     .ca-red{background:none;border:0.5px solid var(--red-border);color:var(--red);}
     .ca-red:hover{background:var(--red-bg);}
     .edit-order-panel{background:var(--bg);border:0.5px solid var(--blue);border-radius:var(--radius-lg);padding:1.25rem;margin-top:0.5rem;display:none;animation:fadeIn 0.15s ease;}
-    #custom-field{display:none;}
-    #gruppe-fields{display:none;}
+    #custom-field{display:none;}#gruppe-fields{display:none;}
     @media(max-width:480px){.app{padding:1rem 0.75rem 3rem;}.app-title{font-size:18px;}}
-    input[type="datetime-local"]::-webkit-calendar-picker-indicator{cursor:pointer;}
-    input[type="datetime-local"]{-webkit-appearance:none;}
   </style>
 </head>
 <body>
 <div class="app">
   <div class="app-header">
     <div class="app-icon"><i class="ti ti-tools-kitchen-2"></i></div>
-    <div>
-      <div class="app-title">VSSM Mittagessen</div>
-      <div class="app-sub">Rothenburg · Schreiner Verband Luzern</div>
-    </div>
+    <div><div class="app-title">VSSM Mittagessen</div><div class="app-sub">Rothenburg · Schreiner Verband Luzern</div></div>
   </div>
 
   <div id="status-pill" class="status-pill status-open">
-    <span class="dot"></span>
-    <span id="status-text">Anmeldung offen</span>
+    <span class="dot"></span><span id="status-text">Anmeldung offen</span>
   </div>
 
   <nav class="nav">
@@ -152,21 +140,15 @@
       <div id="form-open">
         <label>Anmeldetyp</label>
         <div class="toggle-row" style="margin-bottom:1.25rem;">
-          <div class="toggle-opt">
-            <input type="radio" name="atyp" id="atyp-einzel" checked onchange="toggleAnmeldeTyp()">
-            <label for="atyp-einzel"><i class="ti ti-user" style="font-size:14px"></i>Einzeln</label>
-          </div>
-          <div class="toggle-opt">
-            <input type="radio" name="atyp" id="atyp-gruppe" onchange="toggleAnmeldeTyp()">
-            <label for="atyp-gruppe"><i class="ti ti-users" style="font-size:14px"></i>Gruppe</label>
-          </div>
+          <div class="toggle-opt"><input type="radio" name="atyp" id="atyp-einzel" checked onchange="toggleAnmeldeTyp()"><label for="atyp-einzel"><i class="ti ti-user" style="font-size:14px"></i>Einzeln</label></div>
+          <div class="toggle-opt"><input type="radio" name="atyp" id="atyp-gruppe" onchange="toggleAnmeldeTyp()"><label for="atyp-gruppe"><i class="ti ti-users" style="font-size:14px"></i>Gruppe</label></div>
         </div>
         <div id="einzel-fields">
           <label for="inp-name">Ihr Name</label>
           <input type="text" id="inp-name" placeholder="Vorname Nachname" autocomplete="name" />
         </div>
         <div id="gruppe-fields">
-          <div class="info-box"><i class="ti ti-users" style="font-size:16px;flex-shrink:0;margin-top:1px"></i><span>Gruppenanmeldung für Kursleiter. Kursteilnehmer die individuell essen möchten, tätigen bitte eine separate Einzelanmeldung.</span></div>
+          <div class="info-box"><i class="ti ti-users" style="font-size:16px;flex-shrink:0;margin-top:1px"></i><span>Gruppenanmeldung für Kursleiter. Kursteilnehmer die individuell essen möchten, bitte separate Einzelanmeldung tätigen.</span></div>
           <label for="inp-kursleiter">Name Kursleiter</label>
           <input type="text" id="inp-kursleiter" placeholder="Vorname Nachname" />
           <label for="inp-anzahl">Anzahl Personen (inkl. Kursleiter)</label>
@@ -174,36 +156,25 @@
         </div>
         <label>Restaurant</label>
         <div class="toggle-row">
-          <div class="toggle-opt">
-            <input type="radio" name="rmode" id="rmode-list" checked onchange="toggleMode()">
-            <label for="rmode-list"><i class="ti ti-list" style="font-size:14px"></i>Aus Liste</label>
-          </div>
-          <div class="toggle-opt">
-            <input type="radio" name="rmode" id="rmode-custom" onchange="toggleMode()">
-            <label for="rmode-custom"><i class="ti ti-pencil" style="font-size:14px"></i>Eigenes</label>
-          </div>
+          <div class="toggle-opt"><input type="radio" name="rmode" id="rmode-list" checked onchange="toggleMode()"><label for="rmode-list"><i class="ti ti-list" style="font-size:14px"></i>Aus Liste</label></div>
+          <div class="toggle-opt"><input type="radio" name="rmode" id="rmode-custom" onchange="toggleMode()"><label for="rmode-custom"><i class="ti ti-pencil" style="font-size:14px"></i>Eigenes</label></div>
         </div>
         <div id="list-field">
           <select id="inp-restaurant">
             <option value="">— bitte auswählen —</option>
-            <option>Gasthaus Ochsen</option>
-            <option>Gasthaus Bahnhof</option>
-            <option>Fläcke Restaurant</option>
-            <option>AMAYA Restaurant &amp; Bar</option>
-            <option>Ace Cafe Luzern</option>
-            <option>Chärnsmatt Gasthof</option>
+            <option>Gasthaus Ochsen</option><option>Gasthaus Bahnhof</option>
+            <option>Fläcke Restaurant</option><option>AMAYA Restaurant &amp; Bar</option>
+            <option>Ace Cafe Luzern</option><option>Chärnsmatt Gasthof</option>
           </select>
         </div>
-        <div id="custom-field">
-          <input type="text" id="inp-custom" placeholder="z.B. Restaurant Sonne, Luzern" />
-        </div>
+        <div id="custom-field"><input type="text" id="inp-custom" placeholder="z.B. Restaurant Sonne, Luzern" /></div>
         <div class="warn-box" id="einzel-hinweis">
           <i class="ti ti-alert-triangle" style="font-size:16px;flex-shrink:0;margin-top:1px"></i>
           <span>Bitte beachten Sie: <strong>Nachträgliche Änderungen sind nicht möglich.</strong> Bei dringenden Anpassungen wenden Sie sich an einen Mitarbeiter des Schreiner Verbands Luzern.</span>
         </div>
         <div class="confirm-panel" id="confirm-anmeldung">
           <div class="confirm-panel-title"><i class="ti ti-clipboard-check" style="color:var(--green)"></i>Anmeldung bestätigen</div>
-          <div class="confirm-panel-body">Bitte überprüfen Sie Ihre Angaben. Nach der Bestätigung sind keine Änderungen mehr möglich.</div>
+          <div class="confirm-panel-body">Bitte überprüfen Sie Ihre Angaben. Nachträgliche Änderungen sind nicht möglich.</div>
           <div class="confirm-summary" id="confirm-anmeldung-summary"></div>
           <div class="confirm-actions">
             <button class="ca-abort" onclick="hidePanel('confirm-anmeldung');pendingPayload=null;"><i class="ti ti-x"></i>Korrigieren</button>
@@ -219,10 +190,7 @@
           <div>Keine weiteren Anmeldungen möglich.</div>
         </div>
       </div>
-      <div class="privacy-box">
-        <i class="ti ti-shield" style="vertical-align:-2px;margin-right:5px;"></i>
-        <strong>Datenschutz:</strong> Es werden nur Name und Restaurantwahl gespeichert. Die Daten werden ausschliesslich für die Mittagsreservation verwendet und nach dem Kurs vollständig gelöscht.
-      </div>
+      <div class="privacy-box"><i class="ti ti-shield" style="vertical-align:-2px;margin-right:5px;"></i><strong>Datenschutz:</strong> Es werden nur Name und Restaurantwahl gespeichert und nach dem Kurs vollständig gelöscht.</div>
     </div>
   </div>
 
@@ -234,32 +202,22 @@
     </div>
   </div>
 
-  <!-- ADMIN (versteckt, nur via ?admin) -->
+  <!-- ADMIN -->
   <div id="view-admin" class="view">
     <div class="card">
-      <div id="auth-screen">
-        <div class="auth-screen">
-          <div class="auth-icon" id="auth-icon"><i class="ti ti-shield-lock"></i></div>
-          <div style="font-size:17px;font-weight:600;" id="auth-title">Admin-Bereich</div>
-          <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Nur für autorisierte Mitarbeitende</div>
-          <div class="auth-form-wrap">
-            <label for="l-email">E-Mail</label>
-            <input type="email" id="l-email" placeholder="admin@beispiel.ch" style="margin-bottom:1rem;" />
-            <label for="l-pw">Passwort</label>
-            <div class="pw-field">
-              <input type="password" id="l-pw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()" />
-              <button class="pw-eye-btn" type="button" onmousedown="peShow('l-pw')" onmouseup="peHide('l-pw')" onmouseleave="peHide('l-pw')" ontouchstart="peShow('l-pw')" ontouchend="peHide('l-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
-            </div>
-            <div class="field-err" id="l-err"></div>
-            <button class="btn-green-full" onclick="doLogin()"><i class="ti ti-login"></i>Einloggen</button>
-            <div style="margin-top:0.75rem;text-align:center;">
-              <button class="btn-outline" style="width:100%;justify-content:center;" onclick="doResetPw()"><i class="ti ti-mail"></i>Passwort vergessen</button>
-            </div>
-            <div class="field-ok" id="reset-ok" style="margin-top:0.5rem;"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Reset-Link per E-Mail gesendet!</div>
+      <!-- Auth Panel -->
+      <div id="auth-panel">
+        <div class="auth-wrap">
+          <div class="auth-icon"><i class="ti ti-shield-lock"></i></div>
+          <div style="font-size:17px;font-weight:600;">Admin-Bereich</div>
+          <div style="font-size:13px;color:var(--text2);">Nur für autorisierte Mitarbeitende</div>
+          <div class="auth-form" id="auth-form-content">
+            <!-- Login form rendered by JS -->
           </div>
         </div>
       </div>
 
+      <!-- Admin Content -->
       <div id="admin-content" style="display:none;">
         <div class="admin-topbar">
           <div class="card-title" style="margin-bottom:0;"><i class="ti ti-chart-bar"></i>Admin-Übersicht</div>
@@ -276,7 +234,7 @@
         <hr class="divider">
         <div class="card-title" style="margin-bottom:0.5rem;"><i class="ti ti-calendar"></i>Anmeldeschluss</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:0.75rem;">Datum und Uhrzeit bis wann Anmeldungen möglich sind.</div>
-        <input type="datetime-local" id="inp-deadline-dt" style="width:100%;" />
+        <input type="datetime-local" id="inp-deadline-dt" />
         <div class="confirm-panel" id="confirm-deadline">
           <div class="confirm-panel-title"><i class="ti ti-calendar-check" style="color:var(--green)"></i>Anmeldeschluss ändern?</div>
           <div class="confirm-summary" id="confirm-deadline-summary"></div>
@@ -287,31 +245,18 @@
         </div>
         <button class="btn-outline" onclick="initSaveDeadline()" style="margin-top:0.25rem;margin-bottom:0;"><i class="ti ti-check"></i>Speichern</button>
 
-
-
-        <!-- Super Admin Bereich -->
-        <div id="super-admin-section" style="display:none;">
-          <div class="super-box">
-            <div class="super-box-title"><i class="ti ti-shield-check"></i>Super Admin</div>
-            <div style="font-size:13px;color:var(--blue);margin-bottom:0.75rem;">Neuen Admin manuell hinzufügen (via Supabase Dashboard → Authentication → Users → Add user). Danach Super-Rolle setzen via SQL:</div>
-            <div style="background:var(--bg);border-radius:var(--radius-md);padding:10px 12px;font-size:12px;font-family:monospace;color:var(--text2);line-height:1.7;word-break:break-all;">
-              update auth.users set raw_user_meta_data = '{"is_admin": true}' where email = 'neue@email.ch';
-            </div>
-          </div>
-        </div>
-
         <hr class="divider">
-        <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-lock"></i>Mein Passwort ändern</div>
+        <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-lock"></i>Passwort ändern</div>
         <div class="pw-field">
           <input type="password" id="chpw-new" placeholder="Neues Passwort (mind. 6 Zeichen)" />
-          <button class="pw-eye-btn" type="button" onmousedown="peShow('chpw-new')" onmouseup="peHide('chpw-new')" onmouseleave="peHide('chpw-new')" ontouchstart="peShow('chpw-new')" ontouchend="peHide('chpw-new')" tabindex="-1"><i class="ti ti-eye"></i></button>
+          <button class="pw-eye" onmousedown="peShow('chpw-new')" onmouseup="peHide('chpw-new')" onmouseleave="peHide('chpw-new')" ontouchstart="peShow('chpw-new')" ontouchend="peHide('chpw-new')" tabindex="-1"><i class="ti ti-eye"></i></button>
         </div>
         <div class="pw-field">
           <input type="password" id="chpw-rep" placeholder="Passwort wiederholen" />
-          <button class="pw-eye-btn" type="button" onmousedown="peShow('chpw-rep')" onmouseup="peHide('chpw-rep')" onmouseleave="peHide('chpw-rep')" ontouchstart="peShow('chpw-rep')" ontouchend="peHide('chpw-rep')" tabindex="-1"><i class="ti ti-eye"></i></button>
+          <button class="pw-eye" onmousedown="peShow('chpw-rep')" onmouseup="peHide('chpw-rep')" onmouseleave="peHide('chpw-rep')" ontouchstart="peShow('chpw-rep')" ontouchend="peHide('chpw-rep')" tabindex="-1"><i class="ti ti-eye"></i></button>
         </div>
-        <div class="field-err" id="chpw-err" style="display:none;"></div>
-        <div class="field-ok" id="chpw-ok" style="display:none;"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Passwort erfolgreich geändert!</div>
+        <div class="field-err" id="chpw-err"></div>
+        <div class="field-ok" id="chpw-ok"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Passwort erfolgreich geändert!</div>
         <div class="confirm-panel" id="confirm-chpw">
           <div class="confirm-panel-title"><i class="ti ti-lock-check" style="color:var(--green)"></i>Passwort wirklich ändern?</div>
           <div class="confirm-panel-body">Das neue Passwort wird sofort aktiv.</div>
@@ -320,7 +265,7 @@
             <button class="ca-ok" onclick="finalChangePassword()"><i class="ti ti-check"></i>Ja, ändern</button>
           </div>
         </div>
-        <button class="btn-green-full" onclick="initChangePassword()" style="margin-bottom:0;"><i class="ti ti-lock"></i>Passwort ändern</button>
+        <button class="btn-green-full" onclick="initChangePassword()" style="margin-top:0.5rem;margin-bottom:0;"><i class="ti ti-lock"></i>Passwort ändern</button>
 
         <hr class="divider">
         <div class="reset-box">
@@ -329,7 +274,7 @@
           <div class="confirm-panel danger" id="confirm-reset" style="margin-bottom:0.75rem;">
             <div class="confirm-panel-title"><i class="ti ti-trash"></i>Alle Anmeldungen löschen?</div>
             <div class="confirm-summary" id="confirm-reset-summary"></div>
-            <div class="confirm-panel-body" style="margin-top:0.5rem;">Alle Einträge werden datenschutzkonform und unwiderruflich gelöscht.</div>
+            <div class="confirm-panel-body" style="margin-top:0.5rem;">Alle Einträge werden unwiderruflich gelöscht.</div>
             <div class="confirm-actions">
               <button class="ca-abort" onclick="hidePanel('confirm-reset')"><i class="ti ti-x"></i>Abbrechen</button>
               <button class="ca-red" onclick="finalReset()"><i class="ti ti-trash"></i>Ja, löschen</button>
@@ -347,143 +292,160 @@ const SUPABASE_URL='https://gbvmkclhrjogcepmupzm.supabase.co';
 const SUPABASE_KEY='sb_publishable_5cWQ1s6E0giLF_MxkY6_9w_zP_slLh6';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let orders=[],deadlineStr='',currentUser=null,pendingPayload=null,pendingDeleteAdminId=null;
+let orders=[],deadlineStr='',currentUser=null,pendingPayload=null;
 
+// ── Helpers ───────────────────────────────────────────────
 function peShow(id){const e=document.getElementById(id);if(e)e.type='text';}
 function peHide(id){const e=document.getElementById(id);if(e)e.type='password';}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function initials(n){return n.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
 function showPanel(id){const e=document.getElementById(id);if(e)e.style.display='block';}
 function hidePanel(id){const e=document.getElementById(id);if(e)e.style.display='none';}
+function isAdminUrl(){
+  return new URLSearchParams(window.location.search).has('admin')||
+    window.location.hash.includes('type=invite')||
+    window.location.hash.includes('type=recovery');
+}
 
+// ── Auth Forms ────────────────────────────────────────────
+function renderLoginForm(email='',successMsg=''){
+  document.getElementById('auth-form-content').innerHTML=`
+    ${successMsg?`<div class="field-ok" style="display:block;margin-bottom:1rem;text-align:center;">${successMsg}</div>`:''}
+    <label for="l-email">E-Mail</label>
+    <input type="email" id="l-email" value="${esc(email)}" placeholder="admin@beispiel.ch" style="margin-bottom:1rem;" />
+    <label for="l-pw">Passwort</label>
+    <div class="pw-field">
+      <input type="password" id="l-pw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()" />
+      <button class="pw-eye" onmousedown="peShow('l-pw')" onmouseup="peHide('l-pw')" onmouseleave="peHide('l-pw')" ontouchstart="peShow('l-pw')" ontouchend="peHide('l-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
+    </div>
+    <div class="field-err" id="l-err"></div>
+    <button class="btn-green-full" onclick="doLogin()" style="margin-bottom:0.75rem;"><i class="ti ti-login"></i>Einloggen</button>
+    <button class="btn-outline" onclick="showForgotForm()"><i class="ti ti-mail"></i>Passwort vergessen</button>`;
+}
+
+function renderSetPasswordForm(title,subtitle){
+  document.getElementById('auth-form-content').innerHTML=`
+    <div style="text-align:center;margin-bottom:1rem;">
+      <div style="font-size:15px;font-weight:600;color:var(--text);">${title}</div>
+      <div style="font-size:13px;color:var(--text2);">${subtitle}</div>
+    </div>
+    <label>Neues Passwort (mind. 6 Zeichen)</label>
+    <div class="pw-field">
+      <input type="password" id="new-pw" placeholder="Neues Passwort" />
+      <button class="pw-eye" onmousedown="peShow('new-pw')" onmouseup="peHide('new-pw')" onmouseleave="peHide('new-pw')" ontouchstart="peShow('new-pw')" ontouchend="peHide('new-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
+    </div>
+    <label>Passwort wiederholen</label>
+    <div class="pw-field">
+      <input type="password" id="new-pw2" placeholder="Passwort wiederholen" onkeydown="if(event.key==='Enter')saveNewPassword()" />
+      <button class="pw-eye" onmousedown="peShow('new-pw2')" onmouseup="peHide('new-pw2')" onmouseleave="peHide('new-pw2')" ontouchstart="peShow('new-pw2')" ontouchend="peHide('new-pw2')" tabindex="-1"><i class="ti ti-eye"></i></button>
+    </div>
+    <div class="field-err" id="new-pw-err"></div>
+    <button class="btn-green-full" onclick="saveNewPassword()"><i class="ti ti-check"></i>Passwort speichern</button>`;
+}
+
+function showForgotForm(){
+  document.getElementById('auth-form-content').innerHTML=`
+    <div style="text-align:center;margin-bottom:1rem;">
+      <div style="font-size:14px;color:var(--text2);">Geben Sie Ihre E-Mail ein. Sie erhalten einen Reset-Link.</div>
+    </div>
+    <label for="rs-email">E-Mail</label>
+    <input type="email" id="rs-email" placeholder="admin@beispiel.ch" />
+    <div class="field-err" id="rs-err"></div>
+    <div class="field-ok" id="rs-ok" style="display:none;"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Reset-Link per E-Mail gesendet!</div>
+    <button class="btn-green-full" onclick="doResetPw()" style="margin-bottom:0.75rem;"><i class="ti ti-mail"></i>Reset-Link senden</button>
+    <button class="btn-outline" onclick="renderLoginForm()"><i class="ti ti-arrow-left"></i>Zurück zum Login</button>`;
+}
+
+// ── Load ──────────────────────────────────────────────────
 async function load(){
-  const params=new URLSearchParams(window.location.search);
   const hash=window.location.hash;
-  const isInvite=hash&&hash.includes('type=invite');
-  const isRecovery=hash&&hash.includes('type=recovery');
-  const isInviteOrReset=isInvite||isRecovery;
+  const isInvite=hash.includes('type=invite');
+  const isRecovery=hash.includes('type=recovery');
 
   await loadDeadline();
   await loadOrders();
 
-  // Show admin tab if ?admin in URL
-  if(params.has('admin')){
-    document.getElementById('tab-admin').style.display='flex';
-  }
-
-  // Handle invite/recovery links
-  if(isInviteOrReset){
+  // Handle invite / password reset links
+  if(isInvite||isRecovery){
     document.getElementById('tab-admin').style.display='flex';
     switchTab('admin');
-
-    // Listen for auth state change from token
-    sb.auth.onAuthStateChange(async (event,session)=>{
-      if((event==='SIGNED_IN'||event==='PASSWORD_RECOVERY')&&session){
-        currentUser=session.user;
-        sessionStorage.setItem('must_set_password','1');
-        showSetPasswordForm();
-      }
-    });
-
-    // Also check if session already exists immediately (token already processed)
-    const {data:{session}}=await sb.auth.getSession();
-    if(session){
-      currentUser=session.user;
-      sessionStorage.setItem('must_set_password','1');
-      showSetPasswordForm();
-    }
+    // Supabase processes the hash automatically and fires onAuthStateChange
+    renderSetPasswordForm(
+      isInvite?'Willkommen!':'Passwort zurücksetzen',
+      isInvite?'Bitte legen Sie Ihr Passwort fest.':'Bitte legen Sie ein neues Passwort fest.'
+    );
     return;
   }
 
-  // Normal flow - check session
-  sb.auth.onAuthStateChange(async (event,session)=>{
-    if(event==='SIGNED_IN'&&session){
-      currentUser=session.user;
-      // If they must set password (came from invite), force password form
-      if(sessionStorage.getItem('must_set_password')==='1'){
-        document.getElementById('tab-admin').style.display='flex';
-        switchTab('admin');
-        showSetPasswordForm();
-        return;
-      }
-      document.getElementById('tab-admin').style.display='flex';
-      showAdminContent();
-      switchTab('admin');
-    }else if(event==='SIGNED_OUT'){
-      currentUser=null;
-      sessionStorage.removeItem('must_set_password');
-    }
-  });
+  // Show admin tab only if ?admin in URL
+  if(isAdminUrl()){
+    document.getElementById('tab-admin').style.display='flex';
+    renderLoginForm();
+  }
 
+  // Check existing session
   const {data:{session}}=await sb.auth.getSession();
   if(session){
-    // If refreshed while must_set_password is active, force password form
-    if(sessionStorage.getItem('must_set_password')==='1'){
-      currentUser=session.user;
-      document.getElementById('tab-admin').style.display='flex';
-      switchTab('admin');
-      showSetPasswordForm();
-      return;
-    }
     currentUser=session.user;
-    showAdminContent();
     document.getElementById('tab-admin').style.display='flex';
+    showAdminContent();
     switchTab('admin');
+    return;
   }
+
+  // If no session and admin url, show login
+  if(isAdminUrl()) renderLoginForm();
 }
 
+// ── Auth State Changes ────────────────────────────────────
+sb.auth.onAuthStateChange(async (event,session)=>{
+  if(event==='SIGNED_IN'&&session&&!currentUser){
+    currentUser=session.user;
+    // If came from invite/recovery link, show set password form
+    const hash=window.location.hash;
+    if(hash.includes('type=invite')||hash.includes('type=recovery')){
+      renderSetPasswordForm(
+        hash.includes('type=invite')?'Willkommen!':'Passwort zurücksetzen',
+        hash.includes('type=invite')?'Bitte legen Sie Ihr Passwort fest.':'Bitte legen Sie ein neues Passwort fest.'
+      );
+    }else{
+      document.getElementById('tab-admin').style.display='flex';
+      showAdminContent();
+    }
+  }else if(event==='PASSWORD_RECOVERY'&&session){
+    currentUser=session.user;
+    renderSetPasswordForm('Passwort zurücksetzen','Bitte legen Sie ein neues Passwort fest.');
+  }else if(event==='SIGNED_OUT'||event==='USER_DELETED'){
+    if(currentUser){currentUser=null;forceLogout();}
+  }
+});
+
+// ── Session validity check every 10s ─────────────────────
+setInterval(async()=>{
+  if(!currentUser)return;
+  const {error}=await sb.auth.getUser();
+  if(error)forceLogout();
+},10000);
+
+// ── Deadline ──────────────────────────────────────────────
 async function loadDeadline(){
   const {data}=await sb.from('einstellungen').select('value').eq('key','deadline').single();
   if(data)deadlineStr=data.value;
   updateStatus();
   const el=document.getElementById('inp-deadline-dt');
   if(el){
-    if(deadlineStr){el.value=deadlineStr;}
-    else{const d=new Date();d.setMonth(d.getMonth()+3);d.setHours(11,0,0,0);el.value=d.toISOString().slice(0,16);}
+    el.value=deadlineStr||'';
     const t=new Date();
     el.min=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')+'T00:00';
   }
-}
-
-async function loadOrders(){
-  const {data,error}=await sb.from('anmeldungen').select('*').order('created_at',{ascending:true});
-  if(!error&&data)orders=data;
-  renderAll();
-}
-
-async function loadAdmins(){
-  const {data,error}=await sb.auth.admin?.listUsers?.()??{data:null};
-  const el=document.getElementById('admin-list');
-  if(!data){
-    el.innerHTML='<div style="font-size:13px;color:var(--text2);">Admin-Liste nur im Supabase Dashboard einsehbar.</div>';
-    return;
-  }
-  const users=data.users||[];
-  el.innerHTML=users.map(u=>{
-    const isMe=currentUser&&u.id===currentUser.id;
-    const isSuper=u.user_metadata?.is_super;
-    const isAdmin=u.user_metadata?.is_admin;
-    const isMeSuper=currentUser?.user_metadata?.is_super;
-    const canDelete=isMe||(isMeSuper&&!isMe);
-    return`<div class="admin-list-item">
-      <div class="admin-badge${isMe?' admin-badge-me':''}"><i class="ti ti-shield${isSuper?'-check':isAdmin?'-check':''}"></i></div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:500;">${esc(u.email)}
-          ${isSuper?'&nbsp;<span style="font-size:11px;background:var(--blue-bg);color:var(--blue);padding:1px 7px;border-radius:99px;font-weight:600;">Super</span>':''}
-          ${isMe?'&nbsp;<span style="font-size:11px;background:var(--green-bg);color:var(--green);padding:1px 7px;border-radius:99px;font-weight:600;">Ich</span>':''}
-        </div>
-        <div style="font-size:12px;color:var(--text2);">Seit ${new Date(u.created_at).toLocaleDateString('de-CH')}</div>
-      </div>
-      ${canDelete?`<button class="icon-btn del" onclick="initDeleteAdmin('${u.id}','${esc(u.email)}')" title="Löschen"><i class="ti ti-user-x" style="font-size:15px"></i></button>`:''}
-    </div>`;
-  }).join('');
 }
 
 function isPast(){if(!deadlineStr)return false;return new Date()>new Date(deadlineStr);}
 function fmtDeadline(str){
   if(!str)return '—';
   const d=new Date(str);
-  return d.toLocaleDateString('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})+', '+d.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit',hour12:false})+' Uhr';
+  return d.toLocaleDateString('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})+', '+
+    d.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit',hour12:false})+' Uhr';
 }
 
 function updateStatus(){
@@ -502,17 +464,20 @@ function updateStatus(){
 }
 
 function initSaveDeadline(){
+  if(!currentUser)return;
   const val=document.getElementById('inp-deadline-dt').value;
   if(!val)return;
   document.getElementById('confirm-deadline-summary').innerHTML='<strong>Neuer Anmeldeschluss:</strong><br>'+fmtDeadline(val);
   showPanel('confirm-deadline');
 }
 async function finalSaveDeadline(){
+  if(!currentUser)return;
   const val=document.getElementById('inp-deadline-dt').value;
   await sb.from('einstellungen').upsert({key:'deadline',value:val});
   deadlineStr=val;updateStatus();hidePanel('confirm-deadline');
 }
 
+// ── Anmelden ──────────────────────────────────────────────
 function toggleAnmeldeTyp(){
   const isG=document.getElementById('atyp-gruppe').checked;
   document.getElementById('einzel-fields').style.display=isG?'none':'block';
@@ -539,7 +504,7 @@ function submitOrder(){
     const anz=parseInt(document.getElementById('inp-anzahl').value);
     if(!kl||!anz||anz<2)return;
     pendingPayload={name:kl+' (Kursleiter)',restaurant:rest,custom:isC,typ:'gruppe',anzahl:anz};
-    document.getElementById('confirm-anmeldung-summary').innerHTML='<strong>Typ:</strong> Gruppenanmeldung<br><strong>Kursleiter:</strong> '+esc(kl)+'<br><strong>Anzahl Personen:</strong> '+anz+'<br><strong>Restaurant:</strong> '+esc(rest);
+    document.getElementById('confirm-anmeldung-summary').innerHTML='<strong>Typ:</strong> Gruppenanmeldung<br><strong>Kursleiter:</strong> '+esc(kl)+'<br><strong>Anzahl:</strong> '+anz+'<br><strong>Restaurant:</strong> '+esc(rest);
   }else{
     const name=document.getElementById('inp-name').value.trim();
     if(!name)return;
@@ -554,8 +519,7 @@ async function finalSubmit(){
   if(!pendingPayload)return;
   const btn=document.getElementById('btn-submit');btn.disabled=true;
   const {error}=await sb.from('anmeldungen').insert(pendingPayload);
-  btn.disabled=false;
-  if(error)return;
+  btn.disabled=false;if(error)return;
   pendingPayload=null;hidePanel('confirm-anmeldung');
   document.getElementById('inp-name').value='';
   document.getElementById('inp-kursleiter').value='';
@@ -568,30 +532,53 @@ async function finalSubmit(){
   await loadOrders();
 }
 
-// Edit order
+// ── Orders ────────────────────────────────────────────────
+async function loadOrders(){
+  const {data,error}=await sb.from('anmeldungen').select('*').order('created_at',{ascending:true});
+  if(!error&&data)orders=data;
+  renderAll();
+}
+
+function initDeleteOrder(id){
+  document.querySelectorAll('.del-confirm').forEach(p=>p.remove());
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  const panel=document.createElement('div');
+  panel.className='confirm-panel danger del-confirm';panel.style.display='block';
+  panel.innerHTML=`<div class="confirm-panel-title"><i class="ti ti-trash"></i>Anmeldung löschen?</div>
+    <div class="confirm-summary"><strong>Name:</strong> ${esc(o.name)}<br><strong>Restaurant:</strong> ${esc(o.restaurant)}${o.typ==='gruppe'?'<br><strong>Personen:</strong> '+o.anzahl:''}</div>
+    <div class="confirm-actions" style="margin-top:0.75rem;">
+      <button class="ca-abort" onclick="this.closest('.del-confirm').remove()"><i class="ti ti-x"></i>Abbrechen</button>
+      <button class="ca-red" onclick="finalDeleteOrder(${id})"><i class="ti ti-trash"></i>Löschen</button>
+    </div>`;
+  const el=document.getElementById('oai-'+id);if(el)el.after(panel);
+}
+
+async function finalDeleteOrder(id){
+  if(!currentUser)return;
+  await sb.from('anmeldungen').delete().eq('id',id);
+  document.querySelectorAll('.del-confirm').forEach(p=>p.remove());
+  await loadOrders();
+}
+
 function initEditOrder(id){
   document.querySelectorAll('.edit-order-panel').forEach(p=>p.remove());
   const o=orders.find(x=>x.id===id);if(!o)return;
   const isG=o.typ==='gruppe';
   const panel=document.createElement('div');
-  panel.className='edit-order-panel';
-  panel.style.display='block';
+  panel.className='edit-order-panel';panel.style.display='block';
   panel.innerHTML=`
     <div style="font-size:14px;font-weight:600;color:var(--blue);margin-bottom:0.75rem;display:flex;align-items:center;gap:7px;"><i class="ti ti-pencil"></i>Anmeldung bearbeiten</div>
     <label>Anmeldetyp</label>
     <div class="toggle-row" style="margin-bottom:0.75rem;">
-      <div class="toggle-opt"><input type="radio" name="etyp-${id}" id="etyp-e-${id}" ${!isG?'checked':''} onchange="toggleEditTyp(${id})"><label for="etyp-e-${id}"><i class="ti ti-user" style="font-size:14px"></i>Einzeln</label></div>
-      <div class="toggle-opt"><input type="radio" name="etyp-${id}" id="etyp-g-${id}" ${isG?'checked':''} onchange="toggleEditTyp(${id})"><label for="etyp-g-${id}"><i class="ti ti-users" style="font-size:14px"></i>Gruppe</label></div>
+      <div class="toggle-opt"><input type="radio" name="etyp-${id}" id="ete-${id}" ${!isG?'checked':''} onchange="toggleEditTyp(${id})"><label for="ete-${id}"><i class="ti ti-user" style="font-size:14px"></i>Einzeln</label></div>
+      <div class="toggle-opt"><input type="radio" name="etyp-${id}" id="etg-${id}" ${isG?'checked':''} onchange="toggleEditTyp(${id})"><label for="etg-${id}"><i class="ti ti-users" style="font-size:14px"></i>Gruppe</label></div>
     </div>
     <div id="ee-${id}" style="display:${!isG?'block':'none'};">
-      <label>Name</label>
-      <input type="text" id="en-${id}" value="${esc(o.name)}" style="margin-bottom:0.75rem;" />
+      <label>Name</label><input type="text" id="en-${id}" value="${esc(o.name)}" style="margin-bottom:0.75rem;" />
     </div>
     <div id="eg-${id}" style="display:${isG?'block':'none'};">
-      <label>Name Kursleiter</label>
-      <input type="text" id="ekl-${id}" value="${esc(isG?o.name.replace(' (Kursleiter)',''):o.name)}" style="margin-bottom:0.75rem;" />
-      <label>Anzahl Personen</label>
-      <input type="number" id="eanz-${id}" min="2" max="100" value="${o.anzahl}" style="margin-bottom:0.75rem;" />
+      <label>Name Kursleiter</label><input type="text" id="ekl-${id}" value="${esc(isG?o.name.replace(' (Kursleiter)',''):o.name)}" style="margin-bottom:0.75rem;" />
+      <label>Anzahl Personen</label><input type="number" id="eanz-${id}" min="2" max="100" value="${o.anzahl}" style="margin-bottom:0.75rem;" />
     </div>
     <label>Restaurant</label>
     <select id="erest-${id}" style="margin-bottom:0.75rem;" onchange="toggleEditCustom(${id})">
@@ -611,68 +598,37 @@ function initEditOrder(id){
       <button class="ca-abort" style="flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:var(--radius-md);cursor:pointer;font-family:inherit;" onclick="this.closest('.edit-order-panel').remove()"><i class="ti ti-x"></i>Abbrechen</button>
       <button class="ca-ok" style="flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:var(--radius-md);cursor:pointer;font-family:inherit;background:var(--green);border:none;color:#E1F5EE;" id="esave-${id}" onclick="editStep2(${id})"><i class="ti ti-check"></i>Prüfen</button>
     </div>`;
-  const el=document.getElementById('oai-'+id);
-  if(el)el.after(panel);
+  const el=document.getElementById('oai-'+id);if(el)el.after(panel);
 }
 
 function toggleEditTyp(id){
-  const isG=document.getElementById('etyp-g-'+id).checked;
+  const isG=document.getElementById('etg-'+id).checked;
   document.getElementById('ee-'+id).style.display=isG?'none':'block';
   document.getElementById('eg-'+id).style.display=isG?'block':'none';
 }
 function toggleEditCustom(id){
-  const isC=document.getElementById('erest-'+id).value==='__custom__';
-  document.getElementById('ecw-'+id).style.display=isC?'block':'none';
+  document.getElementById('ecw-'+id).style.display=document.getElementById('erest-'+id).value==='__custom__'?'block':'none';
 }
-
 function editStep2(id){
   const o=orders.find(x=>x.id===id);if(!o)return;
-  const isG=document.getElementById('etyp-g-'+id).checked;
+  const isG=document.getElementById('etg-'+id).checked;
   const restSel=document.getElementById('erest-'+id).value;
   const isCustom=restSel==='__custom__';
   const rest=isCustom?document.getElementById('ec-'+id).value.trim():restSel;
   let name,anzahl;
-  if(isG){
-    const kl=document.getElementById('ekl-'+id).value.trim();
-    anzahl=parseInt(document.getElementById('eanz-'+id).value)||o.anzahl;
-    name=kl+' (Kursleiter)';
-  }else{
-    name=document.getElementById('en-'+id).value.trim()||o.name;
-    anzahl=1;
-  }
+  if(isG){name=document.getElementById('ekl-'+id).value.trim()+' (Kursleiter)';anzahl=parseInt(document.getElementById('eanz-'+id).value)||o.anzahl;}
+  else{name=document.getElementById('en-'+id).value.trim()||o.name;anzahl=1;}
   const conf=document.getElementById('econf-'+id);
-  conf.innerHTML='<strong>Bitte bestätigen:</strong><br><strong>Typ:</strong> '+(isG?'Gruppenanmeldung':'Einzelanmeldung')+'<br><strong>Name:</strong> '+esc(name)+'<br><strong>Restaurant:</strong> '+esc(rest)+(isG?'<br><strong>Anzahl:</strong> '+anzahl+' Personen':'');
+  conf.innerHTML='<strong>Bestätigen:</strong><br><strong>Typ:</strong> '+(isG?'Gruppe':'Einzeln')+'<br><strong>Name:</strong> '+esc(name)+'<br><strong>Restaurant:</strong> '+esc(rest)+(isG?'<br><strong>Anzahl:</strong> '+anzahl+' Pers.':'');
   conf.style.display='block';
   const btn=document.getElementById('esave-'+id);
   btn.innerHTML='<i class="ti ti-check"></i>Bestätigen';
   btn.onclick=()=>finalEditOrder(id,{name,restaurant:rest,custom:isCustom,typ:isG?'gruppe':'einzeln',anzahl});
 }
-
 async function finalEditOrder(id,payload){
+  if(!currentUser)return;
   await sb.from('anmeldungen').update(payload).eq('id',id);
   document.querySelectorAll('.edit-order-panel').forEach(p=>p.remove());
-  await loadOrders();
-}
-
-function initDeleteOrder(id){
-  document.querySelectorAll('.del-confirm').forEach(p=>p.remove());
-  const o=orders.find(x=>x.id===id);if(!o)return;
-  const panel=document.createElement('div');
-  panel.className='confirm-panel danger del-confirm';
-  panel.style.display='block';
-  panel.innerHTML=`<div class="confirm-panel-title"><i class="ti ti-trash"></i>Anmeldung löschen?</div>
-    <div class="confirm-summary"><strong>Name:</strong> ${esc(o.name)}<br><strong>Restaurant:</strong> ${esc(o.restaurant)}${o.typ==='gruppe'?'<br><strong>Personen:</strong> '+o.anzahl:''}</div>
-    <div class="confirm-actions" style="margin-top:0.75rem;">
-      <button class="ca-abort" onclick="this.closest('.del-confirm').remove()"><i class="ti ti-x"></i>Abbrechen</button>
-      <button class="ca-red" onclick="finalDeleteOrder(${id})"><i class="ti ti-trash"></i>Löschen</button>
-    </div>`;
-  const el=document.getElementById('oai-'+id);
-  if(el)el.after(panel);
-}
-
-async function finalDeleteOrder(id){
-  await sb.from('anmeldungen').delete().eq('id',id);
-  document.querySelectorAll('.del-confirm').forEach(p=>p.remove());
   await loadOrders();
 }
 
@@ -682,124 +638,59 @@ function initReset(){
   showPanel('confirm-reset');
 }
 async function finalReset(){
+  if(!currentUser)return;
   await sb.from('anmeldungen').delete().gte('id',0);
-  hidePanel('confirm-reset');
-  await loadOrders();
+  hidePanel('confirm-reset');await loadOrders();
 }
 
-function initDeleteAdmin(id,email){
-  pendingDeleteAdminId=id;
-  const isMe=currentUser&&id===currentUser.id;
-  document.getElementById('confirm-delete-admin-summary').innerHTML='<strong>E-Mail:</strong> '+esc(email)+(isMe?'<br><span style="color:var(--red);">⚠ Dies ist Ihr eigenes Konto.</span>':'');
-  showPanel('confirm-delete-admin');
-}
-async function finalDeleteAdmin(){
-  if(!pendingDeleteAdminId)return;
-  const isMe=currentUser&&pendingDeleteAdminId===currentUser.id;
-  // Delete from Supabase Auth (requires service role - works via RLS)
-  await sb.from('admins_delete').insert({user_id:pendingDeleteAdminId}).catch(()=>{});
-  // Sign out if deleting own account
-  if(isMe){
-    await sb.auth.signOut();
-    currentUser=null;
-    sessionStorage.removeItem('must_set_password');
-    window.history.replaceState({},'',window.location.pathname+'?admin');
-    document.getElementById('auth-screen').style.display='block';
-    document.getElementById('admin-content').style.display='none';
-    document.getElementById('super-admin-section').style.display='none';
-    document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
-    restoreLoginForm();
-    switchTab('admin');
-  }else{
-    hidePanel('confirm-delete-admin');
-    pendingDeleteAdminId=null;
-    await loadAdmins();
-  }
-}
-
-function showSetPasswordForm(){
-  document.getElementById('auth-screen').style.display='block';
-  document.getElementById('admin-content').style.display='none';
-  // Replace auth screen content with password setup form
-  const authScreen=document.querySelector('.auth-screen');
-  authScreen.innerHTML=`
-    <div class="auth-icon" style="background:var(--green-bg);color:var(--green);"><i class="ti ti-lock-check"></i></div>
-    <div style="font-size:17px;font-weight:600;">Willkommen!</div>
-    <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Bitte legen Sie Ihr Passwort fest</div>
-    <div class="auth-form-wrap">
-      <label for="new-pw">Neues Passwort (mind. 6 Zeichen)</label>
-      <div class="pw-field">
-        <input type="password" id="new-pw" placeholder="Neues Passwort" />
-        <button class="pw-eye-btn" type="button" onmousedown="peShow('new-pw')" onmouseup="peHide('new-pw')" onmouseleave="peHide('new-pw')" ontouchstart="peShow('new-pw')" ontouchend="peHide('new-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
-      </div>
-      <label for="new-pw2">Passwort wiederholen</label>
-      <div class="pw-field">
-        <input type="password" id="new-pw2" placeholder="Passwort wiederholen" onkeydown="if(event.key==='Enter')saveNewPassword()" />
-        <button class="pw-eye-btn" type="button" onmousedown="peShow('new-pw2')" onmouseup="peHide('new-pw2')" onmouseleave="peHide('new-pw2')" ontouchstart="peShow('new-pw2')" ontouchend="peHide('new-pw2')" tabindex="-1"><i class="ti ti-eye"></i></button>
-      </div>
-      <div class="field-err" id="new-pw-err"></div>
-      <button class="btn-green-full" onclick="saveNewPassword()"><i class="ti ti-check"></i>Passwort speichern</button>
-    </div>`;
-}
-
+// ── Password ──────────────────────────────────────────────
 async function saveNewPassword(){
   const pw=document.getElementById('new-pw').value;
   const pw2=document.getElementById('new-pw2').value;
   const errEl=document.getElementById('new-pw-err');
-  errEl.style.display='none';errEl.style.color='var(--red)';
+  errEl.style.display='none';
   if(!pw||pw.length<6){errEl.textContent='Passwort muss mind. 6 Zeichen haben.';errEl.style.display='block';return;}
   if(pw!==pw2){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
-
-  const {data:sd}=await sb.auth.getSession();
-  if(!sd?.session){errEl.textContent='Session abgelaufen — bitte Einladungslink erneut öffnen.';errEl.style.display='block';return;}
-
   const {data,error}=await sb.auth.updateUser({password:pw});
-  if(error){errEl.textContent='Fehler: '+error.message;errEl.style.display='block';return;}
-
-  // Password set - sign out and show login form
-  sessionStorage.removeItem('must_set_password');
+  if(error){
+    let msg=error.message;
+    if(msg.includes('different'))msg='Das Passwort muss sich vom aktuellen unterscheiden.';
+    errEl.textContent=msg;errEl.style.display='block';return;
+  }
+  // Success - sign out and show login
+  const email=data?.user?.email||'';
   await sb.auth.signOut();
   currentUser=null;
   window.history.replaceState({},'',window.location.pathname+'?admin');
-
-  // Show success + login form
-  document.querySelector('.auth-screen').innerHTML=`
-    <div class="auth-icon" style="background:var(--green-bg);color:var(--green);"><i class="ti ti-circle-check"></i></div>
-    <div style="font-size:17px;font-weight:600;">Passwort gespeichert!</div>
-    <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Bitte loggen Sie sich jetzt ein.</div>
-    <div class="auth-form-wrap">
-      <label for="l-email">E-Mail</label>
-      <input type="email" id="l-email" placeholder="admin@beispiel.ch" style="margin-bottom:1rem;" value="${sd.session.user.email}" />
-      <label for="l-pw">Passwort</label>
-      <div class="pw-field">
-        <input type="password" id="l-pw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()" />
-        <button class="pw-eye-btn" type="button" onmousedown="peShow('l-pw')" onmouseup="peHide('l-pw')" onmouseleave="peHide('l-pw')" ontouchstart="peShow('l-pw')" ontouchend="peHide('l-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
-      </div>
-      <div class="field-err" id="l-err"></div>
-      <button class="btn-green-full" onclick="doLogin()"><i class="ti ti-login"></i>Einloggen</button>
-    </div>`;
+  renderLoginForm(email,'<i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Passwort gesetzt! Bitte einloggen.');
 }
 
-function restoreLoginForm(){
-  document.querySelector('.auth-screen').innerHTML=`
-    <div class="auth-icon"><i class="ti ti-shield-lock"></i></div>
-    <div style="font-size:17px;font-weight:600;">Admin-Bereich</div>
-    <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Nur für autorisierte Mitarbeitende</div>
-    <div class="auth-form-wrap">
-      <label for="l-email">E-Mail</label>
-      <input type="email" id="l-email" placeholder="admin@beispiel.ch" style="margin-bottom:1rem;" />
-      <label for="l-pw">Passwort</label>
-      <div class="pw-field">
-        <input type="password" id="l-pw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()" />
-        <button class="pw-eye-btn" type="button" onmousedown="peShow('l-pw')" onmouseup="peHide('l-pw')" onmouseleave="peHide('l-pw')" ontouchstart="peShow('l-pw')" ontouchend="peHide('l-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
-      </div>
-      <div class="field-err" id="l-err"></div>
-      <button class="btn-green-full" onclick="doLogin()"><i class="ti ti-login"></i>Einloggen</button>
-      <div style="margin-top:0.75rem;text-align:center;">
-        <button class="btn-outline" style="width:100%;justify-content:center;" onclick="doResetPw()"><i class="ti ti-mail"></i>Passwort vergessen</button>
-      </div>
-      <div class="field-ok" id="reset-ok" style="margin-top:0.5rem;display:none;"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Reset-Link per E-Mail gesendet!</div>
-    </div>`;
+function initChangePassword(){
+  const pw=document.getElementById('chpw-new').value;
+  const rep=document.getElementById('chpw-rep').value;
+  const errEl=document.getElementById('chpw-err');
+  document.getElementById('chpw-ok').style.display='none';
+  errEl.style.display='none';
+  if(!pw||pw.length<6){errEl.textContent='Passwort mind. 6 Zeichen.';errEl.style.display='block';return;}
+  if(pw!==rep){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
+  showPanel('confirm-chpw');
+}
+async function finalChangePassword(){
+  if(!currentUser)return;
+  const pw=document.getElementById('chpw-new').value;
+  const {error}=await sb.auth.updateUser({password:pw});
+  hidePanel('confirm-chpw');
+  if(error){
+    let msg=error.message;
+    if(msg.includes('different'))msg='Das neue Passwort muss sich vom aktuellen unterscheiden.';
+    else if(msg.includes('weak'))msg='Passwort zu schwach.';
+    document.getElementById('chpw-err').textContent=msg;
+    document.getElementById('chpw-err').style.display='block';return;
+  }
+  document.getElementById('chpw-new').value='';
+  document.getElementById('chpw-rep').value='';
+  document.getElementById('chpw-ok').style.display='block';
+  setTimeout(()=>document.getElementById('chpw-ok').style.display='none',3000);
 }
 
 async function doLogin(){
@@ -810,7 +701,7 @@ async function doLogin(){
   if(!email||!pw){errEl.textContent='Bitte E-Mail und Passwort eingeben.';errEl.style.display='block';return;}
   const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
   if(error){
-    errEl.textContent=error.message.includes('Invalid')?'E-Mail oder Passwort ungültig.':error.message;
+    errEl.textContent=error.message.includes('Invalid')?'E-Mail oder Passwort ungültig.':'Fehler beim Einloggen.';
     errEl.style.display='block';return;
   }
   currentUser=data.user;
@@ -818,89 +709,62 @@ async function doLogin(){
 }
 
 async function doResetPw(){
-  const email=document.getElementById('l-email').value.trim().toLowerCase();
-  if(!email){
-    const errEl=document.getElementById('l-err');
-    errEl.textContent='Bitte E-Mail eingeben.';errEl.style.display='block';return;
-  }
-  const {error}=await sb.auth.resetPasswordForEmail(email,{
-    redirectTo:window.location.origin+window.location.pathname+'?admin'
-  });
-  if(!error){
-    document.getElementById('reset-ok').style.display='block';
-  }
+  const email=document.getElementById('rs-email')?.value.trim().toLowerCase();
+  const errEl=document.getElementById('rs-err');
+  const okEl=document.getElementById('rs-ok');
+  if(errEl)errEl.style.display='none';
+  if(!email){if(errEl){errEl.textContent='Bitte E-Mail eingeben.';errEl.style.display='block';}return;}
+  await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname+'?admin'});
+  if(okEl)okEl.style.display='block';
+  const btn=document.querySelector('#auth-form-content .btn-green-full');
+  if(btn)btn.disabled=true;
 }
 
+// ── Admin UI ──────────────────────────────────────────────
 function showAdminContent(){
-  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('auth-panel').style.display='none';
   document.getElementById('admin-content').style.display='block';
   document.getElementById('tab-admin').innerHTML='<i class="ti ti-shield-check"></i>Admin';
-  const isSuper=currentUser?.user_metadata?.is_super;
   document.getElementById('admin-email-display').innerHTML=
-    '<i class="ti ti-user" style="vertical-align:-2px;margin-right:4px"></i>Eingeloggt als: <strong>'+esc(currentUser.email)+'</strong>'+
-    (isSuper?'&nbsp;<span style="font-size:11px;background:var(--blue-bg);color:var(--blue);padding:1px 7px;border-radius:99px;font-weight:600;">Super Admin</span>':'');
-  if(isSuper)document.getElementById('super-admin-section').style.display='block';
+    '<i class="ti ti-user" style="vertical-align:-2px;margin-right:4px"></i>Eingeloggt als: <strong>'+esc(currentUser.email)+'</strong>';
+  const dl=document.getElementById('inp-deadline-dt');
+  if(dl&&deadlineStr)dl.value=deadlineStr;
   renderAll();
+}
+
+function forceLogout(){
+  currentUser=null;
+  document.getElementById('auth-panel').style.display='block';
+  document.getElementById('admin-content').style.display='none';
+  document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
+  renderLoginForm();
+  switchTab('admin');
 }
 
 async function doLogout(){
   await sb.auth.signOut();
   currentUser=null;
-  sessionStorage.removeItem('must_set_password');
-  window.history.replaceState({},'',window.location.pathname+'?admin');
-  document.getElementById('auth-screen').style.display='block';
+  document.getElementById('auth-panel').style.display='block';
   document.getElementById('admin-content').style.display='none';
-  document.getElementById('super-admin-section').style.display='none';
   document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
-  restoreLoginForm();
+  renderLoginForm();
   switchTab('admin');
 }
 
-function initChangePassword(){
-  const pw=document.getElementById('chpw-new').value;
-  const rep=document.getElementById('chpw-rep').value;
-  const errEl=document.getElementById('chpw-err');
-  const okEl=document.getElementById('chpw-ok');
-  errEl.style.display='none';okEl.style.display='none';
-  if(!pw||pw.length<6){errEl.textContent='Passwort mind. 6 Zeichen.';errEl.style.display='block';return;}
-  if(pw!==rep){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
-  showPanel('confirm-chpw');
-}
-
-async function finalChangePassword(){
-  const pw=document.getElementById('chpw-new').value;
-  const {error}=await sb.auth.updateUser({password:pw});
-  hidePanel('confirm-chpw');
-  if(error){
-    let msg=error.message;
-    if(msg.includes('different from the old password'))msg='Das neue Passwort muss sich vom aktuellen Passwort unterscheiden.';
-    else if(msg.includes('weak'))msg='Passwort zu schwach. Bitte ein stärkeres Passwort wählen.';
-    else if(msg.includes('characters'))msg='Passwort muss mind. 6 Zeichen haben.';
-    document.getElementById('chpw-err').textContent=msg;
-    document.getElementById('chpw-err').style.display='block';return;
-  }
-  document.getElementById('chpw-new').value='';
-  document.getElementById('chpw-rep').value='';
-  document.getElementById('chpw-ok').style.display='block';
-  setTimeout(()=>document.getElementById('chpw-ok').style.display='none',3000);
-}
-
+// ── Render ────────────────────────────────────────────────
 function renderAll(){
   const totalP=orders.reduce((s,o)=>s+(o.typ==='gruppe'?o.anzahl:1),0);
   document.getElementById('count-badge').textContent=totalP+' Pers.';
   const lo=document.getElementById('list-orders');
   lo.innerHTML=orders.length===0
     ?'<div class="empty-state"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div>'
-    :orders.map(o=>{
-      const isG=o.typ==='gruppe';
-      return`<div class="order-item" id="order-item-${o.id}">
-        <div class="order-avatar${isG?' order-avatar-group':''}">${isG?'<i class="ti ti-users" style="font-size:14px"></i>':esc(initials(o.name))}</div>
-        <div class="order-info">
-          <div class="order-name">${esc(o.name)}${isG?'&nbsp;<span class="tag-gruppe">'+o.anzahl+' Personen</span>':''}</div>
-          <div class="order-rest"><i class="ti ti-building-store" style="font-size:11px;margin-right:3px"></i>${esc(o.restaurant)}${o.custom?'<span class="tag-custom">Eigenes</span>':''}</div>
-        </div>
-      </div>`;
-    }).join('');
+    :orders.map(o=>{const isG=o.typ==='gruppe';return`<div class="order-item" id="order-item-${o.id}">
+      <div class="order-avatar${isG?' order-avatar-group':''}">${isG?'<i class="ti ti-users" style="font-size:14px"></i>':esc(initials(o.name))}</div>
+      <div class="order-info">
+        <div class="order-name">${esc(o.name)}${isG?'&nbsp;<span class="tag-gruppe">'+o.anzahl+' Personen</span>':''}</div>
+        <div class="order-rest"><i class="ti ti-building-store" style="font-size:11px;margin-right:3px"></i>${esc(o.restaurant)}${o.custom?'<span class="tag-custom">Eigenes</span>':''}</div>
+      </div>
+    </div>`;}).join('');
 
   if(!currentUser)return;
   document.getElementById('stat-total').textContent=totalP;
@@ -911,8 +775,7 @@ function renderAll(){
     groups[o.restaurant].p+=(o.typ==='gruppe'?o.anzahl:1);
   });
   document.getElementById('stat-rests').textContent=Object.keys(groups).length;
-  const ag=document.getElementById('admin-groups');
-  ag.innerHTML=Object.keys(groups).length===0
+  document.getElementById('admin-groups').innerHTML=Object.keys(groups).length===0
     ?'<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div>'
     :Object.entries(groups).sort((a,b)=>b[1].p-a[1].p).map(([rest,data])=>`
       <div style="margin-bottom:1rem;">
@@ -929,47 +792,19 @@ function renderAll(){
       </div>`).join('');
 }
 
+// ── Navigation ────────────────────────────────────────────
 function switchTab(tab){
+  if(tab==='admin'&&!isAdminUrl()&&!currentUser)return;
   ['anmelden','uebersicht','admin'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('view-'+t).classList.toggle('active',t===tab);
   });
   if(tab==='uebersicht')loadOrders();
-  if(tab==='admin'&&currentUser)loadAdmins();
 }
 
 load();
 setInterval(updateStatus,30000);
 setInterval(()=>loadOrders(),15000);
-
-// Check every 5 seconds if session still valid (instant logout if deleted in Supabase)
-setInterval(async()=>{
-  if(!currentUser)return;
-  const {data,error}=await sb.auth.getUser();
-  if(error||!data?.user){
-    forceLogout();
-  }
-},5000);
-
-// Also listen to Supabase auth events - fires immediately on token revocation
-sb.auth.onAuthStateChange((event,session)=>{
-  if(event==='SIGNED_OUT'||event==='USER_DELETED'||event==='TOKEN_REFRESHED'&&!session){
-    if(currentUser){
-      forceLogout();
-    }
-  }
-});
-
-function forceLogout(){
-  currentUser=null;
-  sessionStorage.removeItem('must_set_password');
-  document.getElementById('auth-screen').style.display='block';
-  document.getElementById('admin-content').style.display='none';
-  document.getElementById('super-admin-section').style.display='none';
-  document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
-  restoreLoginForm();
-  switchTab('admin');
-}
 </script>
 </body>
 </html>
