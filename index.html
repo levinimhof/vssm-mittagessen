@@ -417,11 +417,32 @@ async function load(){
   await loadKurse();
   document.getElementById('status-pill').style.visibility='visible';
 
+  // Handle invite/recovery link - store flag so refresh keeps password form
   if(isInvite||isRecovery){
+    sessionStorage.setItem('must_set_password', isInvite?'invite':'recovery');
     document.getElementById('tab-admin').style.display='flex';
     switchTab('admin');
     renderSetPasswordForm(isInvite?'Willkommen!':'Passwort zurücksetzen',isInvite?'Bitte legen Sie Ihr Passwort fest.':'Bitte legen Sie ein neues Passwort fest.');
     return;
+  }
+
+  // On refresh: if must_set_password flag active and session exists, keep showing password form
+  const mustSet=sessionStorage.getItem('must_set_password');
+  if(mustSet){
+    const {data:{session}}=await sb.auth.getSession();
+    if(session){
+      currentUser=session.user;
+      document.getElementById('tab-admin').style.display='flex';
+      switchTab('admin');
+      renderSetPasswordForm(
+        mustSet==='invite'?'Willkommen!':'Passwort zurücksetzen',
+        mustSet==='invite'?'Bitte legen Sie Ihr Passwort fest.':'Bitte legen Sie ein neues Passwort fest.'
+      );
+      return;
+    }else{
+      // Session expired - clear flag and continue to login
+      sessionStorage.removeItem('must_set_password');
+    }
   }
 
   if(isAdminUrl()){
@@ -953,9 +974,23 @@ async function saveNewPassword(){
   const {data,error}=await sb.auth.updateUser({password:pw});
   if(error){let msg=error.message;if(msg.includes('different'))msg='Das Passwort muss sich vom aktuellen unterscheiden.';errEl.textContent=msg;errEl.style.display='block';return;}
   const email=data?.user?.email||'';
+  sessionStorage.removeItem('must_set_password');
   await sb.auth.signOut();currentUser=null;
   window.history.replaceState({},'',window.location.pathname+'?admin');
-  renderLoginForm(email,'<i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Passwort gesetzt! Bitte einloggen.');
+  // If this tab was opened from email link, try to close it after success
+  // Otherwise show login form
+  if(window.opener){
+    // Tab was opened by another tab - show message and close
+    document.getElementById('auth-form-content').innerHTML=`
+      <div style="text-align:center;padding:1rem 0;">
+        <div style="font-size:40px;color:#0F6E56;margin-bottom:0.75rem;"><i class="ti ti-circle-check"></i></div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:0.5rem;">Passwort gesetzt!</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:1rem;">Sie können sich jetzt im anderen Tab einloggen.</div>
+        <button class="btn-green-full" onclick="window.close()"><i class="ti ti-x"></i>Tab schliessen</button>
+      </div>`;
+  }else{
+    renderLoginForm(email,'<i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Passwort gesetzt! Bitte einloggen.');
+  }
 }
 
 function initChangePassword(){
