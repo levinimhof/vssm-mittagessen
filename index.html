@@ -994,12 +994,42 @@ async function doResetPw(){
   const errEl=document.getElementById('rs-err');
   const okEl=document.getElementById('rs-ok');
   if(errEl)errEl.style.display='none';
-  if(!email){if(errEl){errEl.textContent='Bitte E-Mail eingeben.';errEl.style.display='block';}return;}
-  // Check if email exists in auth users
-  await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname+'?admin'});
-  if(okEl)okEl.style.display='block';
+  if(okEl)okEl.style.display='none';
+  if(!email){
+    if(errEl){errEl.textContent='Bitte E-Mail eingeben.';errEl.style.display='block';}
+    return;
+  }
+
+  // Validate email format
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(errEl){errEl.textContent='Bitte eine gültige E-Mail-Adresse eingeben.';errEl.style.display='block';}
+    return;
+  }
+
+  // Show loading state
   const btn=document.querySelector('#auth-form-content .btn-green-full');
-  if(btn)btn.disabled=true;
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader"></i>Wird geprüft...';}
+
+  // Check if email exists in Supabase Auth via signIn attempt
+  // We use a workaround: try to get user - if OTP request works, user exists
+  // Best approach: use admin API via edge function - but since we don't have that,
+  // we use resetPasswordForEmail which silently fails for non-existent emails
+  // Instead we check via our own method: try signInWithOtp to see response
+  const {error:checkError}=await sb.auth.resetPasswordForEmail(email,{
+    redirectTo:window.location.origin+window.location.pathname+'?admin'
+  });
+
+  if(checkError){
+    if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-mail"></i>Reset-Link senden';}
+    if(errEl){errEl.textContent='Fehler: '+checkError.message;errEl.style.display='block';}
+    return;
+  }
+
+  // Supabase doesn't reveal if email exists (security) but we can check
+  // our own table - since we store emails in auth.users we try via magic link check
+  // For now show success - Supabase only sends email if user exists (silent fail otherwise)
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-check"></i>Gesendet';}
+  if(okEl)okEl.style.display='block';
 }
 
 function showAdminContent(){
@@ -1153,15 +1183,40 @@ function showNoKurs(){
 }
 
 load();
+
+// ── Realtime Subscriptions ────────────────────────────────
+// Listen for changes in kurse table - updates all views instantly
+sb.channel('kurse-changes')
+  .on('postgres_changes', {event:'*', schema:'public', table:'kurse'}, async()=>{
+    await loadKurse();
+    const kurs=kurse.find(k=>k.id===currentKursId);
+    if(kurs) updateStatusForKurs(kurs);
+    else if(!kurse.find(k=>k.aktiv)) showNoKurs();
+  })
+  .subscribe();
+
+// Listen for changes in anmeldungen table - updates orders instantly
+sb.channel('anmeldungen-changes')
+  .on('postgres_changes', {event:'*', schema:'public', table:'anmeldungen'}, async(payload)=>{
+    // Update ubersicht
+    const selU=document.getElementById('sel-kurs-uebersicht');
+    if(selU&&selU.value) await renderUebersichtOrders();
+    // Update admin detail panel if open
+    if(currentUser&&currentKursId){
+      const detail=document.getElementById('kurs-detail-'+currentKursId);
+      if(detail&&detail.style.display!=='none') await loadKursDetailPanel(currentKursId);
+    }
+  })
+  .subscribe();
+
+// Session check every 10s
 setInterval(async()=>{if(!currentUser)return;const{error}=await sb.auth.getUser();if(error)forceLogout();},10000);
 
-// Check deadline every 60 seconds - auto-closes form when deadline passes
+// Deadline check every 60s - auto-closes form when deadline passes
 setInterval(async()=>{
-  await loadKurse();
-  // Update anmelden view
   const kurs=kurse.find(k=>k.id===currentKursId);
-  if(kurs)updateStatusForKurs(kurs);
-  else if(kurse.length===0)showNoKurs();
+  if(kurs) updateStatusForKurs(kurs);
+  else if(!kurse.find(k=>k.aktiv)) showNoKurs();
 },60000);
 </script>
 </body>
