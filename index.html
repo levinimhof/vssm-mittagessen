@@ -309,20 +309,34 @@
         <hr class="divider">
 
         <!-- Kurse verwalten -->
-        <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-calendar"></i>Kurse verwalten</div>
-        <div id="kurse-list"><div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Kurse</div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div class="card-title" style="margin-bottom:0;"><i class="ti ti-calendar"></i>Kurse verwalten</div>
+          <button class="btn-outline" style="width:auto;padding:7px 14px;" onclick="toggleNewKursForm()"><i class="ti ti-plus"></i>Neuer Kurs</button>
+        </div>
 
-        <div style="margin-top:1rem;">
-          <div class="card-title" style="margin-bottom:0.75rem;font-size:14px;"><i class="ti ti-plus"></i>Neuer Kurs</div>
+        <!-- Neuer Kurs Form (collapsed by default) -->
+        <div id="new-kurs-form" style="display:none;background:var(--primary-bg);border:0.5px solid var(--primary);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;animation:fadeIn 0.15s ease;">
+          <div style="font-size:14px;font-weight:600;color:var(--primary);margin-bottom:1rem;display:flex;align-items:center;gap:6px;"><i class="ti ti-plus"></i>Neuen Kurs erstellen</div>
           <label for="new-kurs-name">Kursname</label>
           <input type="text" id="new-kurs-name" placeholder="z.B. Holzverbindungen Grundkurs" />
-          <label for="new-kurs-datum">Datum</label>
-          <input type="date" id="new-kurs-datum" />
-          <label for="new-kurs-deadline">Anmeldeschluss</label>
-          <input type="datetime-local" id="new-kurs-deadline" />
-          <div class="field-err" id="new-kurs-err"></div>
-          <button class="btn-green-full" onclick="createKurs()"><i class="ti ti-plus"></i>Kurs erstellen</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label for="new-kurs-datum">Kursdatum</label>
+              <input type="date" id="new-kurs-datum" style="margin-bottom:0;" />
+            </div>
+            <div>
+              <label for="new-kurs-deadline">Anmeldeschluss</label>
+              <input type="datetime-local" id="new-kurs-deadline" style="margin-bottom:0;" />
+            </div>
+          </div>
+          <div class="field-err" id="new-kurs-err" style="margin-top:0.5rem;"></div>
+          <div style="display:flex;gap:8px;margin-top:1rem;">
+            <button class="btn-outline" style="flex:1;" onclick="toggleNewKursForm()"><i class="ti ti-x"></i>Abbrechen</button>
+            <button style="flex:2;padding:10px;font-size:14px;font-weight:600;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;" onclick="createKurs()"><i class="ti ti-check"></i>Kurs erstellen</button>
+          </div>
         </div>
+
+        <div id="kurse-list"><div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Kurse vorhanden</div></div>
 
         <hr class="divider">
 
@@ -347,6 +361,22 @@
           </div>
         </div>
         <button class="btn-green-full" onclick="initChangePassword()" style="margin-top:0.5rem;margin-bottom:0;"><i class="ti ti-lock"></i>Passwort ändern</button>
+
+        <hr class="divider">
+        <div class="reset-box">
+          <div class="reset-box-title"><i class="ti ti-alert-triangle"></i>Alles zurücksetzen</div>
+          <div class="reset-box-sub">Alle Kurse und sämtliche Anmeldungen werden vollständig und unwiderruflich aus der Datenbank gelöscht.</div>
+          <div class="confirm-panel danger" id="confirm-reset-all" style="margin-bottom:0.75rem;">
+            <div class="confirm-panel-title"><i class="ti ti-trash"></i>Wirklich alles löschen?</div>
+            <div class="confirm-summary" id="confirm-reset-all-summary"></div>
+            <div class="confirm-panel-body" style="margin-top:0.5rem;">Alle Kurse und Anmeldungen werden datenschutzkonform und unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.</div>
+            <div class="confirm-actions">
+              <button class="ca-abort" onclick="hidePanel('confirm-reset-all')"><i class="ti ti-x"></i>Abbrechen</button>
+              <button class="ca-red" onclick="finalResetAll()"><i class="ti ti-trash"></i>Ja, alles löschen</button>
+            </div>
+          </div>
+          <button class="btn-danger-full" onclick="initResetAll()"><i class="ti ti-trash"></i>Alle Kurse &amp; Teilnehmer löschen</button>
+        </div>
       </div>
     </div>
   </div>
@@ -540,19 +570,36 @@ function renderKurseSelects(){
 function renderKurseList(){
   const el=document.getElementById('kurse-list');
   if(!el)return;
-  if(kurse.length===0){el.innerHTML='<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Kurse</div>';return;}
-  el.innerHTML=kurse.map(k=>`
-    <div class="kurs-item" id="kurs-item-${k.id}">
-      <div class="kurs-badge${k.aktiv?' aktiv':''}"><i class="ti ti-calendar"></i></div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:500;">${esc(k.name)}</div>
-        <div style="font-size:12px;color:var(--text2);">${fmtDate(k.datum)}${k.deadline?' · Schluss: '+fmtDatetime(k.deadline):''}</div>
+  if(kurse.length===0){el.innerHTML='<div class="empty-state" style="padding:1.5rem 0;"><i class="ti ti-inbox"></i>Noch keine Kurse erstellt</div>';return;}
+  el.innerHTML=kurse.map(k=>{
+    const past=k.deadline&&new Date()>new Date(k.deadline);
+    const statusColor=k.aktiv&&!past?'var(--primary)':past?'var(--amber)':'var(--text3)';
+    const statusBg=k.aktiv&&!past?'var(--primary-bg)':past?'var(--amber-bg)':'var(--bg3)';
+    const statusLabel=k.aktiv&&!past?'Aktiv':past?'Abgelaufen':'Inaktiv';
+    return`<div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.1rem;margin-bottom:0.75rem;" id="kurs-item-${k.id}">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:var(--radius-md);background:${k.aktiv?'var(--primary)':'var(--bg3)'};display:flex;align-items:center;justify-content:center;font-size:18px;color:${k.aktiv?'#fff':'var(--text3)'};flex-shrink:0;">
+          <i class="ti ti-calendar"></i>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px;">
+            <span style="font-size:14px;font-weight:600;">${esc(k.name)}</span>
+            <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:${statusBg};color:${statusColor};">${statusLabel}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap;">
+            <span><i class="ti ti-calendar" style="font-size:11px;margin-right:3px;vertical-align:-1px;"></i>${fmtDate(k.datum)}</span>
+            ${k.deadline?`<span><i class="ti ti-clock" style="font-size:11px;margin-right:3px;vertical-align:-1px;"></i>Schluss: ${fmtDatetime(k.deadline)}</span>`:'<span style="color:var(--text3);">Kein Anmeldeschluss</span>'}
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0;">
+          <button style="background:${k.aktiv?'var(--primary-bg)':'var(--bg3)'};border:0.5px solid ${k.aktiv?'var(--primary)':'var(--border2)'};border-radius:var(--radius-md);padding:6px 10px;font-size:12px;font-weight:600;color:${k.aktiv?'var(--primary)':'var(--text2)'};cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;" onclick="toggleKursAktiv(${k.id},${!k.aktiv})">
+            <i class="ti ti-${k.aktiv?'eye':'eye-off'}" style="font-size:14px;"></i>${k.aktiv?'Aktiv':'Inaktiv'}
+          </button>
+          <button class="icon-btn del" onclick="deleteKurs(${k.id})" title="Löschen" style="padding:6px 8px;border:0.5px solid var(--border2);border-radius:var(--radius-md);"><i class="ti ti-trash" style="font-size:15px;"></i></button>
+        </div>
       </div>
-      <div style="display:flex;gap:4px;">
-        <button class="icon-btn" onclick="toggleKursAktiv(${k.id},${!k.aktiv})" title="${k.aktiv?'Deaktivieren':'Aktivieren'}" style="color:${k.aktiv?'var(--primary)':'var(--text3)'}"><i class="ti ti-${k.aktiv?'toggle-right':'toggle-left'}" style="font-size:18px;"></i></button>
-        <button class="icon-btn del" onclick="deleteKurs(${k.id})" title="Löschen"><i class="ti ti-trash" style="font-size:15px;"></i></button>
-      </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function createKurs(){
@@ -566,12 +613,22 @@ async function createKurs(){
   document.getElementById('new-kurs-name').value='';
   document.getElementById('new-kurs-datum').value='';
   document.getElementById('new-kurs-deadline').value='';
+  document.getElementById('new-kurs-form').style.display='none';
   await loadKurse();
 }
 
 async function toggleKursAktiv(id,aktiv){
   await sb.from('kurse').update({aktiv}).eq('id',id);
   await loadKurse();
+  // If toggled kurs is current, update status
+  if(id===currentKursId){
+    const kurs=kurse.find(k=>k.id===currentKursId);
+    if(kurs)updateStatusForKurs(kurs);
+  }
+  // Re-select in admin if needed
+  const sel=document.getElementById('sel-kurs-admin');
+  if(sel&&parseInt(sel.value)===id)await onKursAdminChange();
+  renderKurseList();
 }
 
 function deleteKurs(id){
@@ -926,22 +983,21 @@ async function finalSaveDeadline(){
   const val=document.getElementById('inp-deadline-dt').value;
   await sb.from('kurse').update({deadline:val}).eq('id',currentKursId);
   hidePanel('confirm-deadline');
-  // Reload everything so user view and admin view are in sync
+  // Reload all kurse from DB
   await loadKurse();
-  // Re-select the current kurs in admin
+  // Re-select the current kurs in admin dropdown
   const sel=document.getElementById('sel-kurs-admin');
-  if(sel)sel.value=currentKursId;
-  await onKursAdminChange();
-  // Also update the anmelden view if this kurs is selected there
-  const selAnmelden=document.getElementById('sel-kurs-anmelden');
-  if(selAnmelden&&parseInt(selAnmelden.value)===currentKursId){
-    const kurs=kurse.find(k=>k.id===currentKursId);
-    if(kurs)updateStatusForKurs(kurs);
-  }else{
-    // Single kurs - always update
-    const kurs=kurse.find(k=>k.id===currentKursId);
-    if(kurs&&kurse.length===1)updateStatusForKurs(kurs);
+  if(sel){sel.value=currentKursId;await onKursAdminChange();}
+  // Update anmelden status
+  const kurs=kurse.find(k=>k.id===currentKursId);
+  if(kurs)updateStatusForKurs(kurs);
+  // Update ubersicht if this kurs is selected there
+  const selU=document.getElementById('sel-kurs-uebersicht');
+  if(selU&&parseInt(selU.value)===currentKursId){
+    await renderUebersichtOrders();
   }
+  // Refresh kurse list display
+  renderKurseList();
 }
 
 // ── Reset ─────────────────────────────────────────────────
@@ -1070,6 +1126,37 @@ function switchTab(tab){
     document.getElementById('view-'+t).classList.toggle('active',t===tab);
   });
   if(tab==='uebersicht')renderUebersichtOrders();
+}
+
+function toggleNewKursForm(){
+  const f=document.getElementById('new-kurs-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+  if(f.style.display==='block'){
+    document.getElementById('new-kurs-name').focus();
+  }
+}
+
+function initResetAll(){
+  const totalKurse=kurse.length;
+  const totalAnmeldungen=kurse.reduce((s,k)=>s,0); // approximate
+  document.getElementById('confirm-reset-all-summary').innerHTML=
+    '<strong>'+totalKurse+' Kurs'+(totalKurse!==1?'e':'')+' werden gelöscht</strong><br>Alle dazugehörigen Anmeldungen werden ebenfalls entfernt.';
+  showPanel('confirm-reset-all');
+}
+
+async function finalResetAll(){
+  if(!currentUser)return;
+  // Delete all kurse (anmeldungen cascade)
+  await sb.from('kurse').delete().gte('id',0);
+  hidePanel('confirm-reset-all');
+  currentKursId=null;
+  orders=[];
+  kurse=[];
+  document.getElementById('admin-kurs-content').style.display='none';
+  document.getElementById('sel-kurs-admin').innerHTML='<option value="">— Kurs auswählen —</option>';
+  document.getElementById('kurse-list').innerHTML='<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Kurse</div>';
+  showNoKurs();
+  await loadKurse();
 }
 
 load();
