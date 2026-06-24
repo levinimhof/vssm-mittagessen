@@ -358,27 +358,27 @@ async function load(){
     document.getElementById('tab-admin').style.display='flex';
   }
 
-  // Handle invite/recovery links - Supabase fires onAuthStateChange automatically
+  // Handle invite/recovery links
   if(isInviteOrReset){
     document.getElementById('tab-admin').style.display='flex';
     switchTab('admin');
-    // Show simple loading while token is processed
-    document.getElementById('auth-screen').style.display='block';
-    document.getElementById('admin-content').style.display='none';
-    document.querySelector('.auth-screen').innerHTML=`
-      <div class="auth-icon" style="background:var(--green-bg);color:var(--green);"><i class="ti ti-loader"></i></div>
-      <div style="font-size:15px;font-weight:600;">Einen Moment...</div>
-      <div style="font-size:13px;color:var(--text2);">Einladung wird verarbeitet</div>`;
 
-    // Wait for Supabase to process the hash token
+    // Listen for auth state change from token
     sb.auth.onAuthStateChange(async (event,session)=>{
       if((event==='SIGNED_IN'||event==='PASSWORD_RECOVERY')&&session){
         currentUser=session.user;
-        // Mark that this user must set password (hasn't confirmed yet)
         sessionStorage.setItem('must_set_password','1');
         showSetPasswordForm();
       }
     });
+
+    // Also check if session already exists immediately (token already processed)
+    const {data:{session}}=await sb.auth.getSession();
+    if(session){
+      currentUser=session.user;
+      sessionStorage.setItem('must_set_password','1');
+      showSetPasswordForm();
+    }
     return;
   }
 
@@ -699,7 +699,7 @@ function showSetPasswordForm(){
     <div style="font-size:17px;font-weight:600;">Willkommen!</div>
     <div style="font-size:13px;color:var(--text2);margin-top:-4px;">Bitte legen Sie Ihr Passwort fest</div>
     <div class="auth-form-wrap">
-      <label for="new-pw">Neues Passwort (mind. 10 Zeichen)</label>
+      <label for="new-pw">Neues Passwort (mind. 6 Zeichen)</label>
       <div class="pw-field">
         <input type="password" id="new-pw" placeholder="Neues Passwort" />
         <button class="pw-eye-btn" type="button" onmousedown="peShow('new-pw')" onmouseup="peHide('new-pw')" onmouseleave="peHide('new-pw')" ontouchstart="peShow('new-pw')" ontouchend="peHide('new-pw')" tabindex="-1"><i class="ti ti-eye"></i></button>
@@ -719,21 +719,23 @@ async function saveNewPassword(){
   const pw2=document.getElementById('new-pw2').value;
   const errEl=document.getElementById('new-pw-err');
   errEl.style.display='none';
-  if(!pw||pw.length<10){errEl.textContent='Passwort muss mind. 10 Zeichen haben.';errEl.style.display='block';return;}
+  if(!pw||pw.length<6){errEl.textContent='Passwort muss mind. 6 Zeichen haben.';errEl.style.display='block';return;}
   if(pw!==pw2){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
+
+  // Verify session exists before updating
+  const {data:sd}=await sb.auth.getSession();
+  if(!sd?.session){
+    errEl.textContent='Session abgelaufen — bitte Einladungslink erneut öffnen.';
+    errEl.style.display='block';return;
+  }
+
   const {data,error}=await sb.auth.updateUser({password:pw});
   if(error){errEl.textContent='Fehler: '+error.message;errEl.style.display='block';return;}
-  // Password saved successfully - user is already logged in via Supabase session
-  currentUser=data.user;
+
   sessionStorage.removeItem('must_set_password');
+  currentUser=data.user;
   window.history.replaceState({},'',window.location.pathname+'?admin');
-  // Show success message briefly then open admin
-  const authScreen=document.querySelector('.auth-screen');
-  authScreen.innerHTML=`
-    <div class="auth-icon" style="background:var(--green-bg);color:var(--green);"><i class="ti ti-circle-check"></i></div>
-    <div style="font-size:17px;font-weight:600;">Passwort gespeichert!</div>
-    <div style="font-size:13px;color:var(--text2);">Sie werden eingeloggt...</div>`;
-  setTimeout(()=>showAdminContent(), 1500);
+  showAdminContent();
 }
 
 async function doLogin(){
