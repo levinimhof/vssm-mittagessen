@@ -346,57 +346,56 @@ function hidePanel(id){const e=document.getElementById(id);if(e)e.style.display=
 async function load(){
   const params=new URLSearchParams(window.location.search);
   const hash=window.location.hash;
+  const isInviteOrReset=hash&&(hash.includes('type=invite')||hash.includes('type=recovery'));
 
-  // Handle invitation / password reset link from Supabase
-  // Supabase puts tokens in the URL hash after redirect
-  if(hash&&(hash.includes('type=invite')||hash.includes('type=recovery'))){
-    document.getElementById('tab-admin').style.display='flex';
-    switchTab('admin');
-    // Exchange the hash token for a session
-    const {data,error}=await sb.auth.getSession();
-    if(data?.session){
-      currentUser=data.session.user;
-      showSetPasswordForm();
-      return;
-    }
-    // Try to get user from URL hash directly
-    showSetPasswordForm();
-    return;
-  }
-
-  if(params.has('admin')){
+  // Show admin tab if ?admin in URL or invite/reset link
+  if(params.has('admin')||isInviteOrReset){
     document.getElementById('tab-admin').style.display='flex';
   }
 
-  // Check existing session
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){
-    currentUser=session.user;
-    showAdminContent();
-    document.getElementById('tab-admin').style.display='flex';
+  if(isInviteOrReset){
     switchTab('admin');
+    // Show loading state while Supabase processes the token
+    document.querySelector('.auth-screen').innerHTML=`
+      <div class="auth-icon" style="background:var(--green-bg);color:var(--green);"><i class="ti ti-loader"></i></div>
+      <div style="font-size:15px;color:var(--text2);">Wird verarbeitet...</div>`;
   }
 
   await loadDeadline();
   await loadOrders();
 
-  // Listen for auth changes
+  // Supabase v2 automatically processes hash tokens and fires onAuthStateChange
   sb.auth.onAuthStateChange(async (event,session)=>{
-    if((event==='SIGNED_IN'||event==='PASSWORD_RECOVERY')&&session){
+    if(event==='PASSWORD_RECOVERY'&&session){
+      // Password reset link clicked
       currentUser=session.user;
       document.getElementById('tab-admin').style.display='flex';
       switchTab('admin');
-      if(event==='PASSWORD_RECOVERY'){
-        showSetPasswordForm();
-      }else if(event==='SIGNED_IN'&&hash.includes('type=invite')){
+      showSetPasswordForm();
+    }else if(event==='SIGNED_IN'&&session){
+      currentUser=session.user;
+      document.getElementById('tab-admin').style.display='flex';
+      if(isInviteOrReset){
+        // Invite link - user needs to set password
+        switchTab('admin');
         showSetPasswordForm();
       }else{
         showAdminContent();
+        switchTab('admin');
       }
     }else if(event==='SIGNED_OUT'){
       currentUser=null;
     }
   });
+
+  // Check existing session (for already logged in users)
+  const {data:{session}}=await sb.auth.getSession();
+  if(session&&!isInviteOrReset){
+    currentUser=session.user;
+    showAdminContent();
+    document.getElementById('tab-admin').style.display='flex';
+    switchTab('admin');
+  }
 }
 
 async function loadDeadline(){
