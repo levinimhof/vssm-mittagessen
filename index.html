@@ -427,6 +427,7 @@ async function load(){
   if(isAdminUrl()){
     document.getElementById('tab-admin').style.display='flex';
     renderLoginForm();
+    switchTab('admin');
   }
 
   const {data:{session}}=await sb.auth.getSession();
@@ -439,7 +440,6 @@ async function load(){
     }
     return;
   }
-  if(isAdminUrl()) renderLoginForm();
 }
 
 sb.auth.onAuthStateChange(async(event,session)=>{
