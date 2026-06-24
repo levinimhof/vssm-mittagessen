@@ -995,39 +995,30 @@ async function doResetPw(){
   const okEl=document.getElementById('rs-ok');
   if(errEl)errEl.style.display='none';
   if(okEl)okEl.style.display='none';
+
   if(!email){
     if(errEl){errEl.textContent='Bitte E-Mail eingeben.';errEl.style.display='block';}
     return;
   }
 
-  // Validate email format
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    if(errEl){errEl.textContent='Bitte eine gültige E-Mail-Adresse eingeben.';errEl.style.display='block';}
-    return;
-  }
-
-  // Show loading state
+  // Show loading
   const btn=document.querySelector('#auth-form-content .btn-green-full');
   if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader"></i>Wird geprüft...';}
 
-  // Check if email exists in Supabase Auth via signIn attempt
-  // We use a workaround: try to get user - if OTP request works, user exists
-  // Best approach: use admin API via edge function - but since we don't have that,
-  // we use resetPasswordForEmail which silently fails for non-existent emails
-  // Instead we check via our own method: try signInWithOtp to see response
-  const {error:checkError}=await sb.auth.resetPasswordForEmail(email,{
-    redirectTo:window.location.origin+window.location.pathname+'?admin'
-  });
+  // Check if email exists in admin_emails view
+  const {data,error}=await sb.from('admin_emails').select('email').eq('email',email).single();
 
-  if(checkError){
+  if(error||!data){
     if(btn){btn.disabled=false;btn.innerHTML='<i class="ti ti-mail"></i>Reset-Link senden';}
-    if(errEl){errEl.textContent='Fehler: '+checkError.message;errEl.style.display='block';}
+    if(errEl){errEl.textContent='Diese E-Mail-Adresse ist nicht als Admin registriert.';errEl.style.display='block';}
     return;
   }
 
-  // Supabase doesn't reveal if email exists (security) but we can check
-  // our own table - since we store emails in auth.users we try via magic link check
-  // For now show success - Supabase only sends email if user exists (silent fail otherwise)
+  // Email exists - send reset link
+  await sb.auth.resetPasswordForEmail(email,{
+    redirectTo:window.location.origin+window.location.pathname+'?admin'
+  });
+
   if(btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-check"></i>Gesendet';}
   if(okEl)okEl.style.display='block';
 }
