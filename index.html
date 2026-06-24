@@ -6,6 +6,7 @@
   <title>VSSM Mittagessen – Rothenburg</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -13,53 +14,60 @@
       --text:#1a1a1a;--text2:#6b6b68;--text3:#9b9b97;
       --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
       --radius-md:8px;--radius-lg:12px;
-      --green-bg:#E1F5EE;--green:#0F6E56;--green-dark:#085041;
+      --primary:#E8612C;--primary-dark:#C94E1F;--primary-bg:#FEF0EB;
       --red-bg:#FCEBEB;--red:#A32D2D;--red-border:#E24B4A;
       --amber-bg:#FAEEDA;--amber:#854F0B;
       --blue-bg:#EBF4FF;--blue:#1A56A0;
+      --green-bg:#E1F5EE;--green:#0F6E56;
     }
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg2);color:var(--text);min-height:100vh;}
-    .app{max-width:600px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+    .app{max-width:620px;margin:0 auto;padding:1.5rem 1rem 3rem;}
     .app-header{display:flex;align-items:center;gap:14px;margin-bottom:1.75rem;}
-    .app-icon{width:48px;height:48px;border-radius:var(--radius-lg);background:var(--green-bg);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:24px;flex-shrink:0;}
-    .app-title{font-size:20px;font-weight:600;}
+    .app-icon{width:48px;height:48px;border-radius:var(--radius-lg);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:24px;flex-shrink:0;}
+    .app-title{font-size:20px;font-weight:700;color:var(--primary);}
     .app-sub{font-size:13px;color:var(--text2);margin-top:2px;}
     .status-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:99px;font-size:13px;font-weight:500;margin-bottom:1.5rem;}
-    .status-open{background:var(--green-bg);color:var(--green);}
+    .status-open{background:var(--primary-bg);color:var(--primary);}
     .status-closed{background:var(--red-bg);color:var(--red);}
     .dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;}
     .nav{display:flex;background:var(--bg3);border-radius:var(--radius-lg);padding:4px;gap:4px;margin-bottom:1.5rem;}
     .nav-btn{flex:1;padding:9px 4px;border:none;background:none;border-radius:var(--radius-md);cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px;}
-    .nav-btn.active{background:var(--bg);color:var(--text);border:0.5px solid var(--border);}
+    .nav-btn.active{background:var(--bg);color:var(--primary);border:0.5px solid var(--border);font-weight:600;}
     .nav-btn i{font-size:16px;}
     .view{display:none;}.view.active{display:block;}
     .card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.25rem 1.5rem;margin-bottom:1rem;}
     .card-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;}
-    .card-title i{font-size:17px;color:var(--text2);}
+    .card-title i{font-size:17px;color:var(--primary);}
     label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:.03em;text-transform:uppercase;}
-    input,select{width:100%;margin-bottom:1rem;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:9px 12px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;}
-    input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(15,110,86,0.12);}
+    input,select,textarea{width:100%;margin-bottom:1rem;font-size:14px;border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:9px 12px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(232,97,44,0.12);}
     .toggle-row{display:flex;background:var(--bg2);border-radius:var(--radius-md);padding:3px;gap:3px;margin-bottom:1rem;}
     .toggle-opt{flex:1;}.toggle-opt input[type=radio]{display:none;}
     .toggle-opt label{display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);margin:0;text-transform:none;letter-spacing:0;}
-    .toggle-opt input[type=radio]:checked+label{background:var(--bg);color:var(--text);border:0.5px solid var(--border);}
-    .btn-primary{width:100%;padding:12px;font-size:15px;font-weight:600;background:var(--green);color:#E1F5EE;border:none;border-radius:var(--radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;}
-    .btn-primary:hover{background:var(--green-dark);}.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+    .toggle-opt input[type=radio]:checked+label{background:var(--bg);color:var(--primary);border:0.5px solid var(--border);font-weight:600;}
+    .btn-primary{width:100%;padding:12px;font-size:15px;font-weight:600;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;}
+    .btn-primary:hover{background:var(--primary-dark);}.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
     .btn-outline{padding:8px 14px;font-size:13px;font-weight:500;border:0.5px solid var(--border2);border-radius:var(--radius-md);background:none;cursor:pointer;color:var(--text2);display:inline-flex;align-items:center;gap:5px;font-family:inherit;width:100%;justify-content:center;}
     .btn-outline:hover{background:var(--bg2);}
     .btn-logout{padding:8px 14px;font-size:13px;font-weight:500;border:0.5px solid var(--red-border);border-radius:var(--radius-md);background:none;cursor:pointer;color:var(--red);display:inline-flex;align-items:center;gap:5px;font-family:inherit;}
     .btn-logout:hover{background:var(--red-bg);}
     .btn-danger-full{width:100%;padding:12px;font-size:14px;font-weight:600;background:none;border:0.5px solid var(--red-border);color:var(--red);border-radius:var(--radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;}
     .btn-danger-full:hover{background:var(--red-bg);}
-    .btn-green-full{width:100%;padding:12px;font-size:14px;font-weight:600;background:var(--green);color:#E1F5EE;border:none;border-radius:var(--radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;}
-    .btn-green-full:hover{background:var(--green-dark);}
-    .toast{background:var(--green-dark);color:#E1F5EE;border-radius:var(--radius-md);padding:11px 14px;font-size:13px;display:none;margin-top:1rem;align-items:center;justify-content:center;gap:6px;}
+    .btn-green-full{width:100%;padding:12px;font-size:14px;font-weight:600;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;}
+    .btn-green-full:hover{background:var(--primary-dark);}
+    .btn-export{width:100%;padding:10px;font-size:13px;font-weight:600;background:var(--green-bg);color:var(--green);border:0.5px solid var(--green);border-radius:var(--radius-md);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;margin-bottom:0.75rem;}
+    .btn-export:hover{background:#c8eee2;}
+    .toast{background:var(--primary-dark);color:#fff;border-radius:var(--radius-md);padding:11px 14px;font-size:13px;display:none;margin-top:1rem;align-items:center;justify-content:center;gap:6px;}
     .info-box{background:var(--blue-bg);border:0.5px solid var(--blue);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;color:var(--blue);margin-bottom:1rem;display:flex;gap:8px;align-items:flex-start;line-height:1.6;}
     .warn-box{background:var(--amber-bg);border:0.5px solid #d4a24a;border-radius:var(--radius-md);padding:12px 14px;font-size:13px;color:var(--amber);margin-bottom:1rem;display:flex;gap:8px;align-items:flex-start;line-height:1.6;}
     .privacy-box{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;font-size:12px;color:var(--text2);margin-top:1rem;line-height:1.6;}
+    /* Kurs selector */
+    .kurs-banner{background:var(--primary-bg);border:0.5px solid var(--primary);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--primary);font-weight:500;}
+    .kurs-select-wrap{margin-bottom:1.5rem;}
+    /* Orders */
     .order-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);}
     .order-item:last-child{border-bottom:none;}
-    .order-avatar{width:36px;height:36px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--green);flex-shrink:0;}
+    .order-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--primary);flex-shrink:0;}
     .order-avatar-group{background:var(--blue-bg);color:var(--blue);}
     .order-info{flex:1;min-width:0;}
     .order-name{font-size:14px;font-weight:500;color:var(--text);}
@@ -74,14 +82,19 @@
     .empty-state i{font-size:36px;display:block;margin-bottom:10px;color:var(--text3);}
     .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;}
     .stat{background:var(--bg2);border-radius:var(--radius-md);padding:14px;}
-    .stat-num{font-size:26px;font-weight:700;}
+    .stat-num{font-size:26px;font-weight:700;color:var(--primary);}
     .stat-label{font-size:12px;color:var(--text2);margin-top:2px;}
     .group-header{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);margin-bottom:4px;}
     .group-name{font-size:13px;font-weight:600;}
-    .group-count{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--green-bg);color:var(--green);font-weight:700;}
+    .group-count{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--primary-bg);color:var(--primary);font-weight:700;}
+    /* Kurs list admin */
+    .kurs-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);}
+    .kurs-item:last-child{border-bottom:none;}
+    .kurs-badge{width:32px;height:32px;border-radius:var(--radius-md);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--primary);flex-shrink:0;}
+    .kurs-badge.aktiv{background:var(--primary);color:#fff;}
     /* Auth */
     .auth-wrap{display:flex;flex-direction:column;align-items:center;padding:2rem 1.5rem;gap:14px;text-align:center;}
-    .auth-icon{width:60px;height:60px;border-radius:var(--radius-lg);background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--green);margin-bottom:4px;}
+    .auth-icon{width:60px;height:60px;border-radius:var(--radius-lg);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--primary);}
     .auth-form{width:100%;max-width:320px;text-align:left;}
     .field-err{font-size:12px;color:var(--red);margin-top:-8px;margin-bottom:10px;display:none;font-weight:500;}
     .field-ok{font-size:12px;color:var(--green);margin-top:-8px;margin-bottom:10px;display:none;font-weight:500;}
@@ -94,7 +107,6 @@
     .reset-box{background:var(--red-bg);border:0.5px solid #F09595;border-radius:var(--radius-lg);padding:1.1rem 1.25rem;}
     .reset-box-title{font-size:14px;font-weight:600;color:var(--red);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
     .reset-box-sub{font-size:13px;color:#791F1F;margin-bottom:1rem;}
-    .super-box{background:var(--blue-bg);border:0.5px solid var(--blue);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;margin-top:1rem;}
     .confirm-panel{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-lg);padding:1.25rem;margin-top:0.75rem;display:none;animation:fadeIn 0.15s ease;}
     .confirm-panel.danger{background:var(--red-bg);border-color:var(--red-border);}
     @keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
@@ -107,11 +119,11 @@
     .confirm-actions button{flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:var(--radius-md);cursor:pointer;font-family:inherit;}
     .ca-abort{background:none;border:0.5px solid var(--border2);color:var(--text2);}
     .ca-abort:hover{background:var(--bg3);}
-    .ca-ok{background:var(--green);border:none;color:#E1F5EE;}
-    .ca-ok:hover{background:var(--green-dark);}
+    .ca-ok{background:var(--primary);border:none;color:#fff;}
+    .ca-ok:hover{background:var(--primary-dark);}
     .ca-red{background:none;border:0.5px solid var(--red-border);color:var(--red);}
     .ca-red:hover{background:var(--red-bg);}
-    .edit-order-panel{background:var(--bg);border:0.5px solid var(--blue);border-radius:var(--radius-lg);padding:1.25rem;margin-top:0.5rem;display:none;animation:fadeIn 0.15s ease;}
+    .edit-order-panel{background:var(--bg);border:0.5px solid var(--primary);border-radius:var(--radius-lg);padding:1.25rem;margin-top:0.5rem;display:none;animation:fadeIn 0.15s ease;}
     #custom-field{display:none;}#gruppe-fields{display:none;}
     @media(max-width:480px){.app{padding:1rem 0.75rem 3rem;}.app-title{font-size:18px;}}
   </style>
@@ -119,8 +131,11 @@
 <body>
 <div class="app">
   <div class="app-header">
-    <div class="app-icon"><i class="ti ti-tools-kitchen-2"></i></div>
-    <div><div class="app-title">VSSM Mittagessen</div><div class="app-sub">Rothenburg · Schreiner Verband Luzern</div></div>
+    <div class="app-icon"><i class="ti ti-armchair"></i></div>
+    <div>
+      <div class="app-title">VSSM Mittagessen</div>
+      <div class="app-sub">Schreiner Verband Luzern · Rothenburg</div>
+    </div>
   </div>
 
   <div id="status-pill" class="status-pill status-open">
@@ -135,7 +150,19 @@
 
   <!-- ANMELDEN -->
   <div id="view-anmelden" class="view active">
-    <div class="card">
+    <!-- Kurs Auswahl -->
+    <div id="kurs-select-section" class="card" style="display:none;">
+      <div class="card-title"><i class="ti ti-calendar"></i>Kurs auswählen</div>
+      <select id="sel-kurs-anmelden" onchange="onKursAnmeldenChange()">
+        <option value="">— Kurs auswählen —</option>
+      </select>
+    </div>
+
+    <div class="card" id="anmeld-card">
+      <div id="kurs-banner" class="kurs-banner" style="display:none;">
+        <i class="ti ti-calendar" style="flex-shrink:0;font-size:16px;"></i>
+        <span id="kurs-banner-text"></span>
+      </div>
       <div class="card-title"><i class="ti ti-user"></i>Restaurantwahl</div>
       <div id="form-open">
         <label>Anmeldetyp</label>
@@ -173,7 +200,7 @@
           <span>Bitte beachten Sie: <strong>Nachträgliche Änderungen sind nicht möglich.</strong> Bei dringenden Anpassungen wenden Sie sich an einen Mitarbeiter des Schreiner Verbands Luzern.</span>
         </div>
         <div class="confirm-panel" id="confirm-anmeldung">
-          <div class="confirm-panel-title"><i class="ti ti-clipboard-check" style="color:var(--green)"></i>Anmeldung bestätigen</div>
+          <div class="confirm-panel-title"><i class="ti ti-clipboard-check" style="color:var(--primary)"></i>Anmeldung bestätigen</div>
           <div class="confirm-panel-body">Bitte überprüfen Sie Ihre Angaben. Nachträgliche Änderungen sind nicht möglich.</div>
           <div class="confirm-summary" id="confirm-anmeldung-summary"></div>
           <div class="confirm-actions">
@@ -190,14 +217,24 @@
           <div>Keine weiteren Anmeldungen möglich.</div>
         </div>
       </div>
-      <div class="privacy-box"><i class="ti ti-shield" style="vertical-align:-2px;margin-right:5px;"></i><strong>Datenschutz:</strong> Es werden nur Name und Restaurantwahl gespeichert und nach dem Kurs vollständig gelöscht.</div>
+      <div id="form-no-kurs" style="display:none;">
+        <div class="empty-state"><i class="ti ti-calendar-off"></i>
+          <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Kein aktiver Kurs</div>
+          <div>Aktuell ist kein Kurs zur Anmeldung geöffnet.</div>
+        </div>
+      </div>
+      <div class="privacy-box"><i class="ti ti-shield" style="vertical-align:-2px;margin-right:5px;color:var(--primary);"></i><strong>Datenschutz:</strong> Es werden nur Name und Restaurantwahl gespeichert und nach dem Kurs vollständig gelöscht.</div>
     </div>
   </div>
 
   <!-- ÜBERSICHT -->
   <div id="view-uebersicht" class="view">
+    <div class="card" style="margin-bottom:0.75rem;">
+      <label for="sel-kurs-uebersicht" style="margin-bottom:0.5rem;">Kurs</label>
+      <select id="sel-kurs-uebersicht" onchange="onKursUebersichtChange()" style="margin-bottom:0;"></select>
+    </div>
     <div class="card">
-      <div class="card-title"><i class="ti ti-users"></i>Alle Anmeldungen <span id="count-badge" style="font-size:12px;padding:2px 9px;border-radius:99px;background:var(--green-bg);color:var(--green);font-weight:700;margin-left:4px;">0</span></div>
+      <div class="card-title"><i class="ti ti-users"></i>Alle Anmeldungen <span id="count-badge" style="font-size:12px;padding:2px 9px;border-radius:99px;background:var(--primary-bg);color:var(--primary);font-weight:700;margin-left:4px;">0</span></div>
       <div id="list-orders"><div class="empty-state"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div></div>
     </div>
   </div>
@@ -205,19 +242,14 @@
   <!-- ADMIN -->
   <div id="view-admin" class="view">
     <div class="card">
-      <!-- Auth Panel -->
       <div id="auth-panel">
         <div class="auth-wrap">
           <div class="auth-icon"><i class="ti ti-shield-lock"></i></div>
           <div style="font-size:17px;font-weight:600;">Admin-Bereich</div>
           <div style="font-size:13px;color:var(--text2);">Nur für autorisierte Mitarbeitende</div>
-          <div class="auth-form" id="auth-form-content">
-            <!-- Login form rendered by JS -->
-          </div>
+          <div class="auth-form" id="auth-form-content"></div>
         </div>
       </div>
-
-      <!-- Admin Content -->
       <div id="admin-content" style="display:none;">
         <div class="admin-topbar">
           <div class="card-title" style="margin-bottom:0;"><i class="ti ti-chart-bar"></i>Admin-Übersicht</div>
@@ -225,27 +257,74 @@
         </div>
         <div style="font-size:12px;color:var(--text2);margin-bottom:1.25rem;" id="admin-email-display"></div>
 
-        <div class="stat-row">
-          <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Personen total</div></div>
-          <div class="stat"><div class="stat-num" id="stat-rests">0</div><div class="stat-label">Restaurants</div></div>
+        <!-- Kurs Auswahl Admin -->
+        <div style="margin-bottom:1.25rem;">
+          <label for="sel-kurs-admin">Kurs auswählen</label>
+          <select id="sel-kurs-admin" onchange="onKursAdminChange()" style="margin-bottom:0;"></select>
         </div>
-        <div id="admin-groups"></div>
 
-        <hr class="divider">
-        <div class="card-title" style="margin-bottom:0.5rem;"><i class="ti ti-calendar"></i>Anmeldeschluss</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:0.75rem;">Datum und Uhrzeit bis wann Anmeldungen möglich sind.</div>
-        <input type="datetime-local" id="inp-deadline-dt" />
-        <div class="confirm-panel" id="confirm-deadline">
-          <div class="confirm-panel-title"><i class="ti ti-calendar-check" style="color:var(--green)"></i>Anmeldeschluss ändern?</div>
-          <div class="confirm-summary" id="confirm-deadline-summary"></div>
-          <div class="confirm-actions">
-            <button class="ca-abort" onclick="hidePanel('confirm-deadline')"><i class="ti ti-x"></i>Abbrechen</button>
-            <button class="ca-ok" onclick="finalSaveDeadline()"><i class="ti ti-check"></i>Bestätigen</button>
+        <div id="admin-kurs-content" style="display:none;">
+          <div id="kurs-info-banner" class="kurs-banner" style="margin-bottom:1.25rem;"></div>
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Personen total</div></div>
+            <div class="stat"><div class="stat-num" id="stat-rests">0</div><div class="stat-label">Restaurants</div></div>
+          </div>
+          <div id="admin-groups"></div>
+
+          <!-- Export -->
+          <button class="btn-export" onclick="exportExcel()"><i class="ti ti-file-spreadsheet"></i>Als Excel exportieren</button>
+
+          <!-- Anmeldeschluss -->
+          <hr class="divider">
+          <div class="card-title" style="margin-bottom:0.5rem;"><i class="ti ti-clock"></i>Anmeldeschluss dieses Kurses</div>
+          <input type="datetime-local" id="inp-deadline-dt" />
+          <div class="confirm-panel" id="confirm-deadline">
+            <div class="confirm-panel-title"><i class="ti ti-calendar-check" style="color:var(--primary)"></i>Anmeldeschluss ändern?</div>
+            <div class="confirm-summary" id="confirm-deadline-summary"></div>
+            <div class="confirm-actions">
+              <button class="ca-abort" onclick="hidePanel('confirm-deadline')"><i class="ti ti-x"></i>Abbrechen</button>
+              <button class="ca-ok" onclick="finalSaveDeadline()"><i class="ti ti-check"></i>Bestätigen</button>
+            </div>
+          </div>
+          <button class="btn-outline" onclick="initSaveDeadline()" style="margin-top:0.25rem;margin-bottom:0;"><i class="ti ti-check"></i>Speichern</button>
+
+          <!-- Reset -->
+          <hr class="divider">
+          <div class="reset-box">
+            <div class="reset-box-title"><i class="ti ti-refresh"></i>Kurs abschliessen</div>
+            <div class="reset-box-sub">Alle Anmeldungen dieses Kurses werden vollständig und datenschutzkonform gelöscht.</div>
+            <div class="confirm-panel danger" id="confirm-reset" style="margin-bottom:0.75rem;">
+              <div class="confirm-panel-title"><i class="ti ti-trash"></i>Alle Anmeldungen löschen?</div>
+              <div class="confirm-summary" id="confirm-reset-summary"></div>
+              <div class="confirm-actions">
+                <button class="ca-abort" onclick="hidePanel('confirm-reset')"><i class="ti ti-x"></i>Abbrechen</button>
+                <button class="ca-red" onclick="finalReset()"><i class="ti ti-trash"></i>Ja, löschen</button>
+              </div>
+            </div>
+            <button class="btn-danger-full" onclick="initReset()"><i class="ti ti-trash"></i>Alle Anmeldungen löschen</button>
           </div>
         </div>
-        <button class="btn-outline" onclick="initSaveDeadline()" style="margin-top:0.25rem;margin-bottom:0;"><i class="ti ti-check"></i>Speichern</button>
 
         <hr class="divider">
+
+        <!-- Kurse verwalten -->
+        <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-calendar"></i>Kurse verwalten</div>
+        <div id="kurse-list"><div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Kurse</div></div>
+
+        <div style="margin-top:1rem;">
+          <div class="card-title" style="margin-bottom:0.75rem;font-size:14px;"><i class="ti ti-plus"></i>Neuer Kurs</div>
+          <label for="new-kurs-name">Kursname</label>
+          <input type="text" id="new-kurs-name" placeholder="z.B. Holzverbindungen Grundkurs" />
+          <label for="new-kurs-datum">Datum</label>
+          <input type="date" id="new-kurs-datum" />
+          <label for="new-kurs-deadline">Anmeldeschluss</label>
+          <input type="datetime-local" id="new-kurs-deadline" />
+          <button class="btn-green-full" onclick="createKurs()"><i class="ti ti-plus"></i>Kurs erstellen</button>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Passwort -->
         <div class="card-title" style="margin-bottom:1rem;"><i class="ti ti-lock"></i>Passwort ändern</div>
         <div class="pw-field">
           <input type="password" id="chpw-new" placeholder="Neues Passwort (mind. 6 Zeichen)" />
@@ -258,7 +337,7 @@
         <div class="field-err" id="chpw-err"></div>
         <div class="field-ok" id="chpw-ok"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Passwort erfolgreich geändert!</div>
         <div class="confirm-panel" id="confirm-chpw">
-          <div class="confirm-panel-title"><i class="ti ti-lock-check" style="color:var(--green)"></i>Passwort wirklich ändern?</div>
+          <div class="confirm-panel-title"><i class="ti ti-lock-check" style="color:var(--primary)"></i>Passwort wirklich ändern?</div>
           <div class="confirm-panel-body">Das neue Passwort wird sofort aktiv.</div>
           <div class="confirm-actions">
             <button class="ca-abort" onclick="hidePanel('confirm-chpw')"><i class="ti ti-x"></i>Abbrechen</button>
@@ -266,22 +345,6 @@
           </div>
         </div>
         <button class="btn-green-full" onclick="initChangePassword()" style="margin-top:0.5rem;margin-bottom:0;"><i class="ti ti-lock"></i>Passwort ändern</button>
-
-        <hr class="divider">
-        <div class="reset-box">
-          <div class="reset-box-title"><i class="ti ti-refresh"></i>Nächster Kurs</div>
-          <div class="reset-box-sub">Alle Anmeldungen werden vollständig und datenschutzkonform aus der Datenbank entfernt.</div>
-          <div class="confirm-panel danger" id="confirm-reset" style="margin-bottom:0.75rem;">
-            <div class="confirm-panel-title"><i class="ti ti-trash"></i>Alle Anmeldungen löschen?</div>
-            <div class="confirm-summary" id="confirm-reset-summary"></div>
-            <div class="confirm-panel-body" style="margin-top:0.5rem;">Alle Einträge werden unwiderruflich gelöscht.</div>
-            <div class="confirm-actions">
-              <button class="ca-abort" onclick="hidePanel('confirm-reset')"><i class="ti ti-x"></i>Abbrechen</button>
-              <button class="ca-red" onclick="finalReset()"><i class="ti ti-trash"></i>Ja, löschen</button>
-            </div>
-          </div>
-          <button class="btn-danger-full" onclick="initReset()"><i class="ti ti-trash"></i>Alle Kursteilnehmer löschen</button>
-        </div>
       </div>
     </div>
   </div>
@@ -292,7 +355,7 @@ const SUPABASE_URL='https://gbvmkclhrjogcepmupzm.supabase.co';
 const SUPABASE_KEY='sb_publishable_5cWQ1s6E0giLF_MxkY6_9w_zP_slLh6';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let orders=[],deadlineStr='',currentUser=null,pendingPayload=null;
+let orders=[],kurse=[],currentKursId=null,currentUser=null,pendingPayload=null;
 
 // ── Helpers ───────────────────────────────────────────────
 function peShow(id){const e=document.getElementById(id);if(e)e.type='text';}
@@ -301,11 +364,9 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function initials(n){return n.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
 function showPanel(id){const e=document.getElementById(id);if(e)e.style.display='block';}
 function hidePanel(id){const e=document.getElementById(id);if(e)e.style.display='none';}
-function isAdminUrl(){
-  return new URLSearchParams(window.location.search).has('admin')||
-    window.location.hash.includes('type=invite')||
-    window.location.hash.includes('type=recovery');
-}
+function isAdminUrl(){return new URLSearchParams(window.location.search).has('admin')||window.location.hash.includes('type=invite')||window.location.hash.includes('type=recovery');}
+function fmtDate(str){if(!str)return '—';return new Date(str).toLocaleDateString('de-CH',{day:'2-digit',month:'2-digit',year:'numeric'});}
+function fmtDatetime(str){if(!str)return '—';const d=new Date(str);return d.toLocaleDateString('de-CH',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'})+', '+d.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit',hour12:false})+' Uhr';}
 
 // ── Auth Forms ────────────────────────────────────────────
 function renderLoginForm(email='',successMsg=''){
@@ -326,7 +387,7 @@ function renderLoginForm(email='',successMsg=''){
 function renderSetPasswordForm(title,subtitle){
   document.getElementById('auth-form-content').innerHTML=`
     <div style="text-align:center;margin-bottom:1rem;">
-      <div style="font-size:15px;font-weight:600;color:var(--text);">${title}</div>
+      <div style="font-size:15px;font-weight:600;">${title}</div>
       <div style="font-size:13px;color:var(--text2);">${subtitle}</div>
     </div>
     <label>Neues Passwort (mind. 6 Zeichen)</label>
@@ -348,7 +409,7 @@ function showForgotForm(){
     <div style="text-align:center;margin-bottom:1rem;">
       <div style="font-size:14px;color:var(--text2);">Geben Sie Ihre E-Mail ein. Sie erhalten einen Reset-Link.</div>
     </div>
-    <label for="rs-email">E-Mail</label>
+    <label>E-Mail</label>
     <input type="email" id="rs-email" placeholder="admin@beispiel.ch" />
     <div class="field-err" id="rs-err"></div>
     <div class="field-ok" id="rs-ok" style="display:none;"><i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Reset-Link per E-Mail gesendet!</div>
@@ -362,61 +423,40 @@ async function load(){
   const isInvite=hash.includes('type=invite');
   const isRecovery=hash.includes('type=recovery');
 
-  await loadDeadline();
-  await loadOrders();
+  await loadKurse();
 
-  // Handle invite / password reset links
   if(isInvite||isRecovery){
     document.getElementById('tab-admin').style.display='flex';
     switchTab('admin');
-    // Supabase processes the hash automatically and fires onAuthStateChange
-    renderSetPasswordForm(
-      isInvite?'Willkommen!':'Passwort zurücksetzen',
-      isInvite?'Bitte legen Sie Ihr Passwort fest.':'Bitte legen Sie ein neues Passwort fest.'
-    );
+    renderSetPasswordForm(isInvite?'Willkommen!':'Passwort zurücksetzen',isInvite?'Bitte legen Sie Ihr Passwort fest.':'Bitte legen Sie ein neues Passwort fest.');
     return;
   }
 
-  // Show admin tab only if ?admin in URL
   if(isAdminUrl()){
     document.getElementById('tab-admin').style.display='flex';
     renderLoginForm();
   }
 
   const {data:{session}}=await sb.auth.getSession();
-
-  if(!isAdminUrl()){
-    // On normal URL: always sign out to prevent auto-login
-    if(session) await sb.auth.signOut();
-    currentUser=null;
-    return;
-  }
-
-  // On ?admin URL: restore session if exists
   if(session){
     currentUser=session.user;
-    document.getElementById('tab-admin').style.display='flex';
-    showAdminContent();
-    switchTab('admin');
+    if(isAdminUrl()){
+      document.getElementById('tab-admin').style.display='flex';
+      showAdminContent();
+      switchTab('admin');
+    }
     return;
   }
-
-  // No session on ?admin URL: show login
-  renderLoginForm();
+  if(isAdminUrl()) renderLoginForm();
 }
 
-// ── Auth State Changes ────────────────────────────────────
-sb.auth.onAuthStateChange(async (event,session)=>{
+sb.auth.onAuthStateChange(async(event,session)=>{
   if(event==='SIGNED_IN'&&session&&!currentUser){
     currentUser=session.user;
     const hash=window.location.hash;
     if(hash.includes('type=invite')||hash.includes('type=recovery')){
-      renderSetPasswordForm(
-        hash.includes('type=invite')?'Willkommen!':'Passwort zurücksetzen',
-        hash.includes('type=invite')?'Bitte legen Sie Ihr Passwort fest.':'Bitte legen Sie ein neues Passwort fest.'
-      );
+      renderSetPasswordForm(hash.includes('type=invite')?'Willkommen!':'Passwort zurücksetzen',hash.includes('type=invite')?'Bitte legen Sie Ihr Passwort fest.':'Bitte legen Sie ein neues Passwort fest.');
     }else if(isAdminUrl()){
-      // Only show admin if ?admin in URL
       document.getElementById('tab-admin').style.display='flex';
       showAdminContent();
     }
@@ -428,64 +468,185 @@ sb.auth.onAuthStateChange(async (event,session)=>{
   }
 });
 
-// ── Session validity check every 10s ─────────────────────
 setInterval(async()=>{
   if(!currentUser)return;
   const {error}=await sb.auth.getUser();
   if(error)forceLogout();
 },10000);
 
-// ── Deadline ──────────────────────────────────────────────
-async function loadDeadline(){
-  const {data}=await sb.from('einstellungen').select('value').eq('key','deadline').single();
-  if(data)deadlineStr=data.value;
-  updateStatus();
-  const el=document.getElementById('inp-deadline-dt');
-  if(el){
-    el.value=deadlineStr||'';
-    const t=new Date();
-    el.min=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')+'T00:00';
+// ── Kurse ─────────────────────────────────────────────────
+async function loadKurse(){
+  const {data}=await sb.from('kurse').select('*').order('datum',{ascending:false});
+  kurse=data||[];
+  renderKurseSelects();
+  // Auto-select active kurs for anmelden
+  const aktiv=kurse.find(k=>k.aktiv);
+  if(aktiv){
+    currentKursId=aktiv.id;
+    updateKursBanner(aktiv);
+    updateStatusForKurs(aktiv);
+  }else{
+    showNoKurs();
+  }
+  renderUebersichtOrders();
+}
+
+function renderKurseSelects(){
+  const opts=kurse.length===0?'<option value="">Keine Kurse vorhanden</option>':
+    '<option value="">— Kurs auswählen —</option>'+
+    kurse.map(k=>`<option value="${k.id}">${esc(k.name)} · ${fmtDate(k.datum)}${k.aktiv?' ✓':''}</option>`).join('');
+
+  const selAnmelden=document.getElementById('sel-kurs-anmelden');
+  const selUebersicht=document.getElementById('sel-kurs-uebersicht');
+  const selAdmin=document.getElementById('sel-kurs-admin');
+
+  if(kurse.length>1&&selAnmelden){
+    selAnmelden.innerHTML=opts;
+    document.getElementById('kurs-select-section').style.display='block';
+  }
+
+  if(selUebersicht){
+    selUebersicht.innerHTML=opts;
+    const aktiv=kurse.find(k=>k.aktiv);
+    if(aktiv)selUebersicht.value=aktiv.id;
+  }
+
+  if(selAdmin){
+    selAdmin.innerHTML=opts;
+  }
+
+  // Kurse list in admin
+  renderKurseList();
+}
+
+function renderKurseList(){
+  const el=document.getElementById('kurse-list');
+  if(!el)return;
+  if(kurse.length===0){el.innerHTML='<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Kurse</div>';return;}
+  el.innerHTML=kurse.map(k=>`
+    <div class="kurs-item">
+      <div class="kurs-badge${k.aktiv?' aktiv':''}"><i class="ti ti-calendar"></i></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:500;">${esc(k.name)}</div>
+        <div style="font-size:12px;color:var(--text2);">${fmtDate(k.datum)}${k.deadline?' · Schluss: '+fmtDatetime(k.deadline):''}</div>
+      </div>
+      <div style="display:flex;gap:4px;">
+        <button class="icon-btn" onclick="toggleKursAktiv(${k.id},${!k.aktiv})" title="${k.aktiv?'Deaktivieren':'Aktivieren'}" style="color:${k.aktiv?'var(--primary)':'var(--text3)'}"><i class="ti ti-${k.aktiv?'toggle-right':'toggle-left'}" style="font-size:18px;"></i></button>
+        <button class="icon-btn del" onclick="deleteKurs(${k.id})" title="Löschen"><i class="ti ti-trash" style="font-size:15px;"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+async function createKurs(){
+  const name=document.getElementById('new-kurs-name').value.trim();
+  const datum=document.getElementById('new-kurs-datum').value;
+  const deadline=document.getElementById('new-kurs-deadline').value||null;
+  if(!name||!datum){alert('Bitte Kursname und Datum eingeben.');return;}
+  await sb.from('kurse').insert({name,datum,deadline,aktiv:true});
+  document.getElementById('new-kurs-name').value='';
+  document.getElementById('new-kurs-datum').value='';
+  document.getElementById('new-kurs-deadline').value='';
+  await loadKurse();
+}
+
+async function toggleKursAktiv(id,aktiv){
+  await sb.from('kurse').update({aktiv}).eq('id',id);
+  await loadKurse();
+}
+
+async function deleteKurs(id){
+  if(!confirm('Kurs und alle Anmeldungen löschen?'))return;
+  await sb.from('kurse').delete().eq('id',id);
+  await loadKurse();
+}
+
+function onKursAnmeldenChange(){
+  const id=parseInt(document.getElementById('sel-kurs-anmelden').value);
+  const kurs=kurse.find(k=>k.id===id);
+  if(kurs){currentKursId=kurs.id;updateKursBanner(kurs);updateStatusForKurs(kurs);}
+}
+
+function onKursUebersichtChange(){
+  renderUebersichtOrders();
+}
+
+async function onKursAdminChange(){
+  const id=parseInt(document.getElementById('sel-kurs-admin').value);
+  const kurs=kurse.find(k=>k.id===id);
+  if(!kurs){document.getElementById('admin-kurs-content').style.display='none';return;}
+  currentKursId=kurs.id;
+  document.getElementById('admin-kurs-content').style.display='block';
+  document.getElementById('kurs-info-banner').innerHTML=`<i class="ti ti-calendar" style="flex-shrink:0;font-size:16px;"></i> <strong>${esc(kurs.name)}</strong> · ${fmtDate(kurs.datum)}`;
+  if(kurs.deadline)document.getElementById('inp-deadline-dt').value=kurs.deadline.slice(0,16);
+  await loadOrdersForKurs(kurs.id);
+  renderAdminGroups();
+}
+
+function updateKursBanner(kurs){
+  const banner=document.getElementById('kurs-banner');
+  const txt=document.getElementById('kurs-banner-text');
+  if(banner&&txt){
+    txt.innerHTML=`<strong>${esc(kurs.name)}</strong> · ${fmtDate(kurs.datum)}`;
+    banner.style.display='flex';
   }
 }
 
-function isPast(){if(!deadlineStr)return false;return new Date()>new Date(deadlineStr);}
-function fmtDeadline(str){
-  if(!str)return '—';
-  const d=new Date(str);
-  return d.toLocaleDateString('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})+', '+
-    d.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit',hour12:false})+' Uhr';
-}
-
-function updateStatus(){
-  const past=isPast(),pill=document.getElementById('status-pill'),txt=document.getElementById('status-text');
+function updateStatusForKurs(kurs){
+  const past=kurs.deadline&&new Date()>new Date(kurs.deadline);
+  const pill=document.getElementById('status-pill');
+  const txt=document.getElementById('status-text');
   if(past){
     pill.className='status-pill status-closed';
-    txt.innerHTML='<i class="ti ti-lock" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Anmeldeschluss war am <strong>'+fmtDeadline(deadlineStr)+'</strong>';
+    txt.innerHTML='<i class="ti ti-lock" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Anmeldeschluss war am <strong>'+fmtDatetime(kurs.deadline)+'</strong>';
     document.getElementById('form-open').style.display='none';
     document.getElementById('form-closed').style.display='block';
+    document.getElementById('form-no-kurs').style.display='none';
   }else{
     pill.className='status-pill status-open';
-    txt.innerHTML='<span class="dot"></span> Anmeldung offen bis <strong>'+fmtDeadline(deadlineStr)+'</strong>';
+    txt.innerHTML='<span class="dot"></span> Anmeldung offen'+(kurs.deadline?' bis <strong>'+fmtDatetime(kurs.deadline)+'</strong>':'');
     document.getElementById('form-open').style.display='block';
     document.getElementById('form-closed').style.display='none';
+    document.getElementById('form-no-kurs').style.display='none';
   }
 }
 
-function initSaveDeadline(){
-  if(!currentUser)return;
-  const val=document.getElementById('inp-deadline-dt').value;
-  if(!val)return;
-  document.getElementById('confirm-deadline-summary').innerHTML='<strong>Neuer Anmeldeschluss:</strong><br>'+fmtDeadline(val);
-  showPanel('confirm-deadline');
+function showNoKurs(){
+  document.getElementById('form-open').style.display='none';
+  document.getElementById('form-closed').style.display='none';
+  document.getElementById('form-no-kurs').style.display='block';
+  document.getElementById('status-text').innerHTML='Kein aktiver Kurs';
 }
-async function finalSaveDeadline(){
-  if(!currentUser)return;
-  const val=document.getElementById('inp-deadline-dt').value;
-  await sb.from('einstellungen').upsert({key:'deadline',value:val});
-  deadlineStr=val;updateStatus();hidePanel('confirm-deadline');
+
+async function loadOrdersForKurs(kursId){
+  const {data}=await sb.from('anmeldungen').select('*').eq('kurs_id',kursId).order('created_at',{ascending:true});
+  orders=data||[];
+}
+
+async function renderUebersichtOrders(){
+  const id=parseInt(document.getElementById('sel-kurs-uebersicht')?.value);
+  if(!id){document.getElementById('list-orders').innerHTML='<div class="empty-state"><i class="ti ti-inbox"></i>Kurs auswählen</div>';document.getElementById('count-badge').textContent='0';return;}
+  await loadOrdersForKurs(id);
+  const totalP=orders.reduce((s,o)=>s+(o.typ==='gruppe'?o.anzahl:1),0);
+  document.getElementById('count-badge').textContent=totalP+' Pers.';
+  const lo=document.getElementById('list-orders');
+  lo.innerHTML=orders.length===0
+    ?'<div class="empty-state"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div>'
+    :orders.map(o=>{const isG=o.typ==='gruppe';return`<div class="order-item">
+      <div class="order-avatar${isG?' order-avatar-group':''}">${isG?'<i class="ti ti-users" style="font-size:14px"></i>':esc(initials(o.name))}</div>
+      <div class="order-info">
+        <div class="order-name">${esc(o.name)}${isG?'&nbsp;<span class="tag-gruppe">'+o.anzahl+' Personen</span>':''}</div>
+        <div class="order-rest"><i class="ti ti-building-store" style="font-size:11px;margin-right:3px"></i>${esc(o.restaurant)}${o.custom?'<span class="tag-custom">Eigenes</span>':''}</div>
+      </div>
+    </div>`;}).join('');
 }
 
 // ── Anmelden ──────────────────────────────────────────────
+function isPastForCurrentKurs(){
+  const kurs=kurse.find(k=>k.id===currentKursId);
+  if(!kurs||!kurs.deadline)return false;
+  return new Date()>new Date(kurs.deadline);
+}
+
 function toggleAnmeldeTyp(){
   const isG=document.getElementById('atyp-gruppe').checked;
   document.getElementById('einzel-fields').style.display=isG?'none':'block';
@@ -501,7 +662,8 @@ function toggleMode(){
 }
 
 function submitOrder(){
-  if(isPast())return;
+  if(!currentKursId){alert('Bitte zuerst einen Kurs auswählen.');return;}
+  if(isPastForCurrentKurs())return;
   hidePanel('confirm-anmeldung');
   const isG=document.getElementById('atyp-gruppe').checked;
   const isC=document.getElementById('rmode-custom').checked;
@@ -511,13 +673,13 @@ function submitOrder(){
     const kl=document.getElementById('inp-kursleiter').value.trim();
     const anz=parseInt(document.getElementById('inp-anzahl').value);
     if(!kl||!anz||anz<2)return;
-    pendingPayload={name:kl+' (Kursleiter)',restaurant:rest,custom:isC,typ:'gruppe',anzahl:anz};
-    document.getElementById('confirm-anmeldung-summary').innerHTML='<strong>Typ:</strong> Gruppenanmeldung<br><strong>Kursleiter:</strong> '+esc(kl)+'<br><strong>Anzahl:</strong> '+anz+'<br><strong>Restaurant:</strong> '+esc(rest);
+    pendingPayload={kurs_id:currentKursId,name:kl+' (Kursleiter)',restaurant:rest,custom:isC,typ:'gruppe',anzahl:anz};
+    document.getElementById('confirm-anmeldung-summary').innerHTML='<strong>Kurs:</strong> '+esc(kurse.find(k=>k.id===currentKursId)?.name||'')+'<br><strong>Typ:</strong> Gruppenanmeldung<br><strong>Kursleiter:</strong> '+esc(kl)+'<br><strong>Anzahl:</strong> '+anz+'<br><strong>Restaurant:</strong> '+esc(rest);
   }else{
     const name=document.getElementById('inp-name').value.trim();
     if(!name)return;
-    pendingPayload={name,restaurant:rest,custom:isC,typ:'einzeln',anzahl:1};
-    document.getElementById('confirm-anmeldung-summary').innerHTML='<strong>Typ:</strong> Einzelanmeldung<br><strong>Name:</strong> '+esc(name)+'<br><strong>Restaurant:</strong> '+esc(rest);
+    pendingPayload={kurs_id:currentKursId,name,restaurant:rest,custom:isC,typ:'einzeln',anzahl:1};
+    document.getElementById('confirm-anmeldung-summary').innerHTML='<strong>Kurs:</strong> '+esc(kurse.find(k=>k.id===currentKursId)?.name||'')+'<br><strong>Typ:</strong> Einzelanmeldung<br><strong>Name:</strong> '+esc(name)+'<br><strong>Restaurant:</strong> '+esc(rest);
   }
   showPanel('confirm-anmeldung');
   document.getElementById('confirm-anmeldung').scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -529,22 +691,40 @@ async function finalSubmit(){
   const {error}=await sb.from('anmeldungen').insert(pendingPayload);
   btn.disabled=false;if(error)return;
   pendingPayload=null;hidePanel('confirm-anmeldung');
-  document.getElementById('inp-name').value='';
-  document.getElementById('inp-kursleiter').value='';
-  document.getElementById('inp-anzahl').value='2';
-  document.getElementById('inp-restaurant').value='';
+  document.getElementById('inp-name').value='';document.getElementById('inp-kursleiter').value='';
+  document.getElementById('inp-anzahl').value='2';document.getElementById('inp-restaurant').value='';
   document.getElementById('inp-custom').value='';
   document.getElementById('atyp-einzel').checked=true;toggleAnmeldeTyp();
   document.getElementById('rmode-list').checked=true;toggleMode();
   const t=document.getElementById('toast');t.style.display='flex';setTimeout(()=>t.style.display='none',3000);
-  await loadOrders();
 }
 
-// ── Orders ────────────────────────────────────────────────
-async function loadOrders(){
-  const {data,error}=await sb.from('anmeldungen').select('*').order('created_at',{ascending:true});
-  if(!error&&data)orders=data;
-  renderAll();
+// ── Admin Orders ──────────────────────────────────────────
+function renderAdminGroups(){
+  const totalP=orders.reduce((s,o)=>s+(o.typ==='gruppe'?o.anzahl:1),0);
+  document.getElementById('stat-total').textContent=totalP;
+  const groups={};
+  orders.forEach(o=>{
+    if(!groups[o.restaurant])groups[o.restaurant]={entries:[],p:0};
+    groups[o.restaurant].entries.push(o);
+    groups[o.restaurant].p+=(o.typ==='gruppe'?o.anzahl:1);
+  });
+  document.getElementById('stat-rests').textContent=Object.keys(groups).length;
+  document.getElementById('admin-groups').innerHTML=Object.keys(groups).length===0
+    ?'<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div>'
+    :Object.entries(groups).sort((a,b)=>b[1].p-a[1].p).map(([rest,data])=>`
+      <div style="margin-bottom:1rem;">
+        <div class="group-header"><div class="group-name">${esc(rest)}</div><span class="group-count">${data.p} Pers.</span></div>
+        ${data.entries.map(o=>{const isG=o.typ==='gruppe';return`
+          <div class="order-item" id="oai-${o.id}">
+            <div class="order-avatar${isG?' order-avatar-group':''}">${isG?'<i class="ti ti-users" style="font-size:14px"></i>':esc(initials(o.name))}</div>
+            <div class="order-info"><div class="order-name">${esc(o.name)}${isG?'<span class="tag-gruppe" style="margin-left:5px">'+o.anzahl+' Pers.</span>':''}</div></div>
+            <div class="order-actions">
+              <button class="icon-btn edit" onclick="initEditOrder(${o.id})"><i class="ti ti-pencil" style="font-size:15px"></i></button>
+              <button class="icon-btn del" onclick="initDeleteOrder(${o.id})"><i class="ti ti-trash" style="font-size:15px"></i></button>
+            </div>
+          </div>`;}).join('')}
+      </div>`).join('');
 }
 
 function initDeleteOrder(id){
@@ -565,7 +745,7 @@ async function finalDeleteOrder(id){
   if(!currentUser)return;
   await sb.from('anmeldungen').delete().eq('id',id);
   document.querySelectorAll('.del-confirm').forEach(p=>p.remove());
-  await loadOrders();
+  await loadOrdersForKurs(currentKursId);renderAdminGroups();
 }
 
 function initEditOrder(id){
@@ -575,11 +755,10 @@ function initEditOrder(id){
   const panel=document.createElement('div');
   panel.className='edit-order-panel';panel.style.display='block';
   panel.innerHTML=`
-    <div style="font-size:14px;font-weight:600;color:var(--blue);margin-bottom:0.75rem;display:flex;align-items:center;gap:7px;"><i class="ti ti-pencil"></i>Anmeldung bearbeiten</div>
-    <label>Anmeldetyp</label>
+    <div style="font-size:14px;font-weight:600;color:var(--primary);margin-bottom:0.75rem;"><i class="ti ti-pencil"></i> Anmeldung bearbeiten</div>
     <div class="toggle-row" style="margin-bottom:0.75rem;">
-      <div class="toggle-opt"><input type="radio" name="etyp-${id}" id="ete-${id}" ${!isG?'checked':''} onchange="toggleEditTyp(${id})"><label for="ete-${id}"><i class="ti ti-user" style="font-size:14px"></i>Einzeln</label></div>
-      <div class="toggle-opt"><input type="radio" name="etyp-${id}" id="etg-${id}" ${isG?'checked':''} onchange="toggleEditTyp(${id})"><label for="etg-${id}"><i class="ti ti-users" style="font-size:14px"></i>Gruppe</label></div>
+      <div class="toggle-opt"><input type="radio" name="etyp-${id}" id="ete-${id}" ${!isG?'checked':''} onchange="toggleET(${id})"><label for="ete-${id}"><i class="ti ti-user" style="font-size:14px"></i>Einzeln</label></div>
+      <div class="toggle-opt"><input type="radio" name="etyp-${id}" id="etg-${id}" ${isG?'checked':''} onchange="toggleET(${id})"><label for="etg-${id}"><i class="ti ti-users" style="font-size:14px"></i>Gruppe</label></div>
     </div>
     <div id="ee-${id}" style="display:${!isG?'block':'none'};">
       <label>Name</label><input type="text" id="en-${id}" value="${esc(o.name)}" style="margin-bottom:0.75rem;" />
@@ -589,7 +768,7 @@ function initEditOrder(id){
       <label>Anzahl Personen</label><input type="number" id="eanz-${id}" min="2" max="100" value="${o.anzahl}" style="margin-bottom:0.75rem;" />
     </div>
     <label>Restaurant</label>
-    <select id="erest-${id}" style="margin-bottom:0.75rem;" onchange="toggleEditCustom(${id})">
+    <select id="erest-${id}" style="margin-bottom:0.75rem;" onchange="toggleEC(${id})">
       <option ${o.restaurant==='Gasthaus Ochsen'?'selected':''}>Gasthaus Ochsen</option>
       <option ${o.restaurant==='Gasthaus Bahnhof'?'selected':''}>Gasthaus Bahnhof</option>
       <option ${o.restaurant==='Fläcke Restaurant'?'selected':''}>Fläcke Restaurant</option>
@@ -604,25 +783,20 @@ function initEditOrder(id){
     <div id="econf-${id}" style="display:none;background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:10px 14px;margin-bottom:0.75rem;font-size:13px;line-height:1.8;"></div>
     <div style="display:flex;gap:8px;">
       <button class="ca-abort" style="flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:var(--radius-md);cursor:pointer;font-family:inherit;" onclick="this.closest('.edit-order-panel').remove()"><i class="ti ti-x"></i>Abbrechen</button>
-      <button class="ca-ok" style="flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:var(--radius-md);cursor:pointer;font-family:inherit;background:var(--green);border:none;color:#E1F5EE;" id="esave-${id}" onclick="editStep2(${id})"><i class="ti ti-check"></i>Prüfen</button>
+      <button class="ca-ok" style="flex:1;padding:10px;font-size:13px;font-weight:600;border-radius:var(--radius-md);cursor:pointer;font-family:inherit;" id="esave-${id}" onclick="editStep2(${id})"><i class="ti ti-check"></i>Prüfen</button>
     </div>`;
   const el=document.getElementById('oai-'+id);if(el)el.after(panel);
 }
 
-function toggleEditTyp(id){
-  const isG=document.getElementById('etg-'+id).checked;
-  document.getElementById('ee-'+id).style.display=isG?'none':'block';
-  document.getElementById('eg-'+id).style.display=isG?'block':'none';
-}
-function toggleEditCustom(id){
-  document.getElementById('ecw-'+id).style.display=document.getElementById('erest-'+id).value==='__custom__'?'block':'none';
-}
+function toggleET(id){const isG=document.getElementById('etg-'+id).checked;document.getElementById('ee-'+id).style.display=isG?'none':'block';document.getElementById('eg-'+id).style.display=isG?'block':'none';}
+function toggleEC(id){document.getElementById('ecw-'+id).style.display=document.getElementById('erest-'+id).value==='__custom__'?'block':'none';}
+
 function editStep2(id){
   const o=orders.find(x=>x.id===id);if(!o)return;
   const isG=document.getElementById('etg-'+id).checked;
   const restSel=document.getElementById('erest-'+id).value;
-  const isCustom=restSel==='__custom__';
-  const rest=isCustom?document.getElementById('ec-'+id).value.trim():restSel;
+  const isC=restSel==='__custom__';
+  const rest=isC?document.getElementById('ec-'+id).value.trim():restSel;
   let name,anzahl;
   if(isG){name=document.getElementById('ekl-'+id).value.trim()+' (Kursleiter)';anzahl=parseInt(document.getElementById('eanz-'+id).value)||o.anzahl;}
   else{name=document.getElementById('en-'+id).value.trim()||o.name;anzahl=1;}
@@ -631,24 +805,62 @@ function editStep2(id){
   conf.style.display='block';
   const btn=document.getElementById('esave-'+id);
   btn.innerHTML='<i class="ti ti-check"></i>Bestätigen';
-  btn.onclick=()=>finalEditOrder(id,{name,restaurant:rest,custom:isCustom,typ:isG?'gruppe':'einzeln',anzahl});
+  btn.onclick=()=>finalEditOrder(id,{name,restaurant:rest,custom:isC,typ:isG?'gruppe':'einzeln',anzahl});
 }
+
 async function finalEditOrder(id,payload){
   if(!currentUser)return;
   await sb.from('anmeldungen').update(payload).eq('id',id);
   document.querySelectorAll('.edit-order-panel').forEach(p=>p.remove());
-  await loadOrders();
+  await loadOrdersForKurs(currentKursId);renderAdminGroups();
 }
 
+// ── Deadline ──────────────────────────────────────────────
+function initSaveDeadline(){
+  if(!currentUser||!currentKursId)return;
+  const val=document.getElementById('inp-deadline-dt').value;
+  if(!val)return;
+  document.getElementById('confirm-deadline-summary').innerHTML='<strong>Neuer Anmeldeschluss:</strong><br>'+fmtDatetime(val);
+  showPanel('confirm-deadline');
+}
+async function finalSaveDeadline(){
+  const val=document.getElementById('inp-deadline-dt').value;
+  await sb.from('kurse').update({deadline:val}).eq('id',currentKursId);
+  hidePanel('confirm-deadline');
+  await loadKurse();
+  await onKursAdminChange();
+}
+
+// ── Reset ─────────────────────────────────────────────────
 function initReset(){
   const total=orders.reduce((s,o)=>s+(o.typ==='gruppe'?o.anzahl:1),0);
   document.getElementById('confirm-reset-summary').innerHTML='<strong>'+orders.length+' Einträge</strong> ('+total+' Personen) werden unwiderruflich gelöscht.';
   showPanel('confirm-reset');
 }
 async function finalReset(){
-  if(!currentUser)return;
-  await sb.from('anmeldungen').delete().gte('id',0);
-  hidePanel('confirm-reset');await loadOrders();
+  if(!currentUser||!currentKursId)return;
+  await sb.from('anmeldungen').delete().eq('kurs_id',currentKursId);
+  hidePanel('confirm-reset');
+  await loadOrdersForKurs(currentKursId);renderAdminGroups();
+}
+
+// ── Export Excel ──────────────────────────────────────────
+function exportExcel(){
+  if(!orders.length){alert('Keine Anmeldungen vorhanden.');return;}
+  const kurs=kurse.find(k=>k.id===currentKursId);
+  const rows=orders.map(o=>({
+    'Name':o.name,
+    'Typ':o.typ==='gruppe'?'Gruppenanmeldung':'Einzelanmeldung',
+    'Anzahl Personen':o.anzahl,
+    'Restaurant':o.restaurant,
+    'Eigenes Restaurant':o.custom?'Ja':'Nein',
+    'Angemeldet am':new Date(o.created_at).toLocaleString('de-CH')
+  }));
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Anmeldungen');
+  const filename=`VSSM_Mittagessen_${kurs?kurs.name.replace(/\s+/g,'_'):'Export'}_${fmtDate(kurs?.datum||new Date())}.xlsx`;
+  XLSX.writeFile(wb,filename);
 }
 
 // ── Password ──────────────────────────────────────────────
@@ -660,15 +872,9 @@ async function saveNewPassword(){
   if(!pw||pw.length<6){errEl.textContent='Passwort muss mind. 6 Zeichen haben.';errEl.style.display='block';return;}
   if(pw!==pw2){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
   const {data,error}=await sb.auth.updateUser({password:pw});
-  if(error){
-    let msg=error.message;
-    if(msg.includes('different'))msg='Das Passwort muss sich vom aktuellen unterscheiden.';
-    errEl.textContent=msg;errEl.style.display='block';return;
-  }
-  // Success - sign out and show login
+  if(error){let msg=error.message;if(msg.includes('different'))msg='Das Passwort muss sich vom aktuellen unterscheiden.';errEl.textContent=msg;errEl.style.display='block';return;}
   const email=data?.user?.email||'';
-  await sb.auth.signOut();
-  currentUser=null;
+  await sb.auth.signOut();currentUser=null;
   window.history.replaceState({},'',window.location.pathname+'?admin');
   renderLoginForm(email,'<i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:4px"></i>Passwort gesetzt! Bitte einloggen.');
 }
@@ -677,8 +883,7 @@ function initChangePassword(){
   const pw=document.getElementById('chpw-new').value;
   const rep=document.getElementById('chpw-rep').value;
   const errEl=document.getElementById('chpw-err');
-  document.getElementById('chpw-ok').style.display='none';
-  errEl.style.display='none';
+  document.getElementById('chpw-ok').style.display='none';errEl.style.display='none';
   if(!pw||pw.length<6){errEl.textContent='Passwort mind. 6 Zeichen.';errEl.style.display='block';return;}
   if(pw!==rep){errEl.textContent='Passwörter stimmen nicht überein.';errEl.style.display='block';return;}
   showPanel('confirm-chpw');
@@ -688,32 +893,21 @@ async function finalChangePassword(){
   const pw=document.getElementById('chpw-new').value;
   const {error}=await sb.auth.updateUser({password:pw});
   hidePanel('confirm-chpw');
-  if(error){
-    let msg=error.message;
-    if(msg.includes('different'))msg='Das neue Passwort muss sich vom aktuellen unterscheiden.';
-    else if(msg.includes('weak'))msg='Passwort zu schwach.';
-    document.getElementById('chpw-err').textContent=msg;
-    document.getElementById('chpw-err').style.display='block';return;
-  }
-  document.getElementById('chpw-new').value='';
-  document.getElementById('chpw-rep').value='';
+  if(error){let msg=error.message;if(msg.includes('different'))msg='Das neue Passwort muss sich vom aktuellen unterscheiden.';document.getElementById('chpw-err').textContent=msg;document.getElementById('chpw-err').style.display='block';return;}
+  document.getElementById('chpw-new').value='';document.getElementById('chpw-rep').value='';
   document.getElementById('chpw-ok').style.display='block';
   setTimeout(()=>document.getElementById('chpw-ok').style.display='none',3000);
 }
 
+// ── Auth ──────────────────────────────────────────────────
 async function doLogin(){
   const email=document.getElementById('l-email').value.trim().toLowerCase();
   const pw=document.getElementById('l-pw').value;
-  const errEl=document.getElementById('l-err');
-  errEl.style.display='none';
+  const errEl=document.getElementById('l-err');errEl.style.display='none';
   if(!email||!pw){errEl.textContent='Bitte E-Mail und Passwort eingeben.';errEl.style.display='block';return;}
   const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
-  if(error){
-    errEl.textContent=error.message.includes('Invalid')?'E-Mail oder Passwort ungültig.':'Fehler beim Einloggen.';
-    errEl.style.display='block';return;
-  }
-  currentUser=data.user;
-  showAdminContent();
+  if(error){errEl.textContent='E-Mail oder Passwort ungültig.';errEl.style.display='block';return;}
+  currentUser=data.user;showAdminContent();
 }
 
 async function doResetPw(){
@@ -722,107 +916,51 @@ async function doResetPw(){
   const okEl=document.getElementById('rs-ok');
   if(errEl)errEl.style.display='none';
   if(!email){if(errEl){errEl.textContent='Bitte E-Mail eingeben.';errEl.style.display='block';}return;}
+  // Check if email exists in auth users
   await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname+'?admin'});
   if(okEl)okEl.style.display='block';
   const btn=document.querySelector('#auth-form-content .btn-green-full');
   if(btn)btn.disabled=true;
 }
 
-// ── Admin UI ──────────────────────────────────────────────
 function showAdminContent(){
   document.getElementById('auth-panel').style.display='none';
   document.getElementById('admin-content').style.display='block';
   document.getElementById('tab-admin').innerHTML='<i class="ti ti-shield-check"></i>Admin';
-  document.getElementById('admin-email-display').innerHTML=
-    '<i class="ti ti-user" style="vertical-align:-2px;margin-right:4px"></i>Eingeloggt als: <strong>'+esc(currentUser.email)+'</strong>';
-  const dl=document.getElementById('inp-deadline-dt');
-  if(dl&&deadlineStr)dl.value=deadlineStr;
-  renderAll();
+  document.getElementById('admin-email-display').innerHTML='<i class="ti ti-user" style="vertical-align:-2px;margin-right:4px"></i>Eingeloggt als: <strong>'+esc(currentUser.email)+'</strong>';
+  renderKurseList();
 }
 
 function forceLogout(){
   currentUser=null;
-  // Hide admin tab if not on ?admin URL
-  if(!isAdminUrl()){
-    document.getElementById('tab-admin').style.display='none';
-    document.getElementById('view-admin').classList.remove('active');
-    document.getElementById('tab-anmelden').classList.add('active');
-    document.getElementById('view-anmelden').classList.add('active');
-  }else{
-    document.getElementById('auth-panel').style.display='block';
-    document.getElementById('admin-content').style.display='none';
-    document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
-    renderLoginForm();
-    switchTab('admin');
-  }
+  if(!isAdminUrl()){document.getElementById('tab-admin').style.display='none';return;}
+  document.getElementById('auth-panel').style.display='block';
+  document.getElementById('admin-content').style.display='none';
+  document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
+  renderLoginForm();switchTab('admin');
 }
 
 async function doLogout(){
-  await sb.auth.signOut();
-  currentUser=null;
+  await sb.auth.signOut();currentUser=null;
   document.getElementById('auth-panel').style.display='block';
   document.getElementById('admin-content').style.display='none';
   document.getElementById('tab-admin').innerHTML='<i class="ti ti-lock"></i>Admin';
   renderLoginForm();
-  // Stay on admin tab (user is on ?admin URL when logged in)
-  if(isAdminUrl()) switchTab('admin');
-}
-
-// ── Render ────────────────────────────────────────────────
-function renderAll(){
-  const totalP=orders.reduce((s,o)=>s+(o.typ==='gruppe'?o.anzahl:1),0);
-  document.getElementById('count-badge').textContent=totalP+' Pers.';
-  const lo=document.getElementById('list-orders');
-  lo.innerHTML=orders.length===0
-    ?'<div class="empty-state"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div>'
-    :orders.map(o=>{const isG=o.typ==='gruppe';return`<div class="order-item" id="order-item-${o.id}">
-      <div class="order-avatar${isG?' order-avatar-group':''}">${isG?'<i class="ti ti-users" style="font-size:14px"></i>':esc(initials(o.name))}</div>
-      <div class="order-info">
-        <div class="order-name">${esc(o.name)}${isG?'&nbsp;<span class="tag-gruppe">'+o.anzahl+' Personen</span>':''}</div>
-        <div class="order-rest"><i class="ti ti-building-store" style="font-size:11px;margin-right:3px"></i>${esc(o.restaurant)}${o.custom?'<span class="tag-custom">Eigenes</span>':''}</div>
-      </div>
-    </div>`;}).join('');
-
-  if(!currentUser)return;
-  document.getElementById('stat-total').textContent=totalP;
-  const groups={};
-  orders.forEach(o=>{
-    if(!groups[o.restaurant])groups[o.restaurant]={entries:[],p:0};
-    groups[o.restaurant].entries.push(o);
-    groups[o.restaurant].p+=(o.typ==='gruppe'?o.anzahl:1);
-  });
-  document.getElementById('stat-rests').textContent=Object.keys(groups).length;
-  document.getElementById('admin-groups').innerHTML=Object.keys(groups).length===0
-    ?'<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Noch keine Anmeldungen</div>'
-    :Object.entries(groups).sort((a,b)=>b[1].p-a[1].p).map(([rest,data])=>`
-      <div style="margin-bottom:1rem;">
-        <div class="group-header"><div class="group-name">${esc(rest)}</div><span class="group-count">${data.p} Pers.</span></div>
-        ${data.entries.map(o=>{const isG=o.typ==='gruppe';return`
-          <div class="order-item" id="oai-${o.id}">
-            <div class="order-avatar${isG?' order-avatar-group':''}">${isG?'<i class="ti ti-users" style="font-size:14px"></i>':esc(initials(o.name))}</div>
-            <div class="order-info"><div class="order-name">${esc(o.name)}${isG?'<span class="tag-gruppe" style="margin-left:5px">'+o.anzahl+' Pers.</span>':''}</div></div>
-            <div class="order-actions">
-              <button class="icon-btn edit" onclick="initEditOrder(${o.id})" title="Bearbeiten"><i class="ti ti-pencil" style="font-size:15px"></i></button>
-              <button class="icon-btn del" onclick="initDeleteOrder(${o.id})" title="Löschen"><i class="ti ti-trash" style="font-size:15px"></i></button>
-            </div>
-          </div>`;}).join('')}
-      </div>`).join('');
+  if(isAdminUrl())switchTab('admin');
 }
 
 // ── Navigation ────────────────────────────────────────────
 function switchTab(tab){
-  // Admin tab STRICTLY requires ?admin in URL
-  if(tab==='admin'&&!isAdminUrl())return;
+  if(tab==='admin'&&!isAdminUrl()&&!currentUser)return;
   ['anmelden','uebersicht','admin'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
     document.getElementById('view-'+t).classList.toggle('active',t===tab);
   });
-  if(tab==='uebersicht')loadOrders();
+  if(tab==='uebersicht')renderUebersichtOrders();
 }
 
 load();
-setInterval(updateStatus,30000);
-setInterval(()=>loadOrders(),15000);
+setInterval(async()=>{if(!currentUser)return;const{error}=await sb.auth.getUser();if(error)forceLogout();},10000);
 </script>
 </body>
 </html>
