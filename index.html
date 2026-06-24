@@ -195,6 +195,7 @@
           </select>
         </div>
         <div id="custom-field"><input type="text" id="inp-custom" placeholder="z.B. Restaurant Sonne, Luzern" /></div>
+        <div id="deadline-box"></div>
         <div class="warn-box" id="einzel-hinweis">
           <i class="ti ti-alert-triangle" style="font-size:16px;flex-shrink:0;margin-top:1px"></i>
           <span>Bitte beachten Sie: <strong>Nachträgliche Änderungen sind nicht möglich.</strong> Bei dringenden Anpassungen wenden Sie sich an einen Mitarbeiter des Schreiner Verbands Luzern.</span>
@@ -319,6 +320,7 @@
           <input type="date" id="new-kurs-datum" />
           <label for="new-kurs-deadline">Anmeldeschluss</label>
           <input type="datetime-local" id="new-kurs-deadline" />
+          <div class="field-err" id="new-kurs-err"></div>
           <button class="btn-green-full" onclick="createKurs()"><i class="ti ti-plus"></i>Kurs erstellen</button>
         </div>
 
@@ -479,12 +481,17 @@ async function loadKurse(){
   const {data}=await sb.from('kurse').select('*').order('datum',{ascending:false});
   kurse=data||[];
   renderKurseSelects();
-  // Auto-select active kurs for anmelden
+  // Auto-select first kurs (active preferred)
   const aktiv=kurse.find(k=>k.aktiv);
-  if(aktiv){
-    currentKursId=aktiv.id;
-    updateKursBanner(aktiv);
-    updateStatusForKurs(aktiv);
+  const first=kurse[0];
+  const selected=aktiv||first;
+  if(selected){
+    currentKursId=selected.id;
+    // Set dropdown value if visible
+    const sel=document.getElementById('sel-kurs-anmelden');
+    if(sel)sel.value=selected.id;
+    updateKursBanner(selected);
+    updateStatusForKurs(selected);
   }else{
     showNoKurs();
   }
@@ -503,6 +510,8 @@ function renderKurseSelects(){
   if(kurse.length>1&&selAnmelden){
     selAnmelden.innerHTML=opts;
     document.getElementById('kurs-select-section').style.display='block';
+  } else if(kurse.length===1&&selAnmelden){
+    document.getElementById('kurs-select-section').style.display='none';
   }
 
   if(selUebersicht){
@@ -524,7 +533,7 @@ function renderKurseList(){
   if(!el)return;
   if(kurse.length===0){el.innerHTML='<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Kurse</div>';return;}
   el.innerHTML=kurse.map(k=>`
-    <div class="kurs-item">
+    <div class="kurs-item" id="kurs-item-${k.id}">
       <div class="kurs-badge${k.aktiv?' aktiv':''}"><i class="ti ti-calendar"></i></div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:14px;font-weight:500;">${esc(k.name)}</div>
@@ -541,7 +550,9 @@ async function createKurs(){
   const name=document.getElementById('new-kurs-name').value.trim();
   const datum=document.getElementById('new-kurs-datum').value;
   const deadline=document.getElementById('new-kurs-deadline').value||null;
-  if(!name||!datum){alert('Bitte Kursname und Datum eingeben.');return;}
+  const errEl=document.getElementById('new-kurs-err');
+  if(errEl)errEl.style.display='none';
+  if(!name||!datum){if(errEl){errEl.textContent='Bitte Kursname und Datum eingeben.';errEl.style.display='block';}return;}
   await sb.from('kurse').insert({name,datum,deadline,aktiv:true});
   document.getElementById('new-kurs-name').value='';
   document.getElementById('new-kurs-datum').value='';
@@ -554,16 +565,40 @@ async function toggleKursAktiv(id,aktiv){
   await loadKurse();
 }
 
-async function deleteKurs(id){
-  if(!confirm('Kurs und alle Anmeldungen löschen?'))return;
+function deleteKurs(id){
+  const kurs=kurse.find(k=>k.id===id);if(!kurs)return;
+  // Remove any existing confirm panels
+  document.querySelectorAll('.kurs-del-confirm').forEach(p=>p.remove());
+  const panel=document.createElement('div');
+  panel.className='confirm-panel danger kurs-del-confirm';
+  panel.style.display='block';
+  panel.style.marginTop='0.5rem';
+  panel.innerHTML=`<div class="confirm-panel-title"><i class="ti ti-trash"></i>Kurs löschen?</div>
+    <div class="confirm-summary"><strong>Kurs:</strong> ${esc(kurs.name)}<br><strong>Datum:</strong> ${fmtDate(kurs.datum)}<br><span style="color:var(--red);font-size:12px;">⚠ Alle Anmeldungen dieses Kurses werden ebenfalls gelöscht.</span></div>
+    <div class="confirm-actions" style="margin-top:0.75rem;">
+      <button class="ca-abort" onclick="this.closest('.kurs-del-confirm').remove()"><i class="ti ti-x"></i>Abbrechen</button>
+      <button class="ca-red" onclick="finalDeleteKurs(${id})"><i class="ti ti-trash"></i>Ja, löschen</button>
+    </div>`;
+  // Insert after the kurs item
+  const el=document.getElementById('kurs-item-'+id);
+  if(el)el.after(panel);
+  else document.getElementById('kurse-list').appendChild(panel);
+}
+
+async function finalDeleteKurs(id){
   await sb.from('kurse').delete().eq('id',id);
+  document.querySelectorAll('.kurs-del-confirm').forEach(p=>p.remove());
   await loadKurse();
 }
 
 function onKursAnmeldenChange(){
   const id=parseInt(document.getElementById('sel-kurs-anmelden').value);
   const kurs=kurse.find(k=>k.id===id);
-  if(kurs){currentKursId=kurs.id;updateKursBanner(kurs);updateStatusForKurs(kurs);}
+  if(kurs){
+    currentKursId=kurs.id;
+    updateKursBanner(kurs);
+    updateStatusForKurs(kurs);
+  }
 }
 
 function onKursUebersichtChange(){
@@ -592,18 +627,55 @@ function updateKursBanner(kurs){
 }
 
 function updateStatusForKurs(kurs){
-  const past=kurs.deadline&&new Date()>new Date(kurs.deadline);
   const pill=document.getElementById('status-pill');
   const txt=document.getElementById('status-text');
+  const deadlineBox=document.getElementById('deadline-box');
+
+  // Kurs deaktiviert
+  if(!kurs.aktiv){
+    pill.className='status-pill status-closed';
+    txt.innerHTML='<i class="ti ti-lock" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Anmeldung deaktiviert';
+    if(deadlineBox)deadlineBox.innerHTML='';
+    document.getElementById('form-open').style.display='none';
+    document.getElementById('form-closed').style.display='block';
+    document.getElementById('form-no-kurs').style.display='none';
+    document.getElementById('form-closed').innerHTML=`<div class="empty-state"><i class="ti ti-calendar-off"></i>
+      <div style="font-weight:600;color:var(--text);margin-bottom:4px;">Anmeldung nicht möglich</div>
+      <div>Die Anmeldung für diesen Kurs ist deaktiviert.</div>
+    </div>`;
+    return;
+  }
+
+  const past=kurs.deadline&&new Date()>new Date(kurs.deadline);
+
   if(past){
     pill.className='status-pill status-closed';
-    txt.innerHTML='<i class="ti ti-lock" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Anmeldeschluss war am <strong>'+fmtDatetime(kurs.deadline)+'</strong>';
+    txt.innerHTML='<i class="ti ti-lock" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Anmeldeschluss erreicht';
+    if(deadlineBox)deadlineBox.innerHTML=`<div style="background:var(--red-bg);border:0.5px solid var(--red-border);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;color:var(--red);display:flex;align-items:center;gap:8px;margin-bottom:1rem;"><i class="ti ti-lock" style="font-size:16px;flex-shrink:0;"></i><span>Anmeldeschluss war am <strong>${fmtDatetime(kurs.deadline)}</strong></span></div>`;
     document.getElementById('form-open').style.display='none';
     document.getElementById('form-closed').style.display='block';
     document.getElementById('form-no-kurs').style.display='none';
   }else{
     pill.className='status-pill status-open';
-    txt.innerHTML='<span class="dot"></span> Anmeldung offen'+(kurs.deadline?' bis <strong>'+fmtDatetime(kurs.deadline)+'</strong>':'');
+    txt.innerHTML='<span class="dot"></span> Anmeldung offen';
+    if(deadlineBox){
+      if(kurs.deadline){
+        // Calculate remaining time
+        const rem=new Date(kurs.deadline)-new Date();
+        const hours=Math.floor(rem/3600000);
+        const mins=Math.floor((rem%3600000)/60000);
+        let remTxt='';
+        if(hours>24)remTxt=Math.floor(hours/24)+' Tage verbleibend';
+        else if(hours>0)remTxt=hours+'h '+mins+'min verbleibend';
+        else remTxt=mins+' Minuten verbleibend';
+        deadlineBox.innerHTML=`<div style="background:var(--primary-bg);border:0.5px solid var(--primary);border-radius:var(--radius-md);padding:10px 14px;font-size:13px;color:var(--primary);margin-bottom:1rem;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><i class="ti ti-clock" style="font-size:16px;flex-shrink:0;"></i><strong>Anmeldeschluss: ${fmtDatetime(kurs.deadline)}</strong></div>
+          <div style="font-size:12px;opacity:0.8;padding-left:24px;">${remTxt}</div>
+        </div>`;
+      }else{
+        deadlineBox.innerHTML='';
+      }
+    }
     document.getElementById('form-open').style.display='block';
     document.getElementById('form-closed').style.display='none';
     document.getElementById('form-no-kurs').style.display='none';
@@ -662,8 +734,13 @@ function toggleMode(){
 }
 
 function submitOrder(){
-  if(!currentKursId){alert('Bitte zuerst einen Kurs auswählen.');return;}
-  if(isPastForCurrentKurs())return;
+  if(!currentKursId){
+    const el=document.getElementById('kurs-select-section');
+    if(el){el.style.border='1.5px solid var(--primary)';setTimeout(()=>el.style.border='',2000);}
+    return;
+  }
+  const currentKurs=kurse.find(k=>k.id===currentKursId);
+  if(!currentKurs?.aktiv||isPastForCurrentKurs())return;
   hidePanel('confirm-anmeldung');
   const isG=document.getElementById('atyp-gruppe').checked;
   const isC=document.getElementById('rmode-custom').checked;
