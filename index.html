@@ -391,6 +391,13 @@ let orders=[],kurse=[],currentKursId=null,currentUser=null,pendingPayload=null;
 
 // ── Helpers ───────────────────────────────────────────────
 function peShow(id){const e=document.getElementById(id);if(e)e.type='text';}
+
+function toLocalDatetimeInput(utcStr){
+  if(!utcStr)return '';
+  const d=new Date(utcStr);
+  const pad=n=>String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+}
 function peHide(id){const e=document.getElementById(id);if(e)e.type='password';}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function initials(n){return n.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
@@ -610,7 +617,8 @@ function renderKurseList(){
 async function createKurs(){
   const name=document.getElementById('new-kurs-name').value.trim();
   const datum=document.getElementById('new-kurs-datum').value;
-  const deadline=document.getElementById('new-kurs-deadline').value||null;
+  const dlRaw=document.getElementById('new-kurs-deadline').value;
+  const deadline=dlRaw?new Date(dlRaw).toISOString():null;
   const errEl=document.getElementById('new-kurs-err');
   if(errEl)errEl.style.display='none';
   if(!name||!datum){if(errEl){errEl.textContent='Bitte Kursname und Datum eingeben.';errEl.style.display='block';}return;}
@@ -697,7 +705,7 @@ async function onKursAdminChange(){
   const _dlTxt=kurs.deadline?`<div style="font-size:12px;margin-top:4px;opacity:0.8;"><i class="ti ti-clock" style="font-size:11px;margin-right:3px;vertical-align:-1px;"></i>Schluss: <strong>${fmtDatetime(kurs.deadline)}</strong></div>`:'<div style="font-size:12px;margin-top:4px;opacity:0.6;">Kein Anmeldeschluss gesetzt</div>';
   document.getElementById('kurs-info-banner').innerHTML=`<div style="width:100%;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><i class="ti ti-calendar" style="font-size:16px;flex-shrink:0;"></i><strong>${esc(kurs.name)}</strong> · ${fmtDate(kurs.datum)}<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;${_statusStyle}">${_statusLabel}</span></div>${_dlTxt}</div>`;
   const dlInput=document.getElementById('inp-deadline-dt');
-  if(dlInput)dlInput.value=kurs.deadline?kurs.deadline.slice(0,16):'';
+  if(dlInput)dlInput.value=kurs.deadline?toLocalDatetimeInput(kurs.deadline):'';
   await loadOrdersForKurs(kurs.id);
   renderAdminGroups();
 }
@@ -998,8 +1006,10 @@ function initSaveDeadline(){
   showPanel('confirm-deadline');
 }
 async function finalSaveDeadline(){
-  const val=document.getElementById('inp-deadline-dt').value;
+  const localVal=document.getElementById('inp-deadline-dt').value;
   const savedId=currentKursId;
+  // Convert local datetime to UTC ISO string for DB
+  const val=localVal?new Date(localVal).toISOString():null;
   await sb.from('kurse').update({deadline:val||null}).eq('id',savedId);
   hidePanel('confirm-deadline');
 
@@ -1022,9 +1032,9 @@ async function finalSaveDeadline(){
   const _dlTxt=kurs.deadline?`<div style="font-size:12px;margin-top:4px;opacity:0.8;"><i class="ti ti-clock" style="font-size:11px;margin-right:3px;vertical-align:-1px;"></i>Schluss: <strong>${fmtDatetime(kurs.deadline)}</strong></div>`:'<div style="font-size:12px;margin-top:4px;opacity:0.6;">Kein Anmeldeschluss gesetzt</div>';
   document.getElementById('kurs-info-banner').innerHTML=`<div style="width:100%;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><i class="ti ti-calendar" style="font-size:16px;flex-shrink:0;"></i><strong>${esc(kurs.name)}</strong> · ${fmtDate(kurs.datum)}<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;${_statusStyle}">${_statusLabel}</span></div>${_dlTxt}</div>`;
 
-  // 3. Update deadline input
+  // 3. Update deadline input (convert UTC to local)
   const dlInput=document.getElementById('inp-deadline-dt');
-  if(dlInput)dlInput.value=kurs.deadline?kurs.deadline.slice(0,16):'';
+  if(dlInput)dlInput.value=kurs.deadline?toLocalDatetimeInput(kurs.deadline):'';
 
   // 4. Update kurse cards
   renderKurseList();
