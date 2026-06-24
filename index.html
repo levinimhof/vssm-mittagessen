@@ -500,7 +500,6 @@ function renderKurseSelects(){
 
   const selAnmelden=document.getElementById('sel-kurs-anmelden');
   const selUebersicht=document.getElementById('sel-kurs-uebersicht');
-  const selAdmin=document.getElementById('sel-kurs-admin');
 
   if(selAnmelden){
     selAnmelden.innerHTML=optsAktiv;
@@ -715,8 +714,6 @@ async function toggleKursAktiv(id,aktiv){
     showNoKurs();
   }
   // Re-select in admin if needed
-  const sel=document.getElementById('sel-kurs-admin');
-  if(sel&&parseInt(sel.value)===id)await onKursAdminChange();
   renderKurseList();
 }
 
@@ -869,7 +866,7 @@ async function finalDeleteOrder(id){
   if(!currentUser)return;
   await sb.from('anmeldungen').delete().eq('id',id);
   document.querySelectorAll('.del-confirm').forEach(p=>p.remove());
-  await loadOrdersForKurs(currentKursId);renderAdminGroups();
+  if(currentKursId)await loadKursDetailPanel(currentKursId);
 }
 
 function initEditOrder(id){
@@ -936,7 +933,7 @@ async function finalEditOrder(id,payload){
   if(!currentUser)return;
   await sb.from('anmeldungen').update(payload).eq('id',id);
   document.querySelectorAll('.edit-order-panel').forEach(p=>p.remove());
-  await loadOrdersForKurs(currentKursId);renderAdminGroups();
+  if(currentKursId)await loadKursDetailPanel(currentKursId);
 }
 
 // ── Deadline ──────────────────────────────────────────────
@@ -1065,9 +1062,7 @@ async function finalResetAll(){
   currentKursId=null;
   orders=[];
   kurse=[];
-  document.getElementById('admin-kurs-content').style.display='none';
-  document.getElementById('sel-kurs-admin').innerHTML='<option value="">— Kurs auswählen —</option>';
-  document.getElementById('kurse-list').innerHTML='<div class="empty-state" style="padding:1rem 0;"><i class="ti ti-inbox"></i>Keine Kurse</div>';
+  document.getElementById('kurse-list').innerHTML='<div class="empty-state" style="padding:1.5rem 0;"><i class="ti ti-inbox"></i>Noch keine Kurse erstellt</div>';
   showNoKurs();
   await loadKurse();
 }
