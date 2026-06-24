@@ -499,29 +499,38 @@ async function loadKurse(){
 }
 
 function renderKurseSelects(){
-  const opts=kurse.length===0?'<option value="">Keine Kurse vorhanden</option>':
+  // Nur aktive Kurse für Anmelden-Dropdown
+  const aktiveKurse=kurse.filter(k=>k.aktiv);
+  const optsAktiv=aktiveKurse.length===0?'<option value="">Keine aktiven Kurse</option>':
     '<option value="">— Kurs auswählen —</option>'+
-    kurse.map(k=>`<option value="${k.id}">${esc(k.name)} · ${fmtDate(k.datum)}${k.aktiv?' ✓':''}</option>`).join('');
+    aktiveKurse.map(k=>`<option value="${k.id}">${esc(k.name)} · ${fmtDate(k.datum)}</option>`).join('');
+
+  // Alle Kurse für Admin und Übersicht
+  const optsAlle=kurse.length===0?'<option value="">Keine Kurse vorhanden</option>':
+    '<option value="">— Kurs auswählen —</option>'+
+    kurse.map(k=>`<option value="${k.id}">${esc(k.name)} · ${fmtDate(k.datum)}${k.aktiv?' ✓':' ✗'}</option>`).join('');
 
   const selAnmelden=document.getElementById('sel-kurs-anmelden');
   const selUebersicht=document.getElementById('sel-kurs-uebersicht');
   const selAdmin=document.getElementById('sel-kurs-admin');
 
-  if(kurse.length>1&&selAnmelden){
-    selAnmelden.innerHTML=opts;
-    document.getElementById('kurs-select-section').style.display='block';
-  } else if(kurse.length===1&&selAnmelden){
-    document.getElementById('kurs-select-section').style.display='none';
+  if(selAnmelden){
+    selAnmelden.innerHTML=optsAktiv;
+    if(aktiveKurse.length>1){
+      document.getElementById('kurs-select-section').style.display='block';
+    }else{
+      document.getElementById('kurs-select-section').style.display='none';
+    }
   }
 
   if(selUebersicht){
-    selUebersicht.innerHTML=opts;
+    selUebersicht.innerHTML=optsAlle;
     const aktiv=kurse.find(k=>k.aktiv);
     if(aktiv)selUebersicht.value=aktiv.id;
   }
 
   if(selAdmin){
-    selAdmin.innerHTML=opts;
+    selAdmin.innerHTML=optsAlle;
   }
 
   // Kurse list in admin
